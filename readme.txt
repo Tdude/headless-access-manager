@@ -1,5 +1,5 @@
-=== Headless Access Manager ===
-Contributors: stegetfore
+# Headless Access Manager
+Contributors: Tdude
 Tags: headless, api, roles, permissions, jwt
 Requires at least: 5.6
 Tested up to: 6.4
@@ -10,7 +10,7 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Manage user roles, permissions, form data and provide API endpoints for a headless WordPress site with Next.js frontend.
 
-== Description ==
+## Description
 
 Headless Access Manager (HAM) is a WordPress plugin designed to work as a backend for a Next.js frontend. The plugin handles:
 
@@ -23,7 +23,7 @@ Headless Access Manager (HAM) is a WordPress plugin designed to work as a backen
 
 HAM provides a comprehensive solution for educational institutions that need a headless CMS approach with sophisticated user management and data handling.
 
-== Features ==
+## Features
 
 * **Custom User Roles**:
   * Student
@@ -54,23 +54,23 @@ HAM provides a comprehensive solution for educational institutions that need a h
   * Intuitive user management
   * School and class administration
 
-== Installation ==
+## Installation
 
 1. Upload the plugin files to the `/wp-content/plugins/headless-access-manager` directory, or install the plugin through the WordPress plugins screen.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
 3. Configure the plugin settings under the 'HAM' menu in the WordPress admin.
 4. Set up your schools, classes, and users as needed.
 
-== Usage ==
+# Usage
 
-= Setting Up Data Structure =
+## Setting Up Data Structure
 
 1. Create schools via HAM > Schools
 2. Create classes and assign them to schools via HAM > Classes
 3. Create users with appropriate roles (Student, Teacher, Principal, School Head)
 4. Assign users to schools and classes via user profile settings
 
-= API Endpoints =
+## API Endpoints
 
 The plugin creates multiple REST API endpoints:
 
@@ -81,15 +81,15 @@ The plugin creates multiple REST API endpoints:
 * Assessments: `/wp-json/ham/v1/assessments`
 * Statistics: `/wp-json/ham/v1/stats/*`
 
-= Frontend Integration =
+## Frontend Integration
 
 1. Obtain JWT token using authentication endpoint
 2. Include token in Authorization header for subsequent requests
 3. Access data using appropriate endpoints based on user permissions
 
-== API Documentation ==
+# API Documentation
 
-= Authentication =
+## Authentication
 
 * `POST /wp-json/ham/v1/auth/token` - Get JWT token with username/password
 * `GET /wp-json/ham/v1/auth/validate` - Validate JWT token
@@ -124,7 +124,8 @@ The plugin creates multiple REST API endpoints:
 * `GET /wp-json/ham/v1/stats/school/{id}` - School statistics
 * `GET /wp-json/ham/v1/stats/schools` - Multi-school statistics
 
-== Frequently Asked Questions ==
+
+# Frequently Asked Questions
 
 = Does this plugin handle frontend rendering? =
 
@@ -142,7 +143,7 @@ The plugin is built to be extensible. You can add custom roles or modify data st
 
 The plugin stores only the data necessary for its functionality. Personal data handling should comply with your organization's GDPR policies.
 
-== Changelog ==
+## Changelog
 
 = 1.0.0 =
 * Initial release
