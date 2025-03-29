@@ -1,0 +1,133 @@
+/**
+ * Assessment Editor Styles
+ */
+
+ .ham-assessment-editor {
+    margin-bottom: 20px;
+}
+
+.ham-section-tabs {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.ham-section-tab {
+    padding: 8px 12px;
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    border-radius: 3px 3px 0 0;
+    cursor: pointer;
+    margin-right: 5px;
+    position: relative;
+    top: 1px;
+}
+
+.ham-section-tab.active {
+    background: #fff;
+    border-bottom: 1px solid #fff;
+}
+
+.ham-section-content {
+    display: none;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-top: none;
+}
+
+.ham-section-content.active {
+    display: block;
+}
+
+.ham-questions-container {
+    margin-bottom: 15px;
+}
+
+.ham-question {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.ham-question-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.ham-question-content {
+    padding: 10px;
+}
+
+.ham-question-text {
+    margin-bottom: 15px;
+}
+
+.ham-question-text input {
+    width: 100%;
+    padding: 8px;
+}
+
+.ham-options-container {
+    margin-bottom: 15px;
+}
+
+.ham-option {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 3px;
+}
+
+.ham-option label {
+    margin-right: 15px;
+    margin-bottom: 5px;
+}
+
+.ham-option input,
+.ham-option select {
+    width: 150px;
+}
+
+.ham-delete-question,
+.ham-delete-option {
+    color: #a00;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.ham-delete-question:hover,
+.ham-delete-option:hover {
+    color: #dc3232;
+}
+
+.ham-actions {
+    text-align: right;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+    .ham-option {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .ham-option label {
+        margin-right: 0;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .ham-option input,
+    .ham-option select {
+        width: 100%;
+    }
+}

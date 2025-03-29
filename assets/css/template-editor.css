@@ -1,0 +1,132 @@
+/**
+ * Assessment Template Editor Styles
+ */
+
+ .ham-sections-container {
+    margin-bottom: 20px;
+}
+
+.ham-section {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    border-radius: 3px;
+}
+
+.ham-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #ddd;
+    cursor: move;
+}
+
+.ham-section-header h3 {
+    margin: 0;
+    padding: 0;
+}
+
+.ham-section-props {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.ham-section-props label {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.ham-fields-container {
+    padding: 10px;
+}
+
+.ham-field {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 3px;
+}
+
+.ham-field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+}
+
+.ham-field-header h4 {
+    margin: 0;
+    padding: 0;
+}
+
+.ham-field-props {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.ham-field-props label {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.ham-options-container {
+    padding: 8px;
+}
+
+.ham-options-container h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.ham-option {
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #eee;
+    background-color: #fafafa;
+    border-radius: 3px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.ham-option label {
+    margin-right: 15px;
+    display: inline-block;
+}
+
+.ham-option .ham-delete-option {
+    margin-left: auto;
+}
+
+.ham-field-actions,
+.ham-option-actions {
+    padding: 8px;
+    text-align: right;
+}
+
+.ham-template-actions {
+    margin-top: 15px;
+}
+
+/* Input styling */
+.ham-section input[type="text"],
+.ham-field input[type="text"],
+.ham-option input[type="text"] {
+    width: 200px;
+}
+
+.ham-delete-section,
+.ham-delete-field,
+.ham-delete-option {
+    color: #a00;
+}
+
+.ham-delete-section:hover,
+.ham-delete-field:hover,
+.ham-delete-option:hover {
+    color: #dc3232;
+}
