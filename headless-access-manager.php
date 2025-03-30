@@ -29,6 +29,7 @@ define('HAM_PLUGIN_FILE', __FILE__);
 // Include necessary files
 require_once HAM_PLUGIN_DIR . 'inc/constants.php';
 require_once HAM_PLUGIN_DIR . 'inc/loader.php';
+require_once HAM_PLUGIN_DIR . 'inc/admin/form-submission-fix.php';
 
 // Hook activation and deactivation functions
 register_activation_hook(__FILE__, 'ham_activate');

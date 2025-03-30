@@ -1,5 +1,5 @@
 /**
- * Assessment Editor JavaScript
+ * Assessment Editor JavaScript - FIXED VERSION
  *
  * Handles the interactive editor for assessment questions in the admin
  */
@@ -16,9 +16,19 @@
         this.$sectionTabs = $('.ham-section-tab');
         this.$sectionContents = $('.ham-section-content');
         this.$addQuestionButtons = $('.ham-add-question');
+        this.$form = $('#post');
 
         // Assessment data
-        this.assessmentData = {};
+        this.assessmentData = {
+            anknytning: {
+                questions: {},
+                comments: {}
+            },
+            ansvar: {
+                questions: {},
+                comments: {}
+            }
+        };
 
         // Initialize
         this.init();
@@ -26,21 +36,23 @@
 
     AssessmentEditor.prototype = {
         init: function() {
+            console.log('Assessment Editor initializing...');
+
             // Try to parse existing data from textarea
             try {
-                this.assessmentData = JSON.parse(this.$assessmentData.val());
+                var jsonData = this.$assessmentData.val();
+                console.log('Raw textarea value:', jsonData);
+
+                if (jsonData && jsonData.trim() !== '') {
+                    var parsed = JSON.parse(jsonData);
+                    console.log('Successfully parsed JSON data', parsed);
+                    this.assessmentData = parsed;
+                } else {
+                    console.log('Textarea is empty, using default structure');
+                }
             } catch (e) {
-                // Initialize with empty structure if parsing fails
-                this.assessmentData = {
-                    anknytning: {
-                        questions: {},
-                        comments: {}
-                    },
-                    ansvar: {
-                        questions: {},
-                        comments: {}
-                    }
-                };
+                console.error('Error parsing JSON from textarea:', e);
+                console.log('Using default structure due to parsing error');
             }
 
             // Render questions
@@ -48,10 +60,13 @@
 
             // Bind events
             this.bindEvents();
+
+            console.log('Assessment Editor initialized');
         },
 
         bindEvents: function() {
             var self = this;
+            console.log('Binding events...');
 
             // Tab switching
             this.$sectionTabs.on('click', function() {
@@ -92,13 +107,29 @@
                 self.deleteOption(section, questionId, optionIndex);
             });
 
-            // Input change events
-            this.$editor.on('change', 'input, select', function() {
+            // Input change events - handle all input types
+            this.$editor.on('input change', 'input, select, textarea', function() {
                 self.updateDataFromDOM();
             });
+
+            // Critical: Form submission handling
+            this.$form.on('submit', function(e) {
+                console.log('Form is being submitted - updating data...');
+                self.updateDataFromDOM();
+
+                // Double check data is in the textarea
+                var textareaValue = self.$assessmentData.val();
+                console.log('Final textarea value length:', textareaValue ? textareaValue.length : 0);
+                console.log('First 100 chars:', textareaValue ? textareaValue.substring(0, 100) : 'empty');
+
+                return true; // Allow form submission to continue
+            });
+
+            console.log('Events bound');
         },
 
         renderAllQuestions: function() {
+            console.log('Rendering all questions');
             this.$ankQuestions.empty();
             this.$ansvarQuestions.empty();
 
@@ -188,6 +219,8 @@
         },
 
         addQuestion: function(section) {
+            console.log('Adding new question to section:', section);
+
             // Generate a unique ID for the question
             var questionId = 'question_' + new Date().getTime();
 
@@ -221,9 +254,13 @@
 
             // Update textarea
             this.updateTextarea();
+
+            console.log('Question added with ID:', questionId);
         },
 
         deleteQuestion: function(section, questionId) {
+            console.log('Deleting question:', section, questionId);
+
             // Remove from assessment data
             if (this.assessmentData[section] &&
                 this.assessmentData[section].questions &&
@@ -236,9 +273,13 @@
 
             // Update textarea
             this.updateTextarea();
+
+            console.log('Question deleted');
         },
 
         addOption: function(section, questionId) {
+            console.log('Adding option to question:', section, questionId);
+
             var self = this;
             var $question = $('.ham-question[data-section="' + section + '"][data-question-id="' + questionId + '"]');
             var $optionsContainer = $question.find('.ham-options-container');
@@ -261,9 +302,13 @@
 
             // Update textarea
             this.updateTextarea();
+
+            console.log('Option added at index:', optionIndex);
         },
 
         deleteOption: function(section, questionId, optionIndex) {
+            console.log('Deleting option:', section, questionId, optionIndex);
+
             // Remove from assessment data
             if (this.assessmentData[section] &&
                 this.assessmentData[section].questions &&
@@ -284,12 +329,16 @@
 
             // Update textarea
             this.updateTextarea();
+
+            console.log('Option deleted');
         },
 
         updateDataFromDOM: function() {
+            console.log('Updating data from DOM');
+
             var self = this;
 
-            // Initialize with empty structure
+            // Initialize with empty structure but preserve comments
             var newData = {
                 anknytning: {
                     questions: {},
@@ -334,16 +383,34 @@
 
             // Update textarea
             this.updateTextarea();
+
+            console.log('Data updated from DOM');
         },
 
         updateTextarea: function() {
-            this.$assessmentData.val(JSON.stringify(this.assessmentData));
+            var jsonString = JSON.stringify(this.assessmentData);
+            console.log('Updating textarea with JSON data, length:', jsonString.length);
+
+            // Update the hidden textarea with the current data
+            this.$assessmentData.val(jsonString);
+
+            // Debug - show first part of the data
+            if (jsonString.length > 0) {
+                console.log('Data sample:', jsonString.substring(0, 100) + '...');
+            }
         }
     };
 
     // Initialize on document ready
     $(document).ready(function() {
-        new AssessmentEditor();
+        console.log('Document ready - initializing Assessment Editor');
+        window.hamEditor = new AssessmentEditor();
+
+        // Debugging - watch for form submission
+        $('#post').on('submit', function() {
+            console.log('Form submit detected!');
+            console.log('Textarea value length:', $('#ham_assessment_data_json').val().length);
+        });
     });
 
 })(jQuery);

@@ -70,6 +70,9 @@ class HAM_Assessment_Meta_Boxes
 
         // Get current assessment data
         $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
+        error_log('Loading data from meta key: ' . HAM_ASSESSMENT_META_DATA);
+        error_log('Retrieved assessment data type: ' . gettype($assessment_data));
+        error_log('Retrieved assessment data: ' . (empty($assessment_data) ? 'EMPTY' : 'NOT EMPTY'));
 
         // If no data exists, initialize with empty structure
         if (empty($assessment_data)) {
@@ -87,6 +90,7 @@ class HAM_Assessment_Meta_Boxes
 
         // Convert to JSON for JavaScript
         $assessment_data_json = wp_json_encode($assessment_data);
+        error_log('Assessment data JSON for editor: ' . substr($assessment_data_json, 0, 100) . '...');
         ?>
 <div id="ham-assessment-editor" class="ham-assessment-editor">
     <div class="ham-sections">
@@ -158,13 +162,13 @@ class HAM_Assessment_Meta_Boxes
     {
         // Check nonce for questions meta box
         if (! isset($_POST['ham_assessment_questions_nonce']) ||
-             ! wp_verify_nonce($_POST['ham_assessment_questions_nonce'], 'ham_assessment_questions_meta_box')) {
+            ! wp_verify_nonce($_POST['ham_assessment_questions_nonce'], 'ham_assessment_questions_meta_box')) {
             return;
         }
 
         // Check nonce for student meta box
         if (! isset($_POST['ham_assessment_student_nonce']) ||
-             ! wp_verify_nonce($_POST['ham_assessment_student_nonce'], 'ham_assessment_student_meta_box')) {
+            ! wp_verify_nonce($_POST['ham_assessment_student_nonce'], 'ham_assessment_student_meta_box')) {
             return;
         }
 
@@ -190,13 +194,29 @@ class HAM_Assessment_Meta_Boxes
 
         // Save assessment data
         if (isset($_POST['ham_assessment_data'])) {
+            error_log('Processing ham_assessment_data');
             $assessment_data_json = wp_unslash($_POST['ham_assessment_data']);
-            $assessment_data = json_decode($assessment_data_json, true);
+            error_log('Assessment Data JSON: ' . substr($assessment_data_json, 0, 100) . '...');
 
-            if ($assessment_data !== null) {
-                update_post_meta($post_id, HAM_ASSESSMENT_META_DATA, $assessment_data);
+            if (!empty($assessment_data_json)) {
+                $assessment_data = json_decode($assessment_data_json, true);
+
+                if ($assessment_data !== null) {
+                    error_log('Successfully decoded JSON data');
+                    update_post_meta($post_id, HAM_ASSESSMENT_META_DATA, $assessment_data);
+                    error_log('Updated assessment data metadata');
+                } else {
+                    error_log('JSON decode error: ' . json_last_error_msg());
+                }
+            } else {
+                error_log('ham_assessment_data is empty');
             }
+        } else {
+            error_log('ham_assessment_data not in POST data');
         }
+
+        // Dump all POST data keys
+        error_log('POST data keys: ' . implode(', ', array_keys($_POST)));
     }
 
     /**

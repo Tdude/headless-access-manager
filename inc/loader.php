@@ -49,9 +49,9 @@ class HAM_Loader
         $this->load_core();
 
         // Load API if not in admin area or during REST API requests
-        if (wp_doing_ajax() || defined('REST_REQUEST') && REST_REQUEST) {
-            $this->load_api();
-        }
+        // if (wp_doing_ajax() || defined('REST_REQUEST') && REST_REQUEST) {
+        $this->load_api();
+        //}
 
         // Load admin functionality if in admin area
         if (is_admin()) {
