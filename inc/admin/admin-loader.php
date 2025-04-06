@@ -47,6 +47,7 @@ class HAM_Admin_Loader
         require_once HAM_PLUGIN_DIR . 'inc/admin/meta-boxes.php';
         require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-assessment-templates-admin.php';
         require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-assessment-meta-boxes.php';
+        require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-assessment-manager.php';
     }
 
     /**

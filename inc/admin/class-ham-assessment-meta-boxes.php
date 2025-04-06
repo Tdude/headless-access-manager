@@ -27,8 +27,11 @@ class HAM_Assessment_Meta_Boxes
         // Add meta boxes
         add_action('add_meta_boxes', array( $this, 'add_meta_boxes' ));
 
-        // Save meta box data
-        add_action('save_post_' . HAM_CPT_ASSESSMENT, array( $this, 'save_meta_boxes' ));
+        // Save post handler
+        add_action('save_post_' . HAM_CPT_ASSESSMENT, array( $this, 'save_post' ), 10, 2);
+
+        // AJAX handlers
+        add_action('wp_ajax_ham_save_assessment_data', array( $this, 'ajax_save_assessment_data' ));
 
         // Enqueue scripts and styles
         add_action('admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ));
@@ -47,15 +50,6 @@ class HAM_Assessment_Meta_Boxes
             'normal',
             'high'
         );
-
-        add_meta_box(
-            'ham_assessment_student',
-            __('Student Information', 'headless-access-manager'),
-            array( $this, 'render_student_meta_box' ),
-            HAM_CPT_ASSESSMENT,
-            'side',
-            'high'
-        );
     }
 
     /**
@@ -65,197 +59,179 @@ class HAM_Assessment_Meta_Boxes
      */
     public function render_questions_meta_box($post)
     {
-        // Add nonce for security
-        wp_nonce_field('ham_assessment_questions_meta_box', 'ham_assessment_questions_nonce');
-
-        // Get current assessment data
-        $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
-        error_log('Loading data from meta key: ' . HAM_ASSESSMENT_META_DATA);
-        error_log('Retrieved assessment data type: ' . gettype($assessment_data));
-        error_log('Retrieved assessment data: ' . (empty($assessment_data) ? 'EMPTY' : 'NOT EMPTY'));
-
-        // If no data exists, initialize with empty structure
+        error_log('HAM Debug - Rendering meta box for post ' . $post->ID);
+        
+        // Get current data
+        $assessment_data = get_post_meta($post->ID, '_ham_assessment_data', true);
+        error_log('HAM Debug - Current data: ' . print_r($assessment_data, true));
+        
+        // Default empty structure
         if (empty($assessment_data)) {
+            error_log('HAM Debug - Using default structure');
             $assessment_data = array(
                 'anknytning' => array(
-                    'questions' => array(),
-                    'comments' => array(),
+                    'title' => 'Anknytning',
+                    'questions' => array(
+                        'a1' => array(
+                            'text' => 'Eleven söker kontakt med läraren vid behov',
+                            'options' => array(
+                                array('value' => '1', 'label' => '1', 'stage' => 'ej'),
+                                array('value' => '2', 'label' => '2', 'stage' => 'ej'),
+                                array('value' => '3', 'label' => '3', 'stage' => 'trans'),
+                                array('value' => '4', 'label' => '4', 'stage' => 'trans'),
+                                array('value' => '5', 'label' => '5', 'stage' => 'full')
+                            )
+                        ),
+                        'a2' => array(
+                            'text' => 'Eleven tar emot tröst från läraren',
+                            'options' => array(
+                                array('value' => '1', 'label' => '1', 'stage' => 'ej'),
+                                array('value' => '2', 'label' => '2', 'stage' => 'ej'),
+                                array('value' => '3', 'label' => '3', 'stage' => 'trans'),
+                                array('value' => '4', 'label' => '4', 'stage' => 'trans'),
+                                array('value' => '5', 'label' => '5', 'stage' => 'full')
+                            )
+                        )
+                    ),
+                    'comments' => array()
                 ),
                 'ansvar' => array(
-                    'questions' => array(),
-                    'comments' => array(),
-                ),
+                    'title' => 'Ansvar',
+                    'questions' => array(
+                        'b1' => array(
+                            'text' => 'Eleven tar ansvar för sina uppgifter',
+                            'options' => array(
+                                array('value' => '1', 'label' => '1', 'stage' => 'ej'),
+                                array('value' => '2', 'label' => '2', 'stage' => 'ej'),
+                                array('value' => '3', 'label' => '3', 'stage' => 'trans'),
+                                array('value' => '4', 'label' => '4', 'stage' => 'trans'),
+                                array('value' => '5', 'label' => '5', 'stage' => 'full')
+                            )
+                        ),
+                        'b2' => array(
+                            'text' => 'Eleven följer klassens regler',
+                            'options' => array(
+                                array('value' => '1', 'label' => '1', 'stage' => 'ej'),
+                                array('value' => '2', 'label' => '2', 'stage' => 'ej'),
+                                array('value' => '3', 'label' => '3', 'stage' => 'trans'),
+                                array('value' => '4', 'label' => '4', 'stage' => 'trans'),
+                                array('value' => '5', 'label' => '5', 'stage' => 'full')
+                            )
+                        )
+                    ),
+                    'comments' => array()
+                )
             );
+            
+            // Save default structure
+            update_post_meta($post->ID, '_ham_assessment_data', $assessment_data);
         }
 
-        // Convert to JSON for JavaScript
-        $assessment_data_json = wp_json_encode($assessment_data);
-        error_log('Assessment data JSON for editor: ' . substr($assessment_data_json, 0, 100) . '...');
         ?>
-<div id="ham-assessment-editor" class="ham-assessment-editor">
-    <div class="ham-sections">
-        <div class="ham-section-tabs">
-            <button type="button" class="ham-section-tab active"
-                data-section="anknytning"><?php _e('Anknytning', 'headless-access-manager'); ?></button>
-            <button type="button" class="ham-section-tab"
-                data-section="ansvar"><?php _e('Ansvar', 'headless-access-manager'); ?></button>
-        </div>
+        <div id="ham-assessment-editor" class="ham-assessment-editor">
+            <?php wp_nonce_field('ham_save_assessment', 'ham_assessment_nonce'); ?>
 
-        <div class="ham-section-content active" data-section="anknytning">
-            <h3><?php _e('Anknytning Questions', 'headless-access-manager'); ?></h3>
-            <div class="ham-questions-container" id="anknytning-questions"></div>
-            <button type="button" class="button ham-add-question"
-                data-section="anknytning"><?php _e('Add Question', 'headless-access-manager'); ?></button>
-        </div>
+            <!-- Tabs -->
+            <div class="ham-section-tabs">
+                <button type="button" class="ham-section-tab active" data-section="anknytning">Anknytning</button>
+                <button type="button" class="ham-section-tab" data-section="ansvar">Ansvar</button>
+            </div>
 
-        <div class="ham-section-content" data-section="ansvar">
-            <h3><?php _e('Ansvar Questions', 'headless-access-manager'); ?></h3>
-            <div class="ham-questions-container" id="ansvar-questions"></div>
-            <button type="button" class="button ham-add-question"
-                data-section="ansvar"><?php _e('Add Question', 'headless-access-manager'); ?></button>
-        </div>
-    </div>
+            <!-- Sections -->
+            <div class="ham-sections">
+                <!-- Anknytning Section -->
+                <div id="anknytning-section" class="ham-section-content" data-section="anknytning">
+                    <div id="anknytning-questions" class="ham-questions"></div>
+                    <button type="button" class="button ham-add-question" data-section="anknytning">Add Question</button>
+                </div>
 
-    <textarea id="ham_assessment_data_json" name="ham_assessment_data"
-        style="display: none;"><?php echo esc_textarea($assessment_data_json); ?></textarea>
-</div>
-<?php
+                <!-- Ansvar Section -->
+                <div id="ansvar-section" class="ham-section-content" data-section="ansvar">
+                    <div id="ansvar-questions" class="ham-questions"></div>
+                    <button type="button" class="button ham-add-question" data-section="ansvar">Add Question</button>
+                </div>
+            </div>
+
+            <!-- Hidden field for assessment data -->
+            <input type="hidden" id="ham_assessment_data" name="_ham_assessment_data" value="<?php echo esc_attr(wp_json_encode($assessment_data)); ?>">
+        </div>
+        <?php
     }
 
     /**
-     * Render student meta box.
+     * Save post handler
      *
-     * @param WP_Post $post Current post object.
+     * @param int $post_id The ID of the post being saved.
+     * @param WP_Post $post The post object.
      */
-    public function render_student_meta_box($post)
+    public function save_post($post_id, $post)
     {
-        // Add nonce for security
-        wp_nonce_field('ham_assessment_student_meta_box', 'ham_assessment_student_nonce');
-
-        // Get current student ID
-        $student_id = get_post_meta($post->ID, HAM_ASSESSMENT_META_STUDENT_ID, true);
-
-        // Get all students
-        $students = get_users(array( 'role' => HAM_ROLE_STUDENT ));
-
-        ?>
-<p>
-    <label for="ham_student_id"><?php _e('Select Student:', 'headless-access-manager'); ?></label>
-    <select name="ham_student_id" id="ham_student_id" class="widefat">
-        <option value=""><?php _e('— Select Student —', 'headless-access-manager'); ?></option>
-        <?php foreach ($students as $student) : ?>
-        <option value="<?php echo esc_attr($student->ID); ?>" <?php selected($student_id, $student->ID); ?>>
-            <?php echo esc_html($student->display_name); ?>
-        </option>
-        <?php endforeach; ?>
-    </select>
-</p>
-<?php
-    }
-
-    /**
-     * Save meta box data.
-     *
-     * @param int $post_id Post ID.
-     */
-    public function save_meta_boxes($post_id)
-    {
-        // Check nonce for questions meta box
-        if (! isset($_POST['ham_assessment_questions_nonce']) ||
-            ! wp_verify_nonce($_POST['ham_assessment_questions_nonce'], 'ham_assessment_questions_meta_box')) {
-            return;
-        }
-
-        // Check nonce for student meta box
-        if (! isset($_POST['ham_assessment_student_nonce']) ||
-            ! wp_verify_nonce($_POST['ham_assessment_student_nonce'], 'ham_assessment_student_meta_box')) {
-            return;
-        }
-
-        // Check if autosave
+        // If this is an autosave, our form has not been submitted, so we don't want to do anything.
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
         }
 
-        // Check permissions
-        if (! current_user_can('edit_post', $post_id)) {
+        // Check if our nonce is set and verify it.
+        if (!isset($_POST['ham_assessment_nonce']) || !wp_verify_nonce($_POST['ham_assessment_nonce'], 'ham_save_assessment')) {
             return;
         }
 
-        // Save student ID
-        if (isset($_POST['ham_student_id'])) {
-            $student_id = absint($_POST['ham_student_id']);
-            if ($student_id > 0) {
-                update_post_meta($post_id, HAM_ASSESSMENT_META_STUDENT_ID, $student_id);
-            } else {
-                delete_post_meta($post_id, HAM_ASSESSMENT_META_STUDENT_ID);
-            }
+        // Check the user's permissions.
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
         }
 
-        // Save assessment data
-        if (isset($_POST['ham_assessment_data'])) {
-            error_log('Processing ham_assessment_data');
-            $assessment_data_json = wp_unslash($_POST['ham_assessment_data']);
-            error_log('Assessment Data JSON: ' . substr($assessment_data_json, 0, 100) . '...');
-
-            if (!empty($assessment_data_json)) {
-                $assessment_data = json_decode($assessment_data_json, true);
-
-                if ($assessment_data !== null) {
-                    error_log('Successfully decoded JSON data');
-                    update_post_meta($post_id, HAM_ASSESSMENT_META_DATA, $assessment_data);
-                    error_log('Updated assessment data metadata');
-                } else {
-                    error_log('JSON decode error: ' . json_last_error_msg());
+        // Get the posted data
+        $assessment_data = isset($_POST['_ham_assessment_data']) ? wp_unslash($_POST['_ham_assessment_data']) : '';
+        
+        if (!empty($assessment_data)) {
+            $data = json_decode($assessment_data, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE) {
+                // Ensure we have the required structure
+                if (!isset($data['anknytning'])) {
+                    $data['anknytning'] = array('title' => 'Anknytning', 'questions' => array(), 'comments' => array());
                 }
-            } else {
-                error_log('ham_assessment_data is empty');
+                if (!isset($data['ansvar'])) {
+                    $data['ansvar'] = array('title' => 'Ansvar', 'questions' => array(), 'comments' => array());
+                }
+                
+                // Save the data
+                update_post_meta($post_id, '_ham_assessment_data', $data);
             }
-        } else {
-            error_log('ham_assessment_data not in POST data');
         }
-
-        // Dump all POST data keys
-        error_log('POST data keys: ' . implode(', ', array_keys($_POST)));
     }
 
     /**
      * Enqueue admin scripts and styles.
-     *
-     * @param string $hook Current admin page.
      */
     public function enqueue_admin_assets($hook)
     {
         global $post;
 
-        // Only enqueue on assessment edit page
-        if (! ($hook === 'post.php' || $hook === 'post-new.php') ||
-             ! is_object($post) || $post->post_type !== HAM_CPT_ASSESSMENT) {
-            return;
-        }
+        // Only enqueue on post edit screen for our post type
+        if ($hook == 'post.php' && $post && get_post_type($post->ID) === HAM_CPT_ASSESSMENT) {
+            // Enqueue JS
+            wp_enqueue_script(
+                'ham-assessment-editor',
+                plugins_url('assets/js/assessment-editor.js', HAM_PLUGIN_FILE),
+                array('jquery'),
+                '1.0.0',
+                true
+            );
 
-        // Enqueue scripts
-        wp_enqueue_script(
-            'ham-assessment-editor',
-            HAM_PLUGIN_URL . 'assets/js/assessment-editor.js',
-            array( 'jquery' ),
-            HAM_VERSION,
-            true
-        );
+            // Enqueue CSS
+            wp_enqueue_style(
+                'ham-assessment-editor',
+                plugins_url('assets/css/assessment-editor.css', HAM_PLUGIN_FILE),
+                array(),
+                '1.0.0'
+            );
 
-        // Enqueue styles
-        wp_enqueue_style(
-            'ham-assessment-editor',
-            HAM_PLUGIN_URL . 'assets/css/assessment-editor.css',
-            array(),
-            HAM_VERSION
-        );
-
-        // Localize script
-        wp_localize_script(
-            'ham-assessment-editor',
-            'hamAssessmentEditor',
-            array(
+            // Pass data to JavaScript
+            wp_localize_script('ham-assessment-editor', 'hamAssessmentEditor', array(
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('ham_save_assessment'),
                 'texts' => array(
                     'question'     => __('Question', 'headless-access-manager'),
                     'option'       => __('Option', 'headless-access-manager'),
@@ -271,9 +247,67 @@ class HAM_Assessment_Meta_Boxes
                     'trans' => __('In Transition', 'headless-access-manager'),
                     'full'  => __('Fully Connected', 'headless-access-manager'),
                 ),
-                'defaultOptionsCount' => 5, // Number of options to create for new questions
-            )
-        );
+                'defaultOptionsCount' => 5
+            ));
+        }
+    }
+
+    /**
+     * AJAX handler for saving assessment data
+     */
+    public function ajax_save_assessment_data()
+    {
+        error_log('HAM Debug - AJAX save called');
+        
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'ham_save_assessment')) {
+            error_log('HAM Debug - Nonce verification failed');
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+
+        // Verify post ID
+        $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+        if (!$post_id || !current_user_can('edit_post', $post_id)) {
+            error_log('HAM Debug - Invalid post ID or permissions');
+            wp_send_json_error('Invalid post ID or permissions');
+            return;
+        }
+
+        // Get and validate data
+        $assessment_data = isset($_POST['assessment_data']) ? $_POST['assessment_data'] : '';
+        if (empty($assessment_data)) {
+            error_log('HAM Debug - No assessment data');
+            wp_send_json_error('No assessment data');
+            return;
+        }
+
+        error_log('HAM Debug - Raw assessment data: ' . $assessment_data);
+        
+        $data = json_decode(wp_unslash($assessment_data), true);
+        error_log('HAM Debug - Decoded data: ' . print_r($data, true));
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            error_log('HAM Debug - JSON decode error: ' . json_last_error_msg());
+            wp_send_json_error('Invalid JSON data');
+            return;
+        }
+
+        // Validate structure
+        if (!isset($data['anknytning']) || !isset($data['ansvar']) ||
+            !isset($data['anknytning']['questions']) || !isset($data['ansvar']['questions'])) {
+            error_log('HAM Debug - Invalid data structure');
+            wp_send_json_error('Invalid data structure');
+            return;
+        }
+
+        // Save the data
+        update_post_meta($post_id, '_ham_assessment_data', $data);
+        error_log('HAM Debug - Data saved successfully');
+        
+        wp_send_json_success(array(
+            'message' => 'Assessment data saved successfully'
+        ));
     }
 }
 

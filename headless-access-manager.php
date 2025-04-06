@@ -29,7 +29,6 @@ define('HAM_PLUGIN_FILE', __FILE__);
 // Include necessary files
 require_once HAM_PLUGIN_DIR . 'inc/constants.php';
 require_once HAM_PLUGIN_DIR . 'inc/loader.php';
-require_once HAM_PLUGIN_DIR . 'inc/admin/form-submission-fix.php';
 
 // Hook activation and deactivation functions
 register_activation_hook(__FILE__, 'ham_activate');
@@ -57,12 +56,16 @@ function ham_deactivate()
 add_action('plugins_loaded', 'ham_init');
 
 /**
- * Initialize the plugin.
+ * Plugin initialization function.
  */
 function ham_init()
 {
-    // Load translations
-    load_plugin_textdomain('headless-access-manager', false, dirname(HAM_PLUGIN_BASENAME) . '/languages');
+    // Load plugin textdomain for translations
+    load_plugin_textdomain(
+        'headless-access-manager',
+        false,
+        dirname(plugin_basename(__FILE__)) . '/languages'
+    );
 
     // Initialize the plugin components
     HAM_Loader::instance()->init();

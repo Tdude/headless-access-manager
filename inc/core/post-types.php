@@ -177,7 +177,7 @@ class HAM_Post_Types
             'hierarchical'       => false,
             'menu_position'      => null,
             'menu_icon'          => 'dashicons-clipboard',
-            'supports'           => array( 'title', 'author', 'custom-fields' ),
+            'supports'           => array( 'title', 'editor', 'custom-fields' ),
             'show_in_rest'       => true,
         );
 

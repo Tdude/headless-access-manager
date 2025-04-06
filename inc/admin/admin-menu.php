@@ -55,6 +55,26 @@ class HAM_Admin_Menu
             array( __CLASS__, 'render_settings_page' )
         );
 
+        // Assessments submenu
+        add_submenu_page(
+            'headless-access-manager',
+            esc_html__('Assessments', 'headless-access-manager'),
+            esc_html__('Assessments', 'headless-access-manager'),
+            'manage_options',
+            'ham-assessments',
+            array( 'HAM_Assessment_Manager', 'render_assessments_page' )
+        );
+
+        // Assessment Statistics submenu
+        add_submenu_page(
+            'headless-access-manager',
+            esc_html__('Assessment Statistics', 'headless-access-manager'),
+            esc_html__('Assessment Stats', 'headless-access-manager'),
+            'manage_options',
+            'ham-assessment-stats',
+            array( 'HAM_Assessment_Manager', 'render_statistics_page' )
+        );
+
         // Register settings
         add_action('admin_init', array( __CLASS__, 'register_settings' ));
     }

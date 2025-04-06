@@ -1,5 +1,5 @@
 /**
- * Assessment Editor JavaScript - FIXED VERSION
+ * Assessment Editor JavaScript
  *
  * Handles the interactive editor for assessment questions in the admin
  */
@@ -10,23 +10,25 @@
     var AssessmentEditor = function() {
         // DOM elements
         this.$editor = $('#ham-assessment-editor');
+        this.$form = this.$editor.closest('form');
+        this.$assessmentData = $('[name="_ham_assessment_data"]');
+        this.$sectionTabs = this.$editor.find('.ham-section-tab');
+        this.$sectionContents = this.$editor.find('.ham-section-content');
         this.$ankQuestions = $('#anknytning-questions');
         this.$ansvarQuestions = $('#ansvar-questions');
-        this.$assessmentData = $('#ham_assessment_data_json');
-        this.$sectionTabs = $('.ham-section-tab');
-        this.$sectionContents = $('.ham-section-content');
-        this.$addQuestionButtons = $('.ham-add-question');
-        this.$form = $('#post');
+        this.$addQuestionButtons = this.$editor.find('.ham-add-question');
 
         // Assessment data
         this.assessmentData = {
             anknytning: {
+                title: 'Anknytning',
                 questions: {},
-                comments: {}
+                comments: []
             },
             ansvar: {
+                title: 'Ansvar',
                 questions: {},
-                comments: {}
+                comments: []
             }
         };
 
@@ -36,37 +38,60 @@
 
     AssessmentEditor.prototype = {
         init: function() {
-            console.log('Assessment Editor initializing...');
-
             // Try to parse existing data from textarea
             try {
                 var jsonData = this.$assessmentData.val();
-                console.log('Raw textarea value:', jsonData);
+                console.log('Initial JSON data:', jsonData);
 
                 if (jsonData && jsonData.trim() !== '') {
                     var parsed = JSON.parse(jsonData);
-                    console.log('Successfully parsed JSON data', parsed);
                     this.assessmentData = parsed;
+                    console.log('Parsed assessment data:', this.assessmentData);
                 } else {
-                    console.log('Textarea is empty, using default structure');
+                    // Use fallback structure
+                    this.assessmentData = {
+                        anknytning: {
+                            title: 'Anknytning',
+                            questions: {},
+                            comments: []
+                        },
+                        ansvar: {
+                            title: 'Ansvar',
+                            questions: {},
+                            comments: []
+                        }
+                    };
+                    console.log('Using fallback structure (empty JSON)');
                 }
             } catch (e) {
-                console.error('Error parsing JSON from textarea:', e);
-                console.log('Using default structure due to parsing error');
+                console.error('Error parsing JSON:', e);
+                // Use same fallback structure on error
+                this.assessmentData = {
+                    anknytning: {
+                        title: 'Anknytning',
+                        questions: {},
+                        comments: []
+                    },
+                    ansvar: {
+                        title: 'Ansvar',
+                        questions: {},
+                        comments: []
+                    }
+                };
             }
+
+            // Show first tab
+            this.switchTab('anknytning');
 
             // Render questions
             this.renderAllQuestions();
 
             // Bind events
             this.bindEvents();
-
-            console.log('Assessment Editor initialized');
         },
 
         bindEvents: function() {
             var self = this;
-            console.log('Binding events...');
 
             // Tab switching
             this.$sectionTabs.on('click', function() {
@@ -78,25 +103,33 @@
             this.$addQuestionButtons.on('click', function() {
                 var section = $(this).data('section');
                 self.addQuestion(section);
+                self.updateDataFromDOM(); // Update JSON after adding question
+                self.saveData(); // Save data via AJAX
             });
 
-            // Event delegation for dynamic elements
+            // Delete question button
             this.$editor.on('click', '.ham-delete-question', function(e) {
                 e.preventDefault();
                 var $question = $(this).closest('.ham-question');
                 var section = $question.data('section');
                 var questionId = $question.data('question-id');
                 self.deleteQuestion(section, questionId);
+                self.updateDataFromDOM(); // Update JSON after deleting question
+                self.saveData(); // Save data via AJAX
             });
 
+            // Add option button
             this.$editor.on('click', '.ham-add-option', function(e) {
                 e.preventDefault();
                 var $question = $(this).closest('.ham-question');
                 var section = $question.data('section');
                 var questionId = $question.data('question-id');
                 self.addOption(section, questionId);
+                self.updateDataFromDOM(); // Update JSON after adding option
+                self.saveData(); // Save data via AJAX
             });
 
+            // Delete option button
             this.$editor.on('click', '.ham-delete-option', function(e) {
                 e.preventDefault();
                 var $option = $(this).closest('.ham-option');
@@ -105,45 +138,45 @@
                 var questionId = $question.data('question-id');
                 var optionIndex = $option.data('option-index');
                 self.deleteOption(section, questionId, optionIndex);
+                self.updateDataFromDOM(); // Update JSON after deleting option
+                self.saveData(); // Save data via AJAX
             });
 
-            // Input change events - handle all input types
-            this.$editor.on('input change', 'input, select, textarea', function() {
+            // Input change events - update JSON when form fields change
+            this.$editor.on('input change', '.ham-question-input, .ham-option-value, .ham-option-label, .ham-option-stage', function() {
                 self.updateDataFromDOM();
+                // Debounce the save to avoid too many AJAX requests
+                clearTimeout(self.saveTimeout);
+                self.saveTimeout = setTimeout(function() {
+                    self.saveData();
+                }, 500);
             });
 
-            // Critical: Form submission handling
+            // Form submission - ensure latest data is saved
             this.$form.on('submit', function(e) {
-                console.log('Form is being submitted - updating data...');
                 self.updateDataFromDOM();
-
-                // Double check data is in the textarea
-                var textareaValue = self.$assessmentData.val();
-                console.log('Final textarea value length:', textareaValue ? textareaValue.length : 0);
-                console.log('First 100 chars:', textareaValue ? textareaValue.substring(0, 100) : 'empty');
-
-                return true; // Allow form submission to continue
+                // No need to call saveData here as the form will be submitted with the updated hidden field
+                return true;
             });
-
-            console.log('Events bound');
         },
 
         renderAllQuestions: function() {
-            console.log('Rendering all questions');
             this.$ankQuestions.empty();
             this.$ansvarQuestions.empty();
 
             // Render anknytning questions
             if (this.assessmentData.anknytning && this.assessmentData.anknytning.questions) {
-                for (var questionId in this.assessmentData.anknytning.questions) {
-                    this.renderQuestion('anknytning', questionId, this.assessmentData.anknytning.questions[questionId]);
+                var questions = this.assessmentData.anknytning.questions;
+                for (var questionId in questions) {
+                    this.renderQuestion('anknytning', questionId, questions[questionId]);
                 }
             }
 
             // Render ansvar questions
             if (this.assessmentData.ansvar && this.assessmentData.ansvar.questions) {
-                for (var questionId in this.assessmentData.ansvar.questions) {
-                    this.renderQuestion('ansvar', questionId, this.assessmentData.ansvar.questions[questionId]);
+                var questions = this.assessmentData.ansvar.questions;
+                for (var questionId in questions) {
+                    this.renderQuestion('ansvar', questionId, questions[questionId]);
                 }
             }
 
@@ -159,7 +192,7 @@
 
             // Question header
             var $header = $('<div class="ham-question-header"></div>');
-            $header.append('<button type="button" class="ham-delete-question button-link" title="' + hamAssessmentEditor.texts.deleteQuestion + '">×</button>');
+            $header.append('<button type="button" class="ham-delete-question button button-secondary button-small" title="' + hamAssessmentEditor.texts.deleteQuestion + '">×</button>');
             $question.append($header);
 
             // Question content
@@ -182,7 +215,7 @@
             $content.append($options);
 
             // Add option button
-            $content.append('<div class="ham-actions"><button type="button" class="button ham-add-option">' + hamAssessmentEditor.texts.addOption + '</button></div>');
+            $content.append('<button type="button" class="button ham-add-option">' + hamAssessmentEditor.texts.addOption + '</button>');
 
             $question.append($content);
             $container.append($question);
@@ -190,21 +223,27 @@
 
         renderOption: function($container, index, option) {
             var $option = $('<div class="ham-option" data-option-index="' + index + '"></div>');
-
-            // Option fields
-            $option.append('<label>' + hamAssessmentEditor.texts.value + ': <input type="text" class="ham-option-value" value="' + (option.value || '') + '"></label>');
-            $option.append('<label>' + hamAssessmentEditor.texts.label + ': <input type="text" class="ham-option-label" value="' + (option.label || '') + '"></label>');
-
-            // Stage dropdown
-            var $stageSelect = $('<select class="ham-option-stage"></select>');
+            
+            // Option number at the beginning of the option
+            $option.append('<span class="ham-option-number">' + (index + 1) + '</span>');
+            
+            // Delete button in the header (positioned absolutely)
+            var $header = $('<div class="ham-option-header"></div>');
+            $header.append('<button type="button" class="ham-delete-option button button-secondary button-small" title="' + hamAssessmentEditor.texts.deleteOption + '">×</button>');
+            $option.append($header);
+            
+            var $content = $('<div class="ham-option-content"></div>');
+            $content.append('<label>' + hamAssessmentEditor.texts.value + ': <input type="text" class="ham-option-value" value="' + (option.value || '') + '"></label>');
+            $content.append('<label>' + hamAssessmentEditor.texts.label + ': <input type="text" class="ham-option-label" value="' + (option.label || '') + '"></label>');
+            
+            var stageSelect = '<label>' + hamAssessmentEditor.texts.stage + ': <select class="ham-option-stage">';
             for (var stage in hamAssessmentEditor.stages) {
-                $stageSelect.append('<option value="' + stage + '"' + (option.stage === stage ? ' selected' : '') + '>' + hamAssessmentEditor.stages[stage] + '</option>');
+                stageSelect += '<option value="' + stage + '"' + (option.stage === stage ? ' selected' : '') + '>' + hamAssessmentEditor.stages[stage] + '</option>';
             }
-            $option.append('<label>' + hamAssessmentEditor.texts.stage + ': </label>').append($stageSelect);
-
-            // Delete button
-            $option.append('<button type="button" class="ham-delete-option button-link" title="' + hamAssessmentEditor.texts.deleteOption + '">×</button>');
-
+            stageSelect += '</select></label>';
+            $content.append(stageSelect);
+            
+            $option.append($content);
             $container.append($option);
         },
 
@@ -212,141 +251,129 @@
             // Update tab buttons
             this.$sectionTabs.removeClass('active');
             this.$sectionTabs.filter('[data-section="' + section + '"]').addClass('active');
-
+            
             // Update content sections
-            this.$sectionContents.removeClass('active');
-            this.$sectionContents.filter('[data-section="' + section + '"]').addClass('active');
+            this.$sectionContents.hide();
+            this.$sectionContents.filter('[data-section="' + section + '"]').show();
         },
 
         addQuestion: function(section) {
-            console.log('Adding new question to section:', section);
-
-            // Generate a unique ID for the question
-            var questionId = 'question_' + new Date().getTime();
-
-            // Create default options
-            var options = [];
+            // Generate a unique ID for the new question
+            var questionId;
+            var i = 1;
+            
+            // For anknytning, use a1, a2, etc.
+            // For ansvar, use b1, b2, etc.
+            var prefix = section === 'anknytning' ? 'a' : 'b';
+            
+            do {
+                questionId = prefix + i;
+                i++;
+            } while (this.assessmentData[section].questions[questionId]);
+            
+            // Create new question with default options
+            var newQuestion = {
+                text: '',
+                options: []
+            };
+            
+            // Add default options
             for (var i = 1; i <= hamAssessmentEditor.defaultOptionsCount; i++) {
-                options.push({
-                    value: String(i),
-                    label: hamAssessmentEditor.texts.option + ' ' + i,
+                newQuestion.options.push({
+                    value: i.toString(),
+                    label: i.toString(),
                     stage: i <= 2 ? 'ej' : (i <= 4 ? 'trans' : 'full')
                 });
             }
-
-            // Create question data
-            var questionData = {
-                text: hamAssessmentEditor.texts.question,
-                options: options
-            };
-
-            // Add to assessment data
-            if (!this.assessmentData[section]) {
-                this.assessmentData[section] = { questions: {}, comments: {} };
-            }
-            if (!this.assessmentData[section].questions) {
-                this.assessmentData[section].questions = {};
-            }
-            this.assessmentData[section].questions[questionId] = questionData;
-
+            
+            // Add to data
+            this.assessmentData[section].questions[questionId] = newQuestion;
+            
             // Render the new question
-            this.renderQuestion(section, questionId, questionData);
-
+            this.renderQuestion(section, questionId, newQuestion);
+            
             // Update textarea
             this.updateTextarea();
-
-            console.log('Question added with ID:', questionId);
         },
 
         deleteQuestion: function(section, questionId) {
-            console.log('Deleting question:', section, questionId);
-
-            // Remove from assessment data
-            if (this.assessmentData[section] &&
-                this.assessmentData[section].questions &&
-                this.assessmentData[section].questions[questionId]) {
+            // Remove from data
+            if (this.assessmentData[section] && this.assessmentData[section].questions) {
                 delete this.assessmentData[section].questions[questionId];
             }
-
+            
             // Remove from DOM
-            $('.ham-question[data-section="' + section + '"][data-question-id="' + questionId + '"]').remove();
-
+            this.$editor.find('.ham-question[data-section="' + section + '"][data-question-id="' + questionId + '"]').remove();
+            
             // Update textarea
             this.updateTextarea();
-
-            console.log('Question deleted');
         },
 
         addOption: function(section, questionId) {
-            console.log('Adding option to question:', section, questionId);
-
-            var self = this;
-            var $question = $('.ham-question[data-section="' + section + '"][data-question-id="' + questionId + '"]');
-            var $optionsContainer = $question.find('.ham-options-container');
-
-            // Get current options count
-            var optionIndex = $optionsContainer.children().length;
-
-            // Create new option data
-            var option = {
-                value: String(optionIndex + 1),
-                label: hamAssessmentEditor.texts.option + ' ' + (optionIndex + 1),
+            // Get current options
+            var question = this.assessmentData[section].questions[questionId];
+            var options = question.options || [];
+            var newIndex = options.length;
+            
+            // Create new option
+            var newOption = {
+                value: (newIndex + 1).toString(),
+                label: (newIndex + 1).toString(),
                 stage: 'ej'
             };
-
-            // Add to assessment data
-            this.assessmentData[section].questions[questionId].options.push(option);
-
+            
+            // Add to data
+            options.push(newOption);
+            question.options = options;
+            
             // Render the new option
-            self.renderOption($optionsContainer, optionIndex, option);
-
+            var $question = this.$editor.find('.ham-question[data-section="' + section + '"][data-question-id="' + questionId + '"]');
+            var $container = $question.find('.ham-options-container');
+            this.renderOption($container, newIndex, newOption);
+            
             // Update textarea
             this.updateTextarea();
-
-            console.log('Option added at index:', optionIndex);
         },
 
         deleteOption: function(section, questionId, optionIndex) {
-            console.log('Deleting option:', section, questionId, optionIndex);
-
-            // Remove from assessment data
-            if (this.assessmentData[section] &&
-                this.assessmentData[section].questions &&
-                this.assessmentData[section].questions[questionId] &&
-                this.assessmentData[section].questions[questionId].options) {
-                this.assessmentData[section].questions[questionId].options.splice(optionIndex, 1);
+            // Get current options
+            var question = this.assessmentData[section].questions[questionId];
+            var options = question.options || [];
+            
+            // Remove from data
+            if (optionIndex < options.length) {
+                options.splice(optionIndex, 1);
+                
+                // Update data
+                question.options = options;
+                
+                // Remove from DOM
+                var $question = this.$editor.find('.ham-question[data-section="' + section + '"][data-question-id="' + questionId + '"]');
+                $question.find('.ham-option[data-option-index="' + optionIndex + '"]').remove();
+                
+                // Re-render all options to update indices
+                var $container = $question.find('.ham-options-container').empty();
+                for (var i = 0; i < options.length; i++) {
+                    this.renderOption($container, i, options[i]);
+                }
+                
+                // Update textarea
+                this.updateTextarea();
             }
-
-            // Re-render all options for this question to update indices
-            var $question = $('.ham-question[data-section="' + section + '"][data-question-id="' + questionId + '"]');
-            var $optionsContainer = $question.find('.ham-options-container');
-            $optionsContainer.empty();
-
-            var options = this.assessmentData[section].questions[questionId].options;
-            for (var i = 0; i < options.length; i++) {
-                this.renderOption($optionsContainer, i, options[i]);
-            }
-
-            // Update textarea
-            this.updateTextarea();
-
-            console.log('Option deleted');
         },
 
         updateDataFromDOM: function() {
-            console.log('Updating data from DOM');
-
             var self = this;
-
-            // Initialize with empty structure but preserve comments
             var newData = {
                 anknytning: {
+                    title: 'Anknytning',
                     questions: {},
-                    comments: this.assessmentData.anknytning ? (this.assessmentData.anknytning.comments || {}) : {}
+                    comments: this.assessmentData.anknytning ? (this.assessmentData.anknytning.comments || []) : []
                 },
                 ansvar: {
+                    title: 'Ansvar',
                     questions: {},
-                    comments: this.assessmentData.ansvar ? (this.assessmentData.ansvar.comments || {}) : {}
+                    comments: this.assessmentData.ansvar ? (this.assessmentData.ansvar.comments || []) : []
                 }
             };
 
@@ -363,12 +390,11 @@
                 var options = [];
                 $question.find('.ham-option').each(function() {
                     var $option = $(this);
-                    var option = {
+                    options.push({
                         value: $option.find('.ham-option-value').val(),
                         label: $option.find('.ham-option-label').val(),
                         stage: $option.find('.ham-option-stage').val()
-                    };
-                    options.push(option);
+                    });
                 });
 
                 // Add to new data
@@ -378,39 +404,58 @@
                 };
             });
 
-            // Update assessment data
+            // Update assessment data and field
             this.assessmentData = newData;
-
-            // Update textarea
             this.updateTextarea();
-
-            console.log('Data updated from DOM');
+            
+            console.log('Updated data from DOM:', this.assessmentData);
         },
 
         updateTextarea: function() {
             var jsonString = JSON.stringify(this.assessmentData);
-            console.log('Updating textarea with JSON data, length:', jsonString.length);
-
-            // Update the hidden textarea with the current data
             this.$assessmentData.val(jsonString);
-
-            // Debug - show first part of the data
-            if (jsonString.length > 0) {
-                console.log('Data sample:', jsonString.substring(0, 100) + '...');
+            console.log('Updated textarea with JSON data');
+        },
+        
+        saveData: function() {
+            var self = this;
+            var postId = $('#post_ID').val();
+            
+            if (!postId) {
+                console.error('Cannot save: No post ID found');
+                return;
             }
+            
+            console.log('Saving assessment data via AJAX...');
+            
+            $.ajax({
+                url: hamAssessmentEditor.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'ham_save_assessment_data',
+                    nonce: hamAssessmentEditor.nonce,
+                    post_id: postId,
+                    assessment_data: JSON.stringify(this.assessmentData)
+                },
+                success: function(response) {
+                    if (response.success) {
+                        console.log('Assessment data saved successfully:', response.data.message);
+                    } else {
+                        console.error('Error saving assessment data:', response.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', error);
+                }
+            });
         }
     };
 
     // Initialize on document ready
     $(document).ready(function() {
-        console.log('Document ready - initializing Assessment Editor');
+        console.log('HAM: Assessment editor initializing...');
         window.hamEditor = new AssessmentEditor();
-
-        // Debugging - watch for form submission
-        $('#post').on('submit', function() {
-            console.log('Form submit detected!');
-            console.log('Textarea value length:', $('#ham_assessment_data_json').val().length);
-        });
+        console.log('HAM: Assessment editor initialized');
     });
 
 })(jQuery);

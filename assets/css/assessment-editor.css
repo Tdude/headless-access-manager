@@ -2,19 +2,20 @@
  * Assessment Editor Styles
  */
 
- .ham-assessment-editor {
+.ham-assessment-editor {
     margin-bottom: 20px;
+    padding: 20px;
 }
 
 .ham-section-tabs {
-    margin-bottom: 15px;
-    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
 }
 
 .ham-section-tab {
-    padding: 8px 12px;
-    background: #f7f7f7;
-    border: 1px solid #ddd;
+    padding: 10px 20px;
+    background: #f5f5f5;
+    border: 1px solid #ccc;
     border-bottom: none;
     border-radius: 3px 3px 0 0;
     cursor: pointer;
@@ -26,13 +27,14 @@
 .ham-section-tab.active {
     background: #fff;
     border-bottom: 1px solid #fff;
+    margin-bottom: -1px;
 }
 
 .ham-section-content {
     display: none;
-    padding: 15px;
+    padding: 20px;
     background: #fff;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-top: none;
 }
 
@@ -47,8 +49,8 @@
 .ham-question {
     margin-bottom: 20px;
     padding: 15px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
     border-radius: 3px;
 }
 
@@ -60,6 +62,7 @@
 
 .ham-question-content {
     padding: 10px;
+    margin-bottom: 15px;
 }
 
 .ham-question-text {
@@ -76,14 +79,29 @@
 }
 
 .ham-option {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 10px;
-    padding: 10px;
-    background-color: #fff;
+    padding: 10px 40px 10px 35px;
+    background-color: #f9f9f9;
     border: 1px solid #eee;
     border-radius: 3px;
+}
+
+.ham-option-header {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+}
+
+.ham-option-number {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-weight: bold;
 }
 
 .ham-option label {
@@ -91,26 +109,64 @@
     margin-bottom: 5px;
 }
 
-.ham-option input,
+input.ham-option-label {
+    width: 400px;
+}
+
+.ham-option input {
+    min-width: 100px;
+}
+
 .ham-option select {
     width: 150px;
 }
 
+.ham-option-content {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.ham-option-content label {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 5px;
+}
+
+/* Style the delete buttons */
 .ham-delete-question,
 .ham-delete-option {
-    color: #a00;
-    text-decoration: none;
+    color: #dc3232;
     font-size: 18px;
     font-weight: bold;
+    border: 1px solid #dc3232;
+    background: transparent;
+    padding: 0 8px;
+    height: 25px;
+    line-height: 1;
+    border-radius: 3px;
 }
 
 .ham-delete-question:hover,
 .ham-delete-option:hover {
-    color: #dc3232;
+    color: #fff;
+    background: #dc3232;
+    border-color: #dc3232;
 }
 
 .ham-actions {
     text-align: right;
+    margin-top: 15px;
+}
+
+.ham-options-container + button.ham-add-option {
+    float: right;
+    margin-bottom: 15px;
+}
+
+.ham-question-content:after {
+    content: "";
+    display: table;
+    clear: both;
 }
 
 /* Responsive adjustments */
@@ -130,4 +186,26 @@
     .ham-option select {
         width: 100%;
     }
+}
+
+/* Target the specific inputs by their class names */
+input.ham-option-value {
+    width: 60px;
+}
+
+select.ham-option-stage {
+    width: 150px;
+}
+
+/* Make sure all buttons align to the right */
+.ham-add-option {
+    float: right;
+    margin-bottom: 15px;
+}
+
+/* Clear the float after the add option button */
+.ham-question-content:after {
+    content: "";
+    display: table;
+    clear: both;
 }
