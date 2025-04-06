@@ -49,6 +49,14 @@ msgstr "Denna vecka"
 msgid "This Month"
 msgstr "Denna månad"
 
+#: templates/admin/assessments-list.php:37
+msgid "This Semester"
+msgstr "Denna termin"
+
+#: templates/admin/assessments-list.php:38
+msgid "This School Year"
+msgstr "Detta läsår"
+
 #: templates/admin/assessments-list.php:41
 msgid "Filter by Completion:"
 msgstr "Filtrera efter slutförande:"
@@ -424,3 +432,19 @@ msgstr "Bedömningen har tagits bort."
 #: assets/js/evaluation-manager.js:221
 msgid "Error deleting assessment."
 msgstr "Fel vid borttagning av bedömning."
+
+#: templates/admin/assessments-list.php:49
+msgid "Filter by Stage:"
+msgstr "Filtrera efter nuläge:"
+
+#: templates/admin/assessments-list.php:50
+msgid "Fully Established"
+msgstr "Fullt etablerat"
+
+#: templates/admin/assessments-list.php:51
+msgid "In Transition"
+msgstr "I transition"
+
+#: templates/admin/assessments-list.php:52
+msgid "Not Established"
+msgstr "Ej etablerat"
