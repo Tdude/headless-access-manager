@@ -62,7 +62,7 @@ if (! defined('ABSPATH')) {
                     <th class="column-student"><?php echo esc_html__('Student', 'headless-access-manager'); ?></th>
                     <th class="column-date"><?php echo esc_html__('Date', 'headless-access-manager'); ?></th>
                     <th class="column-author"><?php echo esc_html__('Author', 'headless-access-manager'); ?></th>
-                    <th class="column-completion"><?php echo esc_html__('Completion', 'headless-access-manager'); ?></th>
+                    <th class="column-completion"><?php echo esc_html__('Stage', 'headless-access-manager'); ?></th>
                     <th class="column-actions"><?php echo esc_html__('Actions', 'headless-access-manager'); ?></th>
                 </tr>
             </thead>
@@ -76,17 +76,34 @@ if (! defined('ABSPATH')) {
                         <tr data-id="<?php echo esc_attr($assessment['id']); ?>" 
                             data-student="<?php echo esc_attr($assessment['student_id']); ?>"
                             data-date="<?php echo esc_attr(date('Y-m-d', strtotime($assessment['date']))); ?>"
-                            data-completion="<?php echo esc_attr($assessment['completion']); ?>">
+                            data-date-raw="<?php echo esc_attr($assessment['date']); ?>"
+                            data-completion="<?php echo esc_attr($assessment['completion']); ?>"
+                            data-stage="<?php echo esc_attr($assessment['stage'] ?? 'not'); ?>">
                             <td class="column-id"><?php echo esc_html($assessment['id']); ?></td>
                             <td class="column-title"><?php echo esc_html($assessment['title']); ?></td>
                             <td class="column-student"><?php echo esc_html($assessment['student_name']); ?></td>
                             <td class="column-date"><?php echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($assessment['date']))); ?></td>
                             <td class="column-author"><?php echo esc_html($assessment['author_name']); ?></td>
                             <td class="column-completion">
-                                <div class="ham-progress-bar">
-                                    <div class="ham-progress-bar-fill" style="width: <?php echo esc_attr($assessment['completion']); ?>%"></div>
-                                    <span class="ham-progress-text"><?php echo esc_html($assessment['completion']); ?>%</span>
-                                </div>
+                                <?php 
+                                $stage = $assessment['stage'] ?? 'not';
+                                $stage_class = '';
+                                $stage_text = '';
+                                
+                                if ($stage === 'full') {
+                                    $stage_class = 'ham-stage-full';
+                                    $stage_text = esc_html__('Fully Established', 'headless-access-manager');
+                                } elseif ($stage === 'transition') {
+                                    $stage_class = 'ham-stage-transition';
+                                    $stage_text = esc_html__('In Transition', 'headless-access-manager');
+                                } else {
+                                    $stage_class = 'ham-stage-not';
+                                    $stage_text = esc_html__('Not Established', 'headless-access-manager');
+                                }
+                                ?>
+                                <span class="ham-stage-badge <?php echo esc_attr($stage_class); ?>">
+                                    <?php echo $stage_text; ?>
+                                </span>
                             </td>
                             <td class="column-actions">
                                 <button class="button ham-view-assessment" data-id="<?php echo esc_attr($assessment['id']); ?>">
@@ -401,5 +418,29 @@ if (! defined('ABSPATH')) {
 
 .ham-answer-text {
     color: #444;
+}
+
+/* Stage Badge Styles */
+.ham-stage-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.ham-stage-full {
+    background-color: #2ecc71;
+    color: #fff;
+}
+
+.ham-stage-transition {
+    background-color: #f1c40f;
+    color: #fff;
+}
+
+.ham-stage-not {
+    background-color: #e74c3c;
+    color: #fff;
 }
 </style>
