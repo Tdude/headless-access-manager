@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File: inc/admin/class-ham-assessment-manager.php
  *
@@ -17,46 +18,52 @@ if (! defined('ABSPATH')) {
  *
  * Handles assessment management in the WordPress admin.
  */
-class HAM_Assessment_Manager {
+class HAM_Assessment_Manager
+{
     /**
      * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         // Fix metadata on existing assessments (one-time operation)
         add_action('admin_init', array($this, 'fix_assessment_metadata'));
-        
+
         // Register AJAX handlers
         add_action('wp_ajax_ham_get_assessment_details', array($this, 'ajax_get_assessment_details'));
         add_action('wp_ajax_ham_get_assessment_stats', array($this, 'ajax_get_assessment_stats'));
 
         // Enqueue scripts and styles
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
-        
+
         // Filter out frontend assessments from the default post type listing
         add_action('pre_get_posts', array($this, 'filter_assessment_admin_listing'));
+
+        // Delete button functionality in the modal list for assessments
+        add_action('wp_ajax_ham_delete_assessment', array($this, 'ajax_delete_assessment'));
     }
-    
+
     /**
      * Fix metadata on existing assessments.
      * This ensures all frontend submissions have the correct source flag.
      */
-    public function fix_assessment_metadata() {
+    public function fix_assessment_metadata()
+    {
         // Only run for administrators to avoid unnecessary DB operations
         if (!current_user_can('manage_options')) {
             return;
         }
-        
+
         // Force re-run if explicitly requested via URL parameter
         $force_run = isset($_GET['fix_assessments']) && $_GET['fix_assessments'] === '1';
-        
+
         // Check if we've already run this fix
         $fix_run = get_option('ham_assessment_metadata_fixed', false);
         if ($fix_run && !$force_run) {
             return;
         }
-        
+
         global $wpdb;
-        
+
         // Find ALL assessments, regardless of metadata
         $assessments = get_posts(array(
             'post_type' => HAM_CPT_ASSESSMENT,
@@ -70,13 +77,13 @@ class HAM_Assessment_Manager {
                 ),
             ),
         ));
-        
+
         $count = 0;
-        
+
         // For each assessment, determine if it's frontend or admin
         foreach ($assessments as $assessment) {
             $is_frontend = false;
-            
+
             // Strong indicators of frontend submission
             $frontend_indicators = array(
                 // Check if created via API
@@ -88,7 +95,7 @@ class HAM_Assessment_Manager {
                 // Check submission metadata
                 get_post_meta($assessment->ID, '_ham_frontend_submission', true)
             );
-            
+
             // If any indicator is true, mark as frontend
             foreach ($frontend_indicators as $indicator) {
                 if ($indicator) {
@@ -96,24 +103,24 @@ class HAM_Assessment_Manager {
                     break;
                 }
             }
-            
+
             // Set the source metadata
             update_post_meta($assessment->ID, '_ham_assessment_source', $is_frontend ? 'frontend' : 'admin');
             $count++;
         }
-        
+
         // Mark as completed to avoid running again
         update_option('ham_assessment_metadata_fixed', true);
-        
+
         if ($count > 0) {
             // Add an admin notice that metadata was fixed
-            add_action('admin_notices', function() use ($count) {
-                echo '<div class="notice notice-success is-dismissible"><p>' . 
-                    sprintf(__('Updated source metadata for %d assessments.', 'headless-access-manager'), $count) . 
+            add_action('admin_notices', function () use ($count) {
+                echo '<div class="notice notice-success is-dismissible"><p>' .
+                    sprintf(__('Updated source metadata for %d assessments.', 'headless-access-manager'), $count) .
                     '</p></div>';
             });
         }
-        
+
         // If force run was triggered via URL, redirect back to assessment list
         if ($force_run) {
             // Remove the parameter to avoid looping
@@ -125,19 +132,20 @@ class HAM_Assessment_Manager {
     /**
      * Render assessments list page.
      */
-    public static function render_assessments_page() {
+    public static function render_assessments_page()
+    {
         // Get current screen to determine which source filter to use
         $screen = get_current_screen();
         $source = 'all'; // Show all assessments in the custom admin page
-        
+
         // Check if explicitly requesting admin source only
         if (isset($_GET['source']) && $_GET['source'] === 'admin' && current_user_can('manage_options')) {
             $source = 'admin';
         }
-        
+
         // Get assessments with the appropriate filter
         $assessments = self::get_assessments($source);
-        
+
         // Double-check: filter out any assessments that might still be from frontend
         if ($source === 'admin') {
             foreach ($assessments as $key => $assessment) {
@@ -146,24 +154,24 @@ class HAM_Assessment_Manager {
                     unset($assessments[$key]);
                     continue;
                 }
-                
-                // Check source metadata 
+
+                // Check source metadata
                 if (isset($assessment['meta']['_ham_assessment_source']) && $assessment['meta']['_ham_assessment_source'] === 'frontend') {
                     unset($assessments[$key]);
                     continue;
                 }
-                
+
                 // Check API created flag
                 if (isset($assessment['meta']['_ham_api_created']) && $assessment['meta']['_ham_api_created']) {
                     unset($assessments[$key]);
                     continue;
                 }
             }
-            
+
             // Reset array keys
             $assessments = array_values($assessments);
         }
-        
+
         // Include the template
         include HAM_PLUGIN_DIR . 'templates/admin/assessments-list.php';
     }
@@ -171,13 +179,14 @@ class HAM_Assessment_Manager {
     /**
      * Render assessment statistics page.
      */
-    public static function render_statistics_page() {
+    public static function render_statistics_page()
+    {
         // For statistics, we likely want all assessments to provide complete stats
         $source = 'all';
-        
+
         // Get statistics data (pass the source filter)
         $stats = self::get_assessment_statistics($source);
-        
+
         // Include the template
         include HAM_PLUGIN_DIR . 'templates/admin/assessment-statistics.php';
     }
@@ -188,7 +197,8 @@ class HAM_Assessment_Manager {
      * @param string $source Optional. Filter by assessment source ('admin', 'frontend', or 'all'). Default 'all'.
      * @return array Array of assessment data.
      */
-    public static function get_assessments($source = 'all') {
+    public static function get_assessments($source = 'all')
+    {
         $args = array(
             'post_type'      => HAM_CPT_ASSESSMENT,
             'posts_per_page' => -1,
@@ -222,7 +232,7 @@ class HAM_Assessment_Manager {
                         'compare' => 'NOT EXISTS',
                     ),
                 );
-            } else if ($source === 'frontend') {
+            } elseif ($source === 'frontend') {
                 // Frontend submissions have the frontend source flag
                 $args['meta_query'][] = array(
                     'key'     => '_ham_assessment_source',
@@ -243,26 +253,26 @@ class HAM_Assessment_Manager {
 
         foreach ($posts as $post) {
             $student_id = get_post_meta($post->ID, HAM_ASSESSMENT_META_STUDENT_ID, true);
-            
+
             // Debug: Log the post and student ID
             error_log('Processing post ID: ' . $post->ID . ', Student ID: ' . $student_id);
-            
+
             // Skip posts without a student ID (likely templates)
             if (empty($student_id)) {
                 error_log('Skipping post ' . $post->ID . ' - no student ID');
                 continue;
             }
-            
+
             $student = get_user_by('id', $student_id);
             $student_name = $student ? $student->display_name : esc_html__('Unknown Student', 'headless-access-manager');
-            
+
             $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
-            
+
             // Debug: Log the assessment data structure
             error_log('Assessment data structure for post ' . $post->ID . ': ' . (is_array($assessment_data) ? json_encode(array_keys($assessment_data)) : 'not an array'));
-            
+
             $completion_percentage = self::calculate_completion_percentage($assessment_data);
-            
+
             $assessments[] = array(
                 'id'           => $post->ID,
                 'title'        => $post->post_title,
@@ -287,7 +297,8 @@ class HAM_Assessment_Manager {
      * @param array $assessment_data The assessment data.
      * @return int Completion percentage.
      */
-    private static function calculate_completion_percentage($assessment_data) {
+    private static function calculate_completion_percentage($assessment_data)
+    {
         if (empty($assessment_data) || !is_array($assessment_data)) {
             return 0;
         }
@@ -320,9 +331,10 @@ class HAM_Assessment_Manager {
      * @param string $source Optional. Filter by assessment source ('admin', 'frontend', or 'all'). Default 'all'.
      * @return array Statistics data.
      */
-    public static function get_assessment_statistics($source = 'all') {
+    public static function get_assessment_statistics($source = 'all')
+    {
         $assessments = self::get_assessments($source);
-        
+
         // Initialize statistics data
         $stats = array(
             'total_assessments' => count($assessments),
@@ -340,11 +352,11 @@ class HAM_Assessment_Manager {
             ),
             'monthly_submissions' => array()
         );
-        
+
         if (empty($assessments)) {
             return $stats;
         }
-        
+
         // Process each assessment
         $student_ids = array();
         $completion_sum = 0;
@@ -354,19 +366,19 @@ class HAM_Assessment_Manager {
         $question_counts = array();
         $stage_counts = array('ej' => 0, 'trans' => 0, 'full' => 0);
         $monthly_data = array();
-        
+
         foreach ($assessments as $assessment) {
             // Track unique students
             if (!in_array($assessment['student_id'], $student_ids)) {
                 $student_ids[] = $assessment['student_id'];
             }
-            
+
             // Sum completion percentages
             $completion_sum += $assessment['completion'];
-            
+
             // Get full assessment data
             $assessment_data = get_post_meta($assessment['id'], HAM_ASSESSMENT_META_DATA, true);
-            
+
             if (!empty($assessment_data) && is_array($assessment_data)) {
                 // Process section data
                 foreach (array('anknytning', 'ansvar') as $section_key) {
@@ -376,7 +388,7 @@ class HAM_Assessment_Manager {
                                 // Track section averages
                                 $section_sums[$section_key] += intval($answer);
                                 $section_counts[$section_key]++;
-                                
+
                                 // Track question averages
                                 $question_key = $section_key . '_' . $question_id;
                                 if (!isset($question_sums[$question_key])) {
@@ -385,7 +397,7 @@ class HAM_Assessment_Manager {
                                 }
                                 $question_sums[$question_key] += intval($answer);
                                 $question_counts[$question_key]++;
-                                
+
                                 // Get stage information
                                 $stage = self::get_answer_stage($section_key, $question_id, $answer);
                                 if ($stage) {
@@ -396,7 +408,7 @@ class HAM_Assessment_Manager {
                     }
                 }
             }
-            
+
             // Track monthly submissions
             $month = date('Y-m', strtotime($assessment['date']));
             if (!isset($monthly_data[$month])) {
@@ -404,21 +416,21 @@ class HAM_Assessment_Manager {
             }
             $monthly_data[$month]++;
         }
-        
+
         // Calculate final statistics
         $stats['total_students'] = count($student_ids);
         $stats['average_completion'] = $stats['total_assessments'] > 0 ? round($completion_sum / $stats['total_assessments']) : 0;
-        
+
         // Calculate section averages
         foreach ($section_sums as $section => $sum) {
             $stats['section_averages'][$section] = $section_counts[$section] > 0 ? round($sum / $section_counts[$section], 1) : 0;
         }
-        
+
         // Calculate question averages
         foreach ($question_sums as $question => $sum) {
             $stats['question_averages'][$question] = $question_counts[$question] > 0 ? round($sum / $question_counts[$question], 1) : 0;
         }
-        
+
         // Calculate stage distribution percentages
         $total_answers = array_sum($stage_counts);
         if ($total_answers > 0) {
@@ -426,7 +438,7 @@ class HAM_Assessment_Manager {
                 $stats['stage_distribution'][$stage] = round(($count / $total_answers) * 100);
             }
         }
-        
+
         // Sort and format monthly data
         ksort($monthly_data);
         foreach ($monthly_data as $month => $count) {
@@ -435,7 +447,7 @@ class HAM_Assessment_Manager {
                 'count' => $count
             );
         }
-        
+
         return $stats;
     }
 
@@ -447,22 +459,23 @@ class HAM_Assessment_Manager {
      * @param string $answer Answer value.
      * @return string|null Stage value or null if not found.
      */
-    private static function get_answer_stage($section_key, $question_id, $answer) {
+    private static function get_answer_stage($section_key, $question_id, $answer)
+    {
         // Get the questions structure
         $structure = self::get_questions_structure();
-        
+
         if (empty($structure) || !isset($structure[$section_key]['questions'][$question_id]['options'])) {
             return null;
         }
-        
+
         $options = $structure[$section_key]['questions'][$question_id]['options'];
-        
+
         foreach ($options as $option) {
             if ($option['value'] === $answer && isset($option['stage'])) {
                 return $option['stage'];
             }
         }
-        
+
         return null;
     }
 
@@ -471,7 +484,8 @@ class HAM_Assessment_Manager {
      *
      * @return array Questions structure.
      */
-    private static function get_questions_structure() {
+    private static function get_questions_structure()
+    {
         // Define default options for questions
         $default_options = array(
             array('value' => '1', 'label' => 'Inte alls', 'stage' => 'ej'),
@@ -480,7 +494,7 @@ class HAM_Assessment_Manager {
             array('value' => '4', 'label' => 'Ofta', 'stage' => 'trans'),
             array('value' => '5', 'label' => 'Alltid', 'stage' => 'full')
         );
-        
+
         // Hardcoded question texts - normalize all keys to lowercase for consistency
         $question_texts = array(
             'anknytning' => array(
@@ -542,39 +556,39 @@ class HAM_Assessment_Manager {
                 );
                 continue;
             }
-            
+
             $section_data = $assessment_data[$section];
             $section_structure = array(
                 'title' => isset($section_data['title']) ? $section_data['title'] : ucfirst($section),
                 'questions' => array()
             );
-            
+
             // Process questions
             if (isset($section_data['questions']) && is_array($section_data['questions'])) {
                 foreach ($section_data['questions'] as $question_id => $question_data) {
                     // Normalize question ID to lowercase
                     $question_id = strtolower($question_id);
-                    
+
                     // If question_data is an array and has a text property, use it
                     if (is_array($question_data) && isset($question_data['text'])) {
                         $section_structure['questions'][$question_id] = $question_data;
-                    } 
+                    }
                     // Otherwise, create a structure with the question text
                     else {
                         $section_structure['questions'][$question_id] = array(
-                            'text' => isset($question_texts[$section][$question_id]) ? 
-                                    $question_texts[$section][$question_id] : 
+                            'text' => isset($question_texts[$section][$question_id]) ?
+                                    $question_texts[$section][$question_id] :
                                     ucfirst($question_id)
                         );
                     }
-                    
+
                     // Ensure options are set for each question
                     if (!isset($section_structure['questions'][$question_id]['options']) || !is_array($section_structure['questions'][$question_id]['options']) || empty($section_structure['questions'][$question_id]['options'])) {
                         $section_structure['questions'][$question_id]['options'] = $default_options;
                     }
                 }
             }
-            
+
             $structure[$section] = $section_structure;
         }
 
@@ -586,7 +600,8 @@ class HAM_Assessment_Manager {
      *
      * @return array Default questions structure.
      */
-    private static function get_default_questions_structure() {
+    private static function get_default_questions_structure()
+    {
         return array(
             'anknytning' => array(
                 'title' => 'Anknytningstecken',
@@ -605,21 +620,23 @@ class HAM_Assessment_Manager {
      * @param mixed $data The data to dump.
      * @param string $prefix A prefix for the log file.
      */
-    private function debug_dump($data, $prefix = 'debug') {
+    private function debug_dump($data, $prefix = 'debug')
+    {
         $file = HAM_PLUGIN_DIR . 'logs/' . $prefix . '-' . date('Y-m-d-H-i-s') . '.log';
-        
+
         // Create logs directory if it doesn't exist
         if (!file_exists(HAM_PLUGIN_DIR . 'logs/')) {
             mkdir(HAM_PLUGIN_DIR . 'logs/', 0755, true);
         }
-        
+
         file_put_contents($file, print_r($data, true));
     }
 
     /**
      * AJAX handler for getting assessment details.
      */
-    public function ajax_get_assessment_details() {
+    public function ajax_get_assessment_details()
+    {
         // Check nonce
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'ham_assessment_nonce')) {
             wp_send_json_error('Invalid nonce');
@@ -639,7 +656,7 @@ class HAM_Assessment_Manager {
         }
 
         $assessment_id = intval($_POST['assessment_id']);
-        
+
         // Debug information
         error_log('Processing assessment details request for ID: ' . $assessment_id);
 
@@ -655,20 +672,20 @@ class HAM_Assessment_Manager {
         $student_name = $student ? $student->display_name : esc_html__('Unknown Student', 'headless-access-manager');
 
         $assessment_data = get_post_meta($assessment_id, HAM_ASSESSMENT_META_DATA, true);
-        
+
         // Get the source of this assessment (admin, frontend, or undefined)
         $source = get_post_meta($assessment_id, '_ham_assessment_source', true);
         if (empty($source)) {
             // If no source is set, assume it's an admin assessment for backward compatibility
             $source = 'admin';
         }
-        
+
         // Dump raw data for debugging
         $this->debug_dump($assessment_data, 'raw-assessment-data-' . $assessment_id);
-        
+
         // Process the assessment data to ensure it's in the right format
         $processed_assessment_data = $this->process_assessment_data($assessment_data);
-        
+
         // Log processed data in a more readable way
         error_log('PROCESSED ASSESSMENT DATA STRUCTURE:');
         if (!empty($processed_assessment_data['anknytning']['questions'])) {
@@ -678,11 +695,11 @@ class HAM_Assessment_Manager {
                     if (isset($qdata['text'])) {
                         error_log(" - text: {$qdata['text']}");
                     }
-                    
+
                     if (isset($qdata['answer'])) {
                         error_log(" - answer: {$qdata['answer']}");
                     }
-                    
+
                     if (isset($qdata['options']) && is_array($qdata['options'])) {
                         error_log(" - has options: " . count($qdata['options']));
                         foreach ($qdata['options'] as $i => $opt) {
@@ -696,11 +713,11 @@ class HAM_Assessment_Manager {
         } else {
             error_log("No processed anknytning questions found!");
         }
-        
+
         // Get the questions structure - create a proper structure with question text and options
         // Do not rely on get_questions_structure() as it doesn't contain the proper structure
         $questions_structure = array();
-        
+
         // Define the default options
         $default_options = array(
             array('value' => '1', 'label' => 'Inte alls', 'stage' => 'ej'),
@@ -709,7 +726,7 @@ class HAM_Assessment_Manager {
             array('value' => '4', 'label' => 'Ofta', 'stage' => 'trans'),
             array('value' => '5', 'label' => 'Alltid', 'stage' => 'full')
         );
-        
+
         // Define default question texts - these should match the frontend
         $question_texts = array(
             'anknytning' => array(
@@ -731,17 +748,17 @@ class HAM_Assessment_Manager {
                 'b7' => 'Ansvar'
             )
         );
-        
+
         // Build a proper structure for each section
         foreach (array('anknytning', 'ansvar') as $section) {
             $questions = array();
-            
+
             // Add question structure with text and options for each key in assessment data
             if (!empty($processed_assessment_data[$section]['questions'])) {
                 foreach ($processed_assessment_data[$section]['questions'] as $qkey => $qdata) {
                     // Normalize key
                     $qkey = strtolower($qkey);
-                    
+
                     // Add question with proper text and options
                     $questions[$qkey] = array(
                         'text' => isset($question_texts[$section][$qkey]) ? $question_texts[$section][$qkey] : ucfirst($qkey),
@@ -749,17 +766,17 @@ class HAM_Assessment_Manager {
                     );
                 }
             }
-            
+
             $questions_structure[$section] = array(
                 'title' => $section == 'anknytning' ? 'Anknytningstecken' : 'Ansvarstecken',
                 'questions' => $questions
             );
         }
-        
+
         // Dump processed data for debugging
         $this->debug_dump($processed_assessment_data, 'processed-assessment-data-' . $assessment_id);
         $this->debug_dump($questions_structure, 'questions-structure-' . $assessment_id);
-        
+
         // Debug information
         error_log('Raw assessment data: ' . print_r($assessment_data, true));
         error_log('Processed assessment data: ' . print_r($processed_assessment_data, true));
@@ -779,23 +796,24 @@ class HAM_Assessment_Manager {
 
         wp_send_json_success($response);
     }
-    
+
     /**
      * Process assessment data to ensure it's in the right format for display.
      *
      * @param array $data Raw assessment data.
      * @return array Processed assessment data.
      */
-    private function process_assessment_data($data) {
+    private function process_assessment_data($data)
+    {
         if (!is_array($data)) {
             return array();
         }
-        
+
         error_log('Raw data structure: ' . json_encode($data));
         $this->debug_dump($data, 'raw-data-structure');
-        
+
         $processed_data = array();
-        
+
         // Process each section
         foreach (array('anknytning', 'ansvar') as $section) {
             if (!isset($data[$section]) || !is_array($data[$section])) {
@@ -805,36 +823,36 @@ class HAM_Assessment_Manager {
                 );
                 continue;
             }
-            
+
             $section_data = $data[$section];
             $processed_section = array(
                 'questions' => array(),
                 'comments' => isset($section_data['comments']) ? $section_data['comments'] : ''
             );
-            
+
             error_log('Section ' . $section . ' data: ' . json_encode($section_data));
-            
+
             // Get questions structure for reference
             $questions_structure = self::get_questions_structure();
-            $section_structure = isset($questions_structure[$section]) && isset($questions_structure[$section]['questions']) 
-                ? $questions_structure[$section]['questions'] 
+            $section_structure = isset($questions_structure[$section]) && isset($questions_structure[$section]['questions'])
+                ? $questions_structure[$section]['questions']
                 : array();
-            
+
             // Process questions
             if (isset($section_data['questions']) && is_array($section_data['questions'])) {
                 foreach ($section_data['questions'] as $question_id => $answer) {
                     error_log('Question ' . $question_id . ' answer: ' . json_encode($answer));
-                    
+
                     // If answer is an array, extract the relevant information
                     if (is_array($answer)) {
                         // Convert the array to a more readable format
                         $processed_answer = array();
-                        
+
                         // Extract text or value
                         if (isset($answer['text'])) {
                             $processed_answer['text'] = $answer['text'];
                         }
-                        
+
                         if (isset($answer['value'])) {
                             $processed_answer['value'] = $answer['value'];
                             error_log("Found value in answer: " . $answer['value']);
@@ -842,13 +860,13 @@ class HAM_Assessment_Manager {
                             $processed_answer['value'] = $answer['selected'];
                             error_log("Found selected in answer: " . $answer['selected']);
                         }
-                        
+
                         // Extract stage if available
                         if (isset($answer['stage'])) {
                             $processed_answer['stage'] = $answer['stage'];
                             error_log("Found stage directly in answer: " . $answer['stage']);
                         }
-                        
+
                         // Look for any numeric property that might be the value
                         if (!isset($processed_answer['value'])) {
                             foreach ($answer as $key => $value) {
@@ -859,40 +877,40 @@ class HAM_Assessment_Manager {
                                 }
                             }
                         }
-                        
+
                         // If we still don't have a value, use the first option value as a default
-                        if (!isset($processed_answer['value']) && isset($section_structure[$question_id]) && 
-                            isset($section_structure[$question_id]['options']) && 
-                            is_array($section_structure[$question_id]['options']) && 
+                        if (!isset($processed_answer['value']) && isset($section_structure[$question_id]) &&
+                            isset($section_structure[$question_id]['options']) &&
+                            is_array($section_structure[$question_id]['options']) &&
                             !empty($section_structure[$question_id]['options'])) {
-                            
+
                             $first_option = $section_structure[$question_id]['options'][0];
                             $processed_answer['value'] = $first_option['value'];
                             error_log("Using first option value as default: " . $first_option['value']);
-                            
+
                             // Also include the stage if available and not already set
                             if (!isset($processed_answer['stage']) && isset($first_option['stage'])) {
                                 $processed_answer['stage'] = $first_option['stage'];
                                 error_log("Using first option stage as default: " . $first_option['stage']);
                             }
                         }
-                        
+
                         // If we have a value but no stage, try to find the stage from the matching option
-                        if (isset($processed_answer['value']) && !isset($processed_answer['stage']) && 
-                            isset($section_structure[$question_id]) && 
-                            isset($section_structure[$question_id]['options']) && 
+                        if (isset($processed_answer['value']) && !isset($processed_answer['stage']) &&
+                            isset($section_structure[$question_id]) &&
+                            isset($section_structure[$question_id]['options']) &&
                             is_array($section_structure[$question_id]['options'])) {
-                            
+
                             error_log("Looking for option with value: " . $processed_answer['value']);
                             $found_matching_option = false;
-                            
+
                             foreach ($section_structure[$question_id]['options'] as $option) {
                                 error_log("Checking option: " . json_encode($option));
-                                
+
                                 // Convert both values to strings for comparison
                                 $option_value = (string) $option['value'];
                                 $selected_value = (string) $processed_answer['value'];
-                                
+
                                 if (isset($option['value']) && $option_value === $selected_value && isset($option['stage'])) {
                                     $processed_answer['stage'] = $option['stage'];
                                     error_log("Found matching option with stage: " . $option['stage']);
@@ -900,34 +918,34 @@ class HAM_Assessment_Manager {
                                     break;
                                 }
                             }
-                            
+
                             if (!$found_matching_option) {
                                 error_log("No matching option found for value: " . $processed_answer['value']);
                             }
                         }
-                        
+
                         error_log("Final processed answer: " . json_encode($processed_answer));
                         $processed_section['questions'][$question_id] = $processed_answer;
                     } else {
                         // If answer is not an array, keep it as is
                         $processed_answer = array('value' => $answer);
                         error_log("Answer is a primitive: $answer");
-                        
+
                         // Try to find the stage from the matching option
-                        if (isset($section_structure[$question_id]) && 
-                            isset($section_structure[$question_id]['options']) && 
+                        if (isset($section_structure[$question_id]) &&
+                            isset($section_structure[$question_id]['options']) &&
                             is_array($section_structure[$question_id]['options'])) {
-                            
+
                             error_log("Looking for option with value: $answer");
                             $found_matching_option = false;
-                            
+
                             foreach ($section_structure[$question_id]['options'] as $option) {
                                 error_log("Checking option: " . json_encode($option));
-                                
+
                                 // Convert both values to strings for comparison
                                 $option_value = (string) $option['value'];
                                 $selected_value = (string) $answer;
-                                
+
                                 if (isset($option['value']) && $option_value === $selected_value && isset($option['stage'])) {
                                     $processed_answer['stage'] = $option['stage'];
                                     error_log("Found matching option with stage: " . $option['stage']);
@@ -935,21 +953,21 @@ class HAM_Assessment_Manager {
                                     break;
                                 }
                             }
-                            
+
                             if (!$found_matching_option) {
                                 error_log("No matching option found for value: $answer");
                             }
                         }
-                        
+
                         error_log("Final processed answer: " . json_encode($processed_answer));
                         $processed_section['questions'][$question_id] = $processed_answer;
                     }
                 }
             }
-            
+
             $processed_data[$section] = $processed_section;
         }
-        
+
         $this->debug_dump($processed_data, 'processed-data-structure');
         return $processed_data;
     }
@@ -957,7 +975,8 @@ class HAM_Assessment_Manager {
     /**
      * AJAX handler for getting assessment statistics.
      */
-    public function ajax_get_assessment_stats() {
+    public function ajax_get_assessment_stats()
+    {
         // Check nonce
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'ham_assessment_nonce')) {
             wp_send_json_error('Invalid nonce');
@@ -981,7 +1000,8 @@ class HAM_Assessment_Manager {
      *
      * @param string $hook Current admin page.
      */
-    public function enqueue_admin_assets($hook) {
+    public function enqueue_admin_assets($hook)
+    {
         // Debug information
         error_log('Enqueuing assets for hook: ' . $hook);
 
@@ -1010,7 +1030,7 @@ class HAM_Assessment_Manager {
         // Add Chart.js for statistics page
         if (strpos($hook, 'ham-assessment-stats') !== false || strpos($hook, 'page_ham-assessment-stats') !== false) {
             error_log('Loading Chart.js on hook: ' . $hook);
-            
+
             wp_enqueue_script(
                 'chart-js',
                 'https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js',
@@ -1043,31 +1063,32 @@ class HAM_Assessment_Manager {
 
     /**
      * Filter the post type listing to exclude frontend assessments
-     * 
+     *
      * @param WP_Query $query The WP query object
      */
-    public function filter_assessment_admin_listing($query) {
+    public function filter_assessment_admin_listing($query)
+    {
         global $pagenow, $typenow;
-        
+
         // Only apply on the post type listing page for ham_assessment
         if (!is_admin() || $pagenow !== 'edit.php' || $typenow !== HAM_CPT_ASSESSMENT || !$query->is_main_query()) {
             return;
         }
-        
+
         // Skip if explicitly requesting to see all assessments
         if (isset($_GET['view']) && $_GET['view'] === 'all') {
             return;
         }
-        
+
         // Skip if we're viewing a single assessment
         if (isset($_GET['post'])) {
             return;
         }
-        
+
         // Direct SQL filter for frontend submissions - more reliable than meta query
         add_filter('posts_where', array($this, 'exclude_frontend_assessments_sql'), 10, 2);
     }
-    
+
     /**
      * Add SQL conditions to exclude frontend submissions
      * This is more reliable than meta_query for complex conditions
@@ -1076,41 +1097,83 @@ class HAM_Assessment_Manager {
      * @param WP_Query $query The WP_Query instance
      * @return string Modified WHERE clause
      */
-    public function exclude_frontend_assessments_sql($where, $query) {
+    public function exclude_frontend_assessments_sql($where, $query)
+    {
         global $wpdb;
-        
+
         // Only apply once per request
         remove_filter('posts_where', array($this, 'exclude_frontend_assessments_sql'), 10);
-        
+
         // SQL to exclude frontend submissions based on multiple indicators
         $where .= " AND (
             /* Submissions with admin source */
             EXISTS (
-                SELECT 1 FROM {$wpdb->postmeta} 
-                WHERE {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID 
-                AND {$wpdb->postmeta}.meta_key = '_ham_assessment_source' 
+                SELECT 1 FROM {$wpdb->postmeta}
+                WHERE {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID
+                AND {$wpdb->postmeta}.meta_key = '_ham_assessment_source'
                 AND {$wpdb->postmeta}.meta_value = 'admin'
             )
             OR
             /* Identified admin posts */
             (
-                {$wpdb->posts}.post_author != 0 
+                {$wpdb->posts}.post_author != 0
                 AND NOT EXISTS (
-                    SELECT 1 FROM {$wpdb->postmeta} 
-                    WHERE {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID 
+                    SELECT 1 FROM {$wpdb->postmeta}
+                    WHERE {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID
                     AND (
                         ({$wpdb->postmeta}.meta_key = '_ham_assessment_source' AND {$wpdb->postmeta}.meta_value = 'frontend')
-                        OR 
+                        OR
                         ({$wpdb->postmeta}.meta_key = '_ham_api_created' AND {$wpdb->postmeta}.meta_value = '1')
                     )
                 )
-                AND {$wpdb->posts}.post_title NOT LIKE '%frontend%' 
+                AND {$wpdb->posts}.post_title NOT LIKE '%frontend%'
                 AND {$wpdb->posts}.post_title NOT LIKE '%submission%'
                 AND {$wpdb->posts}.post_title NOT LIKE '%tryggve%'
             )
         )";
-        
+
         return $where;
+    }
+
+    /**
+     * AJAX handler for deleting assessments
+     *
+     * Checks for proper authentication
+     * and permissions before performing the deletion.
+     *
+     * @uses check_ajax_referer() For security verification
+     * @uses current_user_can() To check user permissions
+     * @uses wp_delete_post() To delete the assessment
+     * @uses wp_send_json_error() To send error response
+     * @uses wp_send_json_success() To send success response
+     *
+     * @return void Sends JSON response and exits
+     */
+    public function ajax_delete_assessment()
+    {
+        // Verify nonce
+        if (!check_ajax_referer('ham_assessment_nonce', 'nonce', false)) {
+            wp_send_json_error(array('message' => 'Invalid security token.'));
+        }
+
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Insufficient permissions.'));
+        }
+
+        $assessment_id = intval($_POST['assessment_id']);
+        if (!$assessment_id) {
+            wp_send_json_error(array('message' => 'Invalid assessment ID.'));
+        }
+
+        // Delete the assessment
+        $result = wp_delete_post($assessment_id, true);
+
+        if ($result) {
+            wp_send_json_success(array('message' => 'Assessment deleted successfully.'));
+        } else {
+            wp_send_json_error(array('message' => 'Failed to delete assessment.'));
+        }
     }
 }
 
