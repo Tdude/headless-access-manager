@@ -22,20 +22,147 @@ class HAM_Assessment_Manager {
      * Constructor.
      */
     public function __construct() {
+        // Fix metadata on existing assessments (one-time operation)
+        add_action('admin_init', array($this, 'fix_assessment_metadata'));
+        
         // Register AJAX handlers
         add_action('wp_ajax_ham_get_assessment_details', array($this, 'ajax_get_assessment_details'));
         add_action('wp_ajax_ham_get_assessment_stats', array($this, 'ajax_get_assessment_stats'));
 
         // Enqueue scripts and styles
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
+        
+        // Filter out frontend assessments from the default post type listing
+        add_action('pre_get_posts', array($this, 'filter_assessment_admin_listing'));
+    }
+    
+    /**
+     * Fix metadata on existing assessments.
+     * This ensures all frontend submissions have the correct source flag.
+     */
+    public function fix_assessment_metadata() {
+        // Only run for administrators to avoid unnecessary DB operations
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        
+        // Force re-run if explicitly requested via URL parameter
+        $force_run = isset($_GET['fix_assessments']) && $_GET['fix_assessments'] === '1';
+        
+        // Check if we've already run this fix
+        $fix_run = get_option('ham_assessment_metadata_fixed', false);
+        if ($fix_run && !$force_run) {
+            return;
+        }
+        
+        global $wpdb;
+        
+        // Find ALL assessments, regardless of metadata
+        $assessments = get_posts(array(
+            'post_type' => HAM_CPT_ASSESSMENT,
+            'posts_per_page' => -1,
+            'post_status' => 'any',
+            'meta_query' => array(
+                array(
+                    'key' => HAM_ASSESSMENT_META_STUDENT_ID,
+                    'value' => '',
+                    'compare' => '!=',
+                ),
+            ),
+        ));
+        
+        $count = 0;
+        
+        // For each assessment, determine if it's frontend or admin
+        foreach ($assessments as $assessment) {
+            $is_frontend = false;
+            
+            // Strong indicators of frontend submission
+            $frontend_indicators = array(
+                // Check if created via API
+                get_post_meta($assessment->ID, '_ham_api_created', true),
+                // Check for zero author (common in API submissions)
+                $assessment->post_author == 0,
+                // Check for REST API creation
+                strpos($assessment->post_content, 'rest-api') !== false,
+                // Check submission metadata
+                get_post_meta($assessment->ID, '_ham_frontend_submission', true)
+            );
+            
+            // If any indicator is true, mark as frontend
+            foreach ($frontend_indicators as $indicator) {
+                if ($indicator) {
+                    $is_frontend = true;
+                    break;
+                }
+            }
+            
+            // Set the source metadata
+            update_post_meta($assessment->ID, '_ham_assessment_source', $is_frontend ? 'frontend' : 'admin');
+            $count++;
+        }
+        
+        // Mark as completed to avoid running again
+        update_option('ham_assessment_metadata_fixed', true);
+        
+        if ($count > 0) {
+            // Add an admin notice that metadata was fixed
+            add_action('admin_notices', function() use ($count) {
+                echo '<div class="notice notice-success is-dismissible"><p>' . 
+                    sprintf(__('Updated source metadata for %d assessments.', 'headless-access-manager'), $count) . 
+                    '</p></div>';
+            });
+        }
+        
+        // If force run was triggered via URL, redirect back to assessment list
+        if ($force_run) {
+            // Remove the parameter to avoid looping
+            wp_redirect(admin_url('edit.php?post_type=' . HAM_CPT_ASSESSMENT . '&metadata_fixed=' . $count));
+            exit;
+        }
     }
 
     /**
      * Render assessments list page.
      */
     public static function render_assessments_page() {
-        // Get assessments
-        $assessments = self::get_assessments();
+        // Get current screen to determine which source filter to use
+        $screen = get_current_screen();
+        $source = 'all'; // Show all assessments in the custom admin page
+        
+        // Check if explicitly requesting admin source only
+        if (isset($_GET['source']) && $_GET['source'] === 'admin' && current_user_can('manage_options')) {
+            $source = 'admin';
+        }
+        
+        // Get assessments with the appropriate filter
+        $assessments = self::get_assessments($source);
+        
+        // Double-check: filter out any assessments that might still be from frontend
+        if ($source === 'admin') {
+            foreach ($assessments as $key => $assessment) {
+                // Check author (frontend often uses author 0)
+                if ($assessment['author_id'] == 0) {
+                    unset($assessments[$key]);
+                    continue;
+                }
+                
+                // Check source metadata 
+                if (isset($assessment['meta']['_ham_assessment_source']) && $assessment['meta']['_ham_assessment_source'] === 'frontend') {
+                    unset($assessments[$key]);
+                    continue;
+                }
+                
+                // Check API created flag
+                if (isset($assessment['meta']['_ham_api_created']) && $assessment['meta']['_ham_api_created']) {
+                    unset($assessments[$key]);
+                    continue;
+                }
+            }
+            
+            // Reset array keys
+            $assessments = array_values($assessments);
+        }
         
         // Include the template
         include HAM_PLUGIN_DIR . 'templates/admin/assessments-list.php';
@@ -45,8 +172,11 @@ class HAM_Assessment_Manager {
      * Render assessment statistics page.
      */
     public static function render_statistics_page() {
-        // Get statistics data
-        $stats = self::get_assessment_statistics();
+        // For statistics, we likely want all assessments to provide complete stats
+        $source = 'all';
+        
+        // Get statistics data (pass the source filter)
+        $stats = self::get_assessment_statistics($source);
         
         // Include the template
         include HAM_PLUGIN_DIR . 'templates/admin/assessment-statistics.php';
@@ -55,9 +185,10 @@ class HAM_Assessment_Manager {
     /**
      * Get all assessments with student information.
      *
+     * @param string $source Optional. Filter by assessment source ('admin', 'frontend', or 'all'). Default 'all'.
      * @return array Array of assessment data.
      */
-    public static function get_assessments() {
+    public static function get_assessments($source = 'all') {
         $args = array(
             'post_type'      => HAM_CPT_ASSESSMENT,
             'posts_per_page' => -1,
@@ -73,6 +204,33 @@ class HAM_Assessment_Manager {
                 ),
             ),
         );
+
+        // Add source filter if specified
+        if ($source !== 'all') {
+            // Add a meta query to check for the source flag
+            if ($source === 'admin') {
+                // Admin templates either have the admin flag or don't have any source flag
+                $args['meta_query'][] = array(
+                    'relation' => 'OR',
+                    array(
+                        'key'     => '_ham_assessment_source',
+                        'value'   => 'admin',
+                        'compare' => '=',
+                    ),
+                    array(
+                        'key'     => '_ham_assessment_source',
+                        'compare' => 'NOT EXISTS',
+                    ),
+                );
+            } else if ($source === 'frontend') {
+                // Frontend submissions have the frontend source flag
+                $args['meta_query'][] = array(
+                    'key'     => '_ham_assessment_source',
+                    'value'   => 'frontend',
+                    'compare' => '=',
+                );
+            }
+        }
 
         // Debug: Log the query arguments
         error_log('Assessment query args: ' . print_r($args, true));
@@ -159,10 +317,11 @@ class HAM_Assessment_Manager {
     /**
      * Get assessment statistics.
      *
+     * @param string $source Optional. Filter by assessment source ('admin', 'frontend', or 'all'). Default 'all'.
      * @return array Statistics data.
      */
-    public static function get_assessment_statistics() {
-        $assessments = self::get_assessments();
+    public static function get_assessment_statistics($source = 'all') {
+        $assessments = self::get_assessments($source);
         
         // Initialize statistics data
         $stats = array(
@@ -322,6 +481,28 @@ class HAM_Assessment_Manager {
             array('value' => '5', 'label' => 'Alltid', 'stage' => 'full')
         );
         
+        // Hardcoded question texts - normalize all keys to lowercase for consistency
+        $question_texts = array(
+            'anknytning' => array(
+                'a1' => 'Närvaro',
+                'a2' => 'Dialog 1',
+                'a3' => 'Dialog 2',
+                'a4' => 'Kontakt',
+                'a5' => 'Samarbete',
+                'a6' => 'Vid konflikt', // Updated to match frontend
+                'a7' => 'Engagemang'
+            ),
+            'ansvar' => array(
+                'b1' => 'Uppgift',
+                'b2' => 'Initiativ',
+                'b3' => 'Material',
+                'b4' => 'Tid',
+                'b5' => 'Regler',
+                'b6' => 'Vid konflikt',
+                'b7' => 'Ansvar'
+            )
+        );
+
         // Get the most recent assessment that has question data
         $assessments = get_posts(array(
             'post_type'      => HAM_CPT_ASSESSMENT,
@@ -352,107 +533,49 @@ class HAM_Assessment_Manager {
         // Return only the questions part of the structure
         $structure = array();
 
-        // Hardcoded question texts as a fallback
-        $question_texts = array(
-            'anknytning' => array(
-                'A1' => 'Närvaro',
-                'A2' => 'Dialog 1',
-                'A3' => 'Dialog 2',
-                'A4' => 'Kontakt',
-                'A5' => 'Samarbete',
-                'A6' => 'Intresse',
-                'A7' => 'Engagemang'
-            ),
-            'ansvar' => array(
-                'B1' => 'Uppgift',
-                'B2' => 'Initiativ',
-                'B3' => 'Material',
-                'B4' => 'Tid',
-                'B5' => 'Regler',
-                'B6' => 'Konflikt',
-                'B7' => 'Ansvar'
-            )
-        );
-
-        // Log the raw assessment data for debugging
-        error_log('Raw assessment data: ' . json_encode($assessment_data));
-        
-        if (isset($assessment_data['anknytning']) && isset($assessment_data['anknytning']['questions'])) {
-            $questions = array();
-            
-            // Process each question to ensure it has a text property
-            foreach ($assessment_data['anknytning']['questions'] as $question_id => $question_data) {
-                // If question_data is an array and has a text property, use it
-                if (is_array($question_data) && isset($question_data['text'])) {
-                    $questions[$question_id] = $question_data;
-                } 
-                // Otherwise, create a structure with the question text
-                else {
-                    $questions[$question_id] = array(
-                        'text' => isset($question_texts['anknytning'][$question_id]) ? 
-                                $question_texts['anknytning'][$question_id] : 
-                                ucfirst($question_id)
-                    );
-                }
-                
-                // Ensure options are set for each question
-                if (!isset($questions[$question_id]['options']) || !is_array($questions[$question_id]['options']) || empty($questions[$question_id]['options'])) {
-                    $questions[$question_id]['options'] = $default_options;
-                }
-                
-                // Log the processed question data
-                error_log('Processed question data for ' . $question_id . ': ' . json_encode($questions[$question_id]));
+        // Process each section
+        foreach (array('anknytning', 'ansvar') as $section) {
+            if (!isset($assessment_data[$section]) || !is_array($assessment_data[$section])) {
+                $structure[$section] = array(
+                    'title' => ucfirst($section),
+                    'questions' => array()
+                );
+                continue;
             }
             
-            $structure['anknytning'] = array(
-                'title' => 'Anknytningstecken',
-                'questions' => $questions
-            );
-        } else {
-            $structure['anknytning'] = array(
-                'title' => 'Anknytningstecken',
+            $section_data = $assessment_data[$section];
+            $section_structure = array(
+                'title' => isset($section_data['title']) ? $section_data['title'] : ucfirst($section),
                 'questions' => array()
             );
-            error_log('Anknytning questions not found in assessment data');
-        }
-
-        if (isset($assessment_data['ansvar']) && isset($assessment_data['ansvar']['questions'])) {
-            $questions = array();
             
-            // Process each question to ensure it has a text property
-            foreach ($assessment_data['ansvar']['questions'] as $question_id => $question_data) {
-                // If question_data is an array and has a text property, use it
-                if (is_array($question_data) && isset($question_data['text'])) {
-                    $questions[$question_id] = $question_data;
-                } 
-                // Otherwise, create a structure with the question text
-                else {
-                    $questions[$question_id] = array(
-                        'text' => isset($question_texts['ansvar'][$question_id]) ? 
-                                $question_texts['ansvar'][$question_id] : 
-                                ucfirst($question_id)
-                    );
+            // Process questions
+            if (isset($section_data['questions']) && is_array($section_data['questions'])) {
+                foreach ($section_data['questions'] as $question_id => $question_data) {
+                    // Normalize question ID to lowercase
+                    $question_id = strtolower($question_id);
+                    
+                    // If question_data is an array and has a text property, use it
+                    if (is_array($question_data) && isset($question_data['text'])) {
+                        $section_structure['questions'][$question_id] = $question_data;
+                    } 
+                    // Otherwise, create a structure with the question text
+                    else {
+                        $section_structure['questions'][$question_id] = array(
+                            'text' => isset($question_texts[$section][$question_id]) ? 
+                                    $question_texts[$section][$question_id] : 
+                                    ucfirst($question_id)
+                        );
+                    }
+                    
+                    // Ensure options are set for each question
+                    if (!isset($section_structure['questions'][$question_id]['options']) || !is_array($section_structure['questions'][$question_id]['options']) || empty($section_structure['questions'][$question_id]['options'])) {
+                        $section_structure['questions'][$question_id]['options'] = $default_options;
+                    }
                 }
-                
-                // Ensure options are set for each question
-                if (!isset($questions[$question_id]['options']) || !is_array($questions[$question_id]['options']) || empty($questions[$question_id]['options'])) {
-                    $questions[$question_id]['options'] = $default_options;
-                }
-                
-                // Log the processed question data
-                error_log('Processed question data for ' . $question_id . ': ' . json_encode($questions[$question_id]));
             }
             
-            $structure['ansvar'] = array(
-                'title' => 'Ansvarstecken',
-                'questions' => $questions
-            );
-        } else {
-            $structure['ansvar'] = array(
-                'title' => 'Ansvarstecken',
-                'questions' => array()
-            );
-            error_log('Ansvar questions not found in assessment data');
+            $structure[$section] = $section_structure;
         }
 
         return $structure;
@@ -533,13 +656,105 @@ class HAM_Assessment_Manager {
 
         $assessment_data = get_post_meta($assessment_id, HAM_ASSESSMENT_META_DATA, true);
         
+        // Get the source of this assessment (admin, frontend, or undefined)
+        $source = get_post_meta($assessment_id, '_ham_assessment_source', true);
+        if (empty($source)) {
+            // If no source is set, assume it's an admin assessment for backward compatibility
+            $source = 'admin';
+        }
+        
         // Dump raw data for debugging
         $this->debug_dump($assessment_data, 'raw-assessment-data-' . $assessment_id);
         
         // Process the assessment data to ensure it's in the right format
         $processed_assessment_data = $this->process_assessment_data($assessment_data);
         
-        $questions_structure = self::get_questions_structure();
+        // Log processed data in a more readable way
+        error_log('PROCESSED ASSESSMENT DATA STRUCTURE:');
+        if (!empty($processed_assessment_data['anknytning']['questions'])) {
+            foreach ($processed_assessment_data['anknytning']['questions'] as $qkey => $qdata) {
+                error_log("Question key: $qkey");
+                if (!empty($qdata) && is_array($qdata)) {
+                    if (isset($qdata['text'])) {
+                        error_log(" - text: {$qdata['text']}");
+                    }
+                    
+                    if (isset($qdata['answer'])) {
+                        error_log(" - answer: {$qdata['answer']}");
+                    }
+                    
+                    if (isset($qdata['options']) && is_array($qdata['options'])) {
+                        error_log(" - has options: " . count($qdata['options']));
+                        foreach ($qdata['options'] as $i => $opt) {
+                            if (is_array($opt)) {
+                                error_log("   - option[$i]: value={$opt['value']}, label={$opt['label']}, stage={$opt['stage']}");
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            error_log("No processed anknytning questions found!");
+        }
+        
+        // Get the questions structure - create a proper structure with question text and options
+        // Do not rely on get_questions_structure() as it doesn't contain the proper structure
+        $questions_structure = array();
+        
+        // Define the default options
+        $default_options = array(
+            array('value' => '1', 'label' => 'Inte alls', 'stage' => 'ej'),
+            array('value' => '2', 'label' => 'Sällan', 'stage' => 'ej'),
+            array('value' => '3', 'label' => 'Ibland', 'stage' => 'trans'),
+            array('value' => '4', 'label' => 'Ofta', 'stage' => 'trans'),
+            array('value' => '5', 'label' => 'Alltid', 'stage' => 'full')
+        );
+        
+        // Define default question texts - these should match the frontend
+        $question_texts = array(
+            'anknytning' => array(
+                'a1' => 'Närvaro',
+                'a2' => 'Dialog 1',
+                'a3' => 'Dialog 2',
+                'a4' => 'Kontakt',
+                'a5' => 'Samarbete',
+                'a6' => 'Vid konflikt',
+                'a7' => 'Engagemang'
+            ),
+            'ansvar' => array(
+                'b1' => 'Uppgift',
+                'b2' => 'Initiativ',
+                'b3' => 'Material',
+                'b4' => 'Tid',
+                'b5' => 'Regler',
+                'b6' => 'Vid konflikt',
+                'b7' => 'Ansvar'
+            )
+        );
+        
+        // Build a proper structure for each section
+        foreach (array('anknytning', 'ansvar') as $section) {
+            $questions = array();
+            
+            // Add question structure with text and options for each key in assessment data
+            if (!empty($processed_assessment_data[$section]['questions'])) {
+                foreach ($processed_assessment_data[$section]['questions'] as $qkey => $qdata) {
+                    // Normalize key
+                    $qkey = strtolower($qkey);
+                    
+                    // Add question with proper text and options
+                    $questions[$qkey] = array(
+                        'text' => isset($question_texts[$section][$qkey]) ? $question_texts[$section][$qkey] : ucfirst($qkey),
+                        'options' => $default_options
+                    );
+                }
+            }
+            
+            $questions_structure[$section] = array(
+                'title' => $section == 'anknytning' ? 'Anknytningstecken' : 'Ansvarstecken',
+                'questions' => $questions
+            );
+        }
         
         // Dump processed data for debugging
         $this->debug_dump($processed_assessment_data, 'processed-assessment-data-' . $assessment_id);
@@ -558,7 +773,8 @@ class HAM_Assessment_Manager {
             'author_id' => $assessment->post_author,
             'author_name' => get_the_author_meta('display_name', $assessment->post_author),
             'assessment_data' => $processed_assessment_data,
-            'questions_structure' => $questions_structure
+            'questions_structure' => $questions_structure,
+            'source' => $source // Include the source in the response for reference
         );
 
         wp_send_json_success($response);
@@ -766,13 +982,13 @@ class HAM_Assessment_Manager {
      * @param string $hook Current admin page.
      */
     public function enqueue_admin_assets($hook) {
-        // Only enqueue on our plugin pages
-        if (strpos($hook, 'ham-assessments') === false && strpos($hook, 'ham-assessment-stats') === false) {
-            return;
-        }
-
         // Debug information
         error_log('Enqueuing assets for hook: ' . $hook);
+
+        // Only enqueue on our plugin pages
+        if (strpos($hook, 'ham-assessments') === false && strpos($hook, 'ham-assessment-stats') === false && strpos($hook, 'page_ham-assessment-stats') === false) {
+            return;
+        }
 
         // Enqueue CSS
         wp_enqueue_style(
@@ -792,7 +1008,9 @@ class HAM_Assessment_Manager {
         );
 
         // Add Chart.js for statistics page
-        if (strpos($hook, 'ham-assessment-stats') !== false) {
+        if (strpos($hook, 'ham-assessment-stats') !== false || strpos($hook, 'page_ham-assessment-stats') !== false) {
+            error_log('Loading Chart.js on hook: ' . $hook);
+            
             wp_enqueue_script(
                 'chart-js',
                 'https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js',
@@ -818,8 +1036,81 @@ class HAM_Assessment_Manager {
                 'question' => esc_html__('Question', 'headless-access-manager'),
                 'answer' => esc_html__('Answer', 'headless-access-manager'),
                 'comments' => esc_html__('Comments', 'headless-access-manager'),
+                'confirmDelete' => esc_html__('Are you sure you want to delete this assessment?', 'headless-access-manager'),
             )
         ));
+    }
+
+    /**
+     * Filter the post type listing to exclude frontend assessments
+     * 
+     * @param WP_Query $query The WP query object
+     */
+    public function filter_assessment_admin_listing($query) {
+        global $pagenow, $typenow;
+        
+        // Only apply on the post type listing page for ham_assessment
+        if (!is_admin() || $pagenow !== 'edit.php' || $typenow !== HAM_CPT_ASSESSMENT || !$query->is_main_query()) {
+            return;
+        }
+        
+        // Skip if explicitly requesting to see all assessments
+        if (isset($_GET['view']) && $_GET['view'] === 'all') {
+            return;
+        }
+        
+        // Skip if we're viewing a single assessment
+        if (isset($_GET['post'])) {
+            return;
+        }
+        
+        // Direct SQL filter for frontend submissions - more reliable than meta query
+        add_filter('posts_where', array($this, 'exclude_frontend_assessments_sql'), 10, 2);
+    }
+    
+    /**
+     * Add SQL conditions to exclude frontend submissions
+     * This is more reliable than meta_query for complex conditions
+     *
+     * @param string $where The WHERE clause of the query
+     * @param WP_Query $query The WP_Query instance
+     * @return string Modified WHERE clause
+     */
+    public function exclude_frontend_assessments_sql($where, $query) {
+        global $wpdb;
+        
+        // Only apply once per request
+        remove_filter('posts_where', array($this, 'exclude_frontend_assessments_sql'), 10);
+        
+        // SQL to exclude frontend submissions based on multiple indicators
+        $where .= " AND (
+            /* Submissions with admin source */
+            EXISTS (
+                SELECT 1 FROM {$wpdb->postmeta} 
+                WHERE {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID 
+                AND {$wpdb->postmeta}.meta_key = '_ham_assessment_source' 
+                AND {$wpdb->postmeta}.meta_value = 'admin'
+            )
+            OR
+            /* Identified admin posts */
+            (
+                {$wpdb->posts}.post_author != 0 
+                AND NOT EXISTS (
+                    SELECT 1 FROM {$wpdb->postmeta} 
+                    WHERE {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID 
+                    AND (
+                        ({$wpdb->postmeta}.meta_key = '_ham_assessment_source' AND {$wpdb->postmeta}.meta_value = 'frontend')
+                        OR 
+                        ({$wpdb->postmeta}.meta_key = '_ham_api_created' AND {$wpdb->postmeta}.meta_value = '1')
+                    )
+                )
+                AND {$wpdb->posts}.post_title NOT LIKE '%frontend%' 
+                AND {$wpdb->posts}.post_title NOT LIKE '%submission%'
+                AND {$wpdb->posts}.post_title NOT LIKE '%tryggve%'
+            )
+        )";
+        
+        return $where;
     }
 }
 

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Headless Access Manager\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-06 22:36+0200\n"
-"PO-Revision-Date: 2025-04-06 23:09+0200\n"
+"PO-Revision-Date: 2025-04-07 22:48+0200\n"
 "Last-Translator: Tdude <tibbecodes@gmail.com>\n"
 "Language-Team: \n"
 "Language: sv_SE\n"
@@ -97,15 +97,18 @@ msgstr "ID"
 msgid "Title"
 msgstr "Titel"
 
-#: templates/admin/assessments-list.php:61 inc/admin/class-ham-assessment-manager.php:815
+#: templates/admin/assessments-list.php:61
+#: inc/admin/class-ham-assessment-manager.php:815
 msgid "Student"
 msgstr "Elev"
 
-#: templates/admin/assessments-list.php:62 inc/admin/class-ham-assessment-manager.php:816
+#: templates/admin/assessments-list.php:62
+#: inc/admin/class-ham-assessment-manager.php:816
 msgid "Date"
 msgstr "Datum"
 
-#: templates/admin/assessments-list.php:63 inc/admin/class-ham-assessment-manager.php:817
+#: templates/admin/assessments-list.php:63
+#: inc/admin/class-ham-assessment-manager.php:817
 msgid "Author"
 msgstr "Författare"
 
@@ -133,7 +136,8 @@ msgstr "Ta bort"
 msgid "Assessment Details"
 msgstr "Bedömningsdetaljer"
 
-#: templates/admin/assessments-list.php:112 inc/admin/class-ham-assessment-manager.php:810
+#: templates/admin/assessments-list.php:112
+#: inc/admin/class-ham-assessment-manager.php:810
 msgid "Loading..."
 msgstr "Laddar..."
 
@@ -151,7 +155,7 @@ msgstr "Datum:"
 
 #: templates/admin/assessments-list.php:125
 msgid "Author:"
-msgstr "Författare:"
+msgstr "Ansvarig pedagog:"
 
 #: templates/admin/assessments-list.php:134
 msgid "Anknytning"
@@ -165,19 +169,28 @@ msgstr "Ansvar"
 msgid "Anknytningstecken"
 msgstr "Anknytningstecken"
 
-#: templates/admin/assessments-list.php:143 templates/admin/assessments-list.php:162 inc/admin/class-ham-assessment-manager.php:818 assets/js/evaluation-manager.js:207
+#: templates/admin/assessments-list.php:143
+#: templates/admin/assessments-list.php:162
+#: inc/admin/class-ham-assessment-manager.php:818
+#: assets/js/evaluation-manager.js:207
 msgid "Question"
 msgstr "Fråga"
 
-#: templates/admin/assessments-list.php:144 templates/admin/assessments-list.php:163 inc/admin/class-ham-assessment-manager.php:819 assets/js/evaluation-manager.js:208
+#: templates/admin/assessments-list.php:144
+#: templates/admin/assessments-list.php:163
+#: inc/admin/class-ham-assessment-manager.php:819
+#: assets/js/evaluation-manager.js:208
 msgid "Answer"
 msgstr "Svar"
 
-#: templates/admin/assessments-list.php:145 templates/admin/assessments-list.php:164 assets/js/evaluation-manager.js:210
+#: templates/admin/assessments-list.php:145
+#: templates/admin/assessments-list.php:164 assets/js/evaluation-manager.js:210
 msgid "Stage"
 msgstr "Nuläge"
 
-#: templates/admin/assessments-list.php:152 templates/admin/assessments-list.php:171 inc/admin/class-ham-assessment-manager.php:820
+#: templates/admin/assessments-list.php:152
+#: templates/admin/assessments-list.php:171
+#: inc/admin/class-ham-assessment-manager.php:820
 msgid "Comments"
 msgstr "Kommentarer"
 
@@ -185,7 +198,8 @@ msgstr "Kommentarer"
 msgid "Ansvarstecken"
 msgstr "Ansvarstecken"
 
-#: templates/admin/assessments-list.php:179 inc/admin/class-ham-assessment-manager.php:814
+#: templates/admin/assessments-list.php:179
+#: inc/admin/class-ham-assessment-manager.php:814
 msgid "Close"
 msgstr "Stäng"
 

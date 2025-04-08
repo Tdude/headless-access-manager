@@ -11,7 +11,7 @@ if (! defined('ABSPATH')) {
 }
 ?>
 <div class="wrap">
-    <h1><?php echo esc_html__('Assessment Statistics', 'headless-access-manager'); ?></h1>
+    <h1><?php echo esc_html__('Bedömningsstatistik', 'headless-access-manager'); ?></h1>
     
     <div class="ham-stats-overview">
         <div class="ham-stats-card">
@@ -20,7 +20,7 @@ if (! defined('ABSPATH')) {
             </div>
             <div class="ham-stats-data">
                 <div class="ham-stats-value"><?php echo esc_html($stats['total_assessments']); ?></div>
-                <div class="ham-stats-label"><?php echo esc_html__('Total Assessments', 'headless-access-manager'); ?></div>
+                <div class="ham-stats-label"><?php echo esc_html__('Totalt antal bedömningar', 'headless-access-manager'); ?></div>
             </div>
         </div>
         
@@ -30,7 +30,7 @@ if (! defined('ABSPATH')) {
             </div>
             <div class="ham-stats-data">
                 <div class="ham-stats-value"><?php echo esc_html($stats['total_students']); ?></div>
-                <div class="ham-stats-label"><?php echo esc_html__('Students Assessed', 'headless-access-manager'); ?></div>
+                <div class="ham-stats-label"><?php echo esc_html__('Bedömda elever', 'headless-access-manager'); ?></div>
             </div>
         </div>
         
@@ -40,7 +40,7 @@ if (! defined('ABSPATH')) {
             </div>
             <div class="ham-stats-data">
                 <div class="ham-stats-value"><?php echo esc_html($stats['average_completion']); ?>%</div>
-                <div class="ham-stats-label"><?php echo esc_html__('Average Completion', 'headless-access-manager'); ?></div>
+                <div class="ham-stats-label"><?php echo esc_html__('Genomsnittlig slutförandegrad', 'headless-access-manager'); ?></div>
             </div>
         </div>
         
@@ -59,7 +59,7 @@ if (! defined('ABSPATH')) {
                     }
                     ?>
                 </div>
-                <div class="ham-stats-label"><?php echo esc_html__('Assessments This Month', 'headless-access-manager'); ?></div>
+                <div class="ham-stats-label"><?php echo esc_html__('Bedömningar denna månad', 'headless-access-manager'); ?></div>
             </div>
         </div>
     </div>
@@ -67,32 +67,67 @@ if (! defined('ABSPATH')) {
     <div class="ham-stats-row">
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Monthly Submissions', 'headless-access-manager'); ?></h2>
-                <div class="ham-chart-container">
-                    <canvas id="monthlyChart"></canvas>
+                <h2><?php echo esc_html__('Månatliga inlämningar', 'headless-access-manager'); ?></h2>
+                <div id="monthlyChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
+                    <?php
+                    $monthlyData = array_map(function($item) {
+                        return array(
+                            'month' => date_i18n('M Y', strtotime($item['month'] . '-01')),
+                            'count' => $item['count']
+                        );
+                    }, $stats['monthly_submissions']);
+                    
+                    if (empty($monthlyData)) {
+                        echo '<p>' . esc_html__('Inga data att visa', 'headless-access-manager') . '</p>';
+                    } else {
+                        echo '<div class="ham-simple-chart">';
+                        foreach ($monthlyData as $item) {
+                            $height = $item['count'] * 20; // 20px per unit
+                            echo '<div class="ham-bar-wrapper" style="display: inline-block; margin: 0 10px; text-align: center;">';
+                            echo '<div class="ham-bar" style="height: ' . esc_attr($height) . 'px; width: 30px; background-color: #0073aa; display: inline-block;"></div>';
+                            echo '<div class="ham-bar-label" style="margin-top: 5px;">' . esc_html($item['month']) . '</div>';
+                            echo '<div class="ham-bar-value" style="font-weight: bold;">' . esc_html($item['count']) . '</div>';
+                            echo '</div>';
+                        }
+                        echo '</div>';
+                    }
+                    ?>
                 </div>
             </div>
         </div>
         
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Stage Distribution', 'headless-access-manager'); ?></h2>
-                <div class="ham-chart-container">
-                    <canvas id="stageChart"></canvas>
-                </div>
-                <div class="ham-chart-legend">
-                    <div class="ham-legend-item">
-                        <span class="ham-legend-color" style="background-color: #ffecec;"></span>
-                        <span class="ham-legend-label"><?php echo esc_html__('Not Achieved', 'headless-access-manager'); ?> (<?php echo esc_html($stats['stage_distribution']['ej']); ?>%)</span>
-                    </div>
-                    <div class="ham-legend-item">
-                        <span class="ham-legend-color" style="background-color: #fcf8e3;"></span>
-                        <span class="ham-legend-label"><?php echo esc_html__('Transitional', 'headless-access-manager'); ?> (<?php echo esc_html($stats['stage_distribution']['trans']); ?>%)</span>
-                    </div>
-                    <div class="ham-legend-item">
-                        <span class="ham-legend-color" style="background-color: #ecf8ec;"></span>
-                        <span class="ham-legend-label"><?php echo esc_html__('Fully Achieved', 'headless-access-manager'); ?> (<?php echo esc_html($stats['stage_distribution']['full']); ?>%)</span>
-                    </div>
+                <h2><?php echo esc_html__('Fördelning av nuläge', 'headless-access-manager'); ?></h2>
+                <div id="stageChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
+                    <?php
+                    $stageData = array(
+                        array(
+                            'label' => esc_html__('Ej anknuten', 'headless-access-manager'),
+                            'value' => $stats['stage_distribution']['ej'],
+                            'color' => '#ffecec'
+                        ),
+                        array(
+                            'label' => esc_html__('Under utveckling', 'headless-access-manager'),
+                            'value' => $stats['stage_distribution']['trans'],
+                            'color' => '#fcf8e3'
+                        ),
+                        array(
+                            'label' => esc_html__('Helt anknuten', 'headless-access-manager'),
+                            'value' => $stats['stage_distribution']['full'],
+                            'color' => '#ecf8ec'
+                        )
+                    );
+                    
+                    echo '<div class="ham-simple-pie" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap;">';
+                    foreach ($stageData as $item) {
+                        echo '<div style="margin: 10px; text-align: center; width: 120px;">';
+                        echo '<div style="height: 80px; width: 80px; margin: 0 auto; background-color: ' . esc_attr($item['color']) . '; border-radius: 50%;"></div>';
+                        echo '<div style="margin-top: 10px;"><strong>' . esc_html($item['label']) . '</strong>: ' . esc_html($item['value']) . '%</div>';
+                        echo '</div>';
+                    }
+                    echo '</div>';
+                    ?>
                 </div>
             </div>
         </div>
@@ -101,22 +136,47 @@ if (! defined('ABSPATH')) {
     <div class="ham-stats-row">
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Section Averages', 'headless-access-manager'); ?></h2>
-                <div class="ham-chart-container">
-                    <canvas id="sectionChart"></canvas>
+                <h2><?php echo esc_html__('Snitt per sektion', 'headless-access-manager'); ?></h2>
+                <div id="sectionChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
+                    <?php
+                    $sectionData = array(
+                        array(
+                            'label' => esc_html__('Anknytning', 'headless-access-manager'),
+                            'value' => $stats['section_averages']['anknytning'],
+                            'color' => '#0073aa'
+                        ),
+                        array(
+                            'label' => esc_html__('Ansvar', 'headless-access-manager'),
+                            'value' => $stats['section_averages']['ansvar'],
+                            'color' => '#00a0d2'
+                        )
+                    );
+                    
+                    echo '<div class="ham-simple-bars" style="display: flex; justify-content: center; align-items: flex-end; height: 200px;">';
+                    foreach ($sectionData as $item) {
+                        $height = ($item['value'] / 5) * 150; // Scale to max height of 150px (5 is max value)
+                        echo '<div style="margin: 0 20px; text-align: center;">';
+                        echo '<div style="height: ' . esc_attr($height) . 'px; width: 60px; background-color: ' . esc_attr($item['color']) . ';"></div>';
+                        echo '<div style="margin-top: 10px;"><strong>' . esc_html($item['label']) . '</strong>: ' . esc_html($item['value']) . '</div>';
+                        echo '</div>';
+                    }
+                    echo '</div>';
+                    ?>
                 </div>
             </div>
         </div>
-        
+    </div>
+    
+    <div class="ham-stats-row">
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Top Questions', 'headless-access-manager'); ?></h2>
+                <h2><?php echo esc_html__('Toppfrågor', 'headless-access-manager'); ?></h2>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
-                            <th><?php echo esc_html__('Question', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('Section', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('Average Score', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('Fråga', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('Sektion', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('Snittbedömning', 'headless-access-manager'); ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -154,7 +214,7 @@ if (! defined('ABSPATH')) {
                         }
                         
                         if ($count === 0) {
-                            echo '<tr><td colspan="3">' . esc_html__('No question data available.', 'headless-access-manager') . '</td></tr>';
+                            echo '<tr><td colspan="3">' . esc_html__('Ingen frågedata tillgänglig.', 'headless-access-manager') . '</td></tr>';
                         }
                         ?>
                     </tbody>
@@ -163,131 +223,6 @@ if (! defined('ABSPATH')) {
         </div>
     </div>
 </div>
-
-<script>
-jQuery(document).ready(function($) {
-    // Chart.js configuration
-    Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif';
-    Chart.defaults.font.size = 13;
-    Chart.defaults.color = '#666';
-    
-    // Monthly Submissions Chart
-    const monthlyData = <?php echo json_encode(array_map(function($item) {
-        return array(
-            'month' => date_i18n('M Y', strtotime($item['month'] . '-01')),
-            'count' => $item['count']
-        );
-    }, $stats['monthly_submissions'])); ?>;
-    
-    new Chart(document.getElementById('monthlyChart'), {
-        type: 'bar',
-        data: {
-            labels: monthlyData.map(item => item.month),
-            datasets: [{
-                label: '<?php echo esc_js(__('Assessments', 'headless-access-manager')); ?>',
-                data: monthlyData.map(item => item.count),
-                backgroundColor: '#0073aa',
-                borderColor: '#0073aa',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        precision: 0
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-    
-    // Stage Distribution Chart
-    new Chart(document.getElementById('stageChart'), {
-        type: 'pie',
-        data: {
-            labels: [
-                '<?php echo esc_js(__('Not Achieved', 'headless-access-manager')); ?>',
-                '<?php echo esc_js(__('Transitional', 'headless-access-manager')); ?>',
-                '<?php echo esc_js(__('Fully Achieved', 'headless-access-manager')); ?>'
-            ],
-            datasets: [{
-                data: [
-                    <?php echo esc_js($stats['stage_distribution']['ej']); ?>,
-                    <?php echo esc_js($stats['stage_distribution']['trans']); ?>,
-                    <?php echo esc_js($stats['stage_distribution']['full']); ?>
-                ],
-                backgroundColor: ['#ffecec', '#fcf8e3', '#ecf8ec'],
-                borderColor: ['#d63638', '#8a6d3b', '#2a9d2a'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + context.raw + '%';
-                        }
-                    }
-                }
-            }
-        }
-    });
-    
-    // Section Averages Chart
-    new Chart(document.getElementById('sectionChart'), {
-        type: 'bar',
-        data: {
-            labels: [
-                '<?php echo esc_js(__('Anknytning', 'headless-access-manager')); ?>',
-                '<?php echo esc_js(__('Ansvar', 'headless-access-manager')); ?>'
-            ],
-            datasets: [{
-                label: '<?php echo esc_js(__('Average Score', 'headless-access-manager')); ?>',
-                data: [
-                    <?php echo esc_js($stats['section_averages']['anknytning']); ?>,
-                    <?php echo esc_js($stats['section_averages']['ansvar']); ?>
-                ],
-                backgroundColor: ['#0073aa', '#00a0d2'],
-                borderColor: ['#0073aa', '#00a0d2'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 5,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-});
-</script>
 
 <style>
 /* Statistics Page Styles */
@@ -387,6 +322,76 @@ jQuery(document).ready(function($) {
 .ham-legend-label {
     font-size: 13px;
     color: #646970;
+}
+
+.ham-simple-chart {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 200px;
+}
+
+.ham-bar-wrapper {
+    margin: 0 10px;
+}
+
+.ham-bar {
+    width: 30px;
+    background-color: #0073aa;
+}
+
+.ham-bar-label {
+    margin-top: 5px;
+    font-size: 13px;
+    color: #646970;
+}
+
+.ham-bar-value {
+    font-weight: bold;
+    font-size: 14px;
+    color: #23282d;
+}
+
+.ham-simple-pie {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.ham-simple-pie > div {
+    margin: 10px;
+    text-align: center;
+    width: 120px;
+}
+
+.ham-simple-pie > div > div:first-child {
+    height: 80px;
+    width: 80px;
+    margin: 0 auto;
+    border-radius: 50%;
+}
+
+.ham-simple-pie > div > div:last-child {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #23282d;
+}
+
+.ham-simple-bars {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 200px;
+}
+
+.ham-simple-bars > div {
+    margin: 0 20px;
+    text-align: center;
+}
+
+.ham-simple-bars > div > div:first-child {
+    width: 60px;
 }
 
 @media screen and (max-width: 782px) {
