@@ -41,12 +41,10 @@
             // Try to parse existing data from textarea
             try {
                 var jsonData = this.$assessmentData.val();
-                console.log('Initial JSON data:', jsonData);
 
                 if (jsonData && jsonData.trim() !== '') {
                     var parsed = JSON.parse(jsonData);
                     this.assessmentData = parsed;
-                    console.log('Parsed assessment data:', this.assessmentData);
                 } else {
                     // Use fallback structure
                     this.assessmentData = {
@@ -61,10 +59,9 @@
                             comments: []
                         }
                     };
-                    console.log('Using fallback structure (empty JSON)');
                 }
             } catch (e) {
-                console.error('Error parsing JSON:', e);
+                console.error('Error parsing JSON');
                 // Use same fallback structure on error
                 this.assessmentData = {
                     anknytning: {
