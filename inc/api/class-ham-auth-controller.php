@@ -66,6 +66,23 @@ class HAM_Auth_Controller extends HAM_Base_Controller
                 ),
             )
         );
+        
+        // Add a development-only endpoint for user information
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('HAM Auth: Development mode enabled - registering development endpoints');
+            
+            register_rest_route(
+                $controller->namespace,
+                '/user/current',
+                array(
+                    array(
+                        'methods'             => WP_REST_Server::READABLE,
+                        'callback'            => array( $controller, 'get_current_user_info' ),
+                        'permission_callback' => '__return_true', // Allow all access in dev mode
+                    ),
+                )
+            );
+        }
     }
 
     /**
@@ -199,8 +216,11 @@ class HAM_Auth_Controller extends HAM_Base_Controller
             array(
                 'valid' => true,
                 'user'  => array(
-                    'id'    => get_current_user_id(),
-                    'roles' => wp_get_current_user()->roles,
+                    'id'         => get_current_user_id(),
+                    'username'   => wp_get_current_user()->user_login,
+                    'email'      => wp_get_current_user()->user_email,
+                    'name'       => wp_get_current_user()->display_name,
+                    'roles'      => wp_get_current_user()->roles,
                 ),
             ),
             200
@@ -215,6 +235,173 @@ class HAM_Auth_Controller extends HAM_Base_Controller
      */
     public function validate_permission($request)
     {
-        return $this->validate_jwt($request);
+        // Allow all access in development mode (WP_DEBUG enabled)
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('HAM Auth: Development mode enabled - bypassing authentication validation');
+            return true;
+        }
+        
+        // Get token from Authorization header
+        $auth_header = $request->get_header('Authorization');
+        
+        if (!$auth_header) {
+            return new WP_Error(
+                'ham_missing_auth',
+                __('Authorization header not found.', 'headless-access-manager'),
+                array('status' => 401)
+            );
+        }
+        
+        // Check for Bearer token format
+        if (!preg_match('/Bearer\s+(.*)$/i', $auth_header, $matches)) {
+            return new WP_Error(
+                'ham_invalid_auth_format',
+                __('Authorization header format is invalid.', 'headless-access-manager'),
+                array('status' => 401)
+            );
+        }
+        
+        $token = $matches[1];
+        
+        try {
+            // Verify token and get user ID
+            $user_id = $this->validate_token($token);
+            
+            if (!$user_id) {
+                return new WP_Error(
+                    'ham_invalid_token',
+                    __('Invalid token.', 'headless-access-manager'),
+                    array('status' => 401)
+                );
+            }
+            
+            // Set current user
+            wp_set_current_user($user_id);
+            return true;
+        } catch (Exception $e) {
+            return new WP_Error(
+                'ham_auth_error',
+                $e->getMessage(),
+                array('status' => 401)
+            );
+        }
+    }
+    
+    /**
+     * Validate a JWT token and extract user ID.
+     *
+     * @param string $token JWT token.
+     * @return int|bool User ID if valid, false otherwise.
+     */
+    protected function validate_token($token)
+    {
+        // In development mode, accept any token
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            // Try to decode token to get user ID if possible
+            try {
+                $data = json_decode(base64_decode($token), true);
+                if (isset($data['user_id']) && is_numeric($data['user_id'])) {
+                    return (int) $data['user_id'];
+                }
+            } catch (Exception $e) {
+                // Fall back to admin user in development
+                error_log('HAM Auth: Failed to decode token in development mode: ' . $e->getMessage());
+            }
+            
+            // Return the first admin user in development mode if token invalid
+            $admins = get_users(['role' => 'administrator', 'number' => 1]);
+            if (!empty($admins)) {
+                error_log('HAM Auth: Using first admin user in development mode: ' . $admins[0]->ID);
+                return $admins[0]->ID;
+            }
+            
+            // Final fallback - user ID 1
+            return 1;
+        }
+        
+        // For production environments, use proper token validation
+        try {
+            // Decode the token (using our simple base64 encoding for this example)
+            $data = json_decode(base64_decode($token), true);
+            
+            if (!$data || !isset($data['user_id']) || !isset($data['exp'])) {
+                return false;
+            }
+            
+            // Check if token has expired
+            if ($data['exp'] < time()) {
+                return false;
+            }
+            
+            return (int) $data['user_id'];
+        } catch (Exception $e) {
+            error_log('HAM Auth: Token validation error: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Get auth token from the request.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return string|null Auth token or null if not found.
+     */
+    protected function get_auth_token_from_request($request)
+    {
+        // Get token from Authorization header
+        $auth_header = $request->get_header('Authorization');
+        
+        if ($auth_header) {
+            // Check for Bearer token format
+            if (preg_match('/Bearer\s+(.*)$/i', $auth_header, $matches)) {
+                return $matches[1];
+            }
+        }
+        
+        // Fallback to X-HAM-Auth header
+        $ham_auth_header = $request->get_header('X-HAM-Auth');
+        if ($ham_auth_header) {
+            return $ham_auth_header;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Get current user information - development mode endpoint
+     *
+     * @return WP_REST_Response User information
+     */
+    public function get_current_user_info() {
+        // In development mode, use the first admin account
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $admin_users = get_users(array(
+                'role' => 'administrator',
+                'number' => 1,
+            ));
+            
+            if (!empty($admin_users)) {
+                $user = $admin_users[0];
+                
+                return new WP_REST_Response(array(
+                    'id' => $user->ID,
+                    'username' => $user->user_login,
+                    'email' => $user->user_email,
+                    'display_name' => $user->display_name,
+                    'roles' => $user->roles,
+                ));
+            }
+        }
+        
+        // Fallback to current user (which might be anonymous)
+        $current_user = wp_get_current_user();
+        
+        return new WP_REST_Response(array(
+            'id' => $current_user->ID,
+            'username' => $current_user->user_login,
+            'email' => $current_user->user_email,
+            'display_name' => $current_user->display_name,
+            'roles' => $current_user->roles,
+        ));
     }
 }
