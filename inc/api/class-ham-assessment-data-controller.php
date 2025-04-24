@@ -518,61 +518,29 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
      */
     private function get_default_questions_structure()
     {
-        // Return a default structure based on the requirements
-        return array(
-            'anknytning' => array(
-                'title' => 'Anknytningstecken',
-                'questions' => array(
-                    'narvaro' => array(
-                        'text' => 'Närvaro',
-                        'options' => array(
-                            array('value' => '1', 'label' => 'Kommer inte till skolan', 'stage' => 'ej'),
-                            array('value' => '2', 'label' => 'Kommer till skolan, ej till lektion', 'stage' => 'ej'),
-                            array('value' => '3', 'label' => 'Kommer till min lektion ibland', 'stage' => 'trans'),
-                            array('value' => '4', 'label' => 'Kommer alltid till min lektion', 'stage' => 'trans'),
-                            array('value' => '5', 'label' => 'Kommer till andras lektioner', 'stage' => 'full'),
-                        ),
-                    ),
-                    'dialog1' => array(
-                        'text' => 'Dialog 1',
-                        'options' => array(
-                            array('value' => '1', 'label' => 'Helt tyst', 'stage' => 'ej'),
-                            array('value' => '2', 'label' => 'Säger enstaka ord till mig', 'stage' => 'ej'),
-                            array('value' => '3', 'label' => 'Vi pratar ibland', 'stage' => 'trans'),
-                            array('value' => '4', 'label' => 'Har full dialog med mig', 'stage' => 'trans'),
-                            array('value' => '5', 'label' => 'Har dialog med andra vuxna', 'stage' => 'full'),
-                        ),
-                    ),
-                    // Additional default fields as needed...
-                ),
-            ),
-            'ansvar' => array(
-                'title' => 'Ansvarstecken',
-                'questions' => array(
-                    'impulskontroll' => array(
-                        'text' => 'Impulskontroll',
-                        'options' => array(
-                            array('value' => '1', 'label' => 'Helt impulsstyrd', 'stage' => 'ej'),
-                            array('value' => '2', 'label' => 'Kan ibland hålla negativa känslor', 'stage' => 'ej'),
-                            array('value' => '3', 'label' => 'Skäms över negativa beteenden', 'stage' => 'trans'),
-                            array('value' => '4', 'label' => 'Kan ta mot tillsägelse', 'stage' => 'trans'),
-                            array('value' => '5', 'label' => 'Kan prata om det som hänt', 'stage' => 'full'),
-                        ),
-                    ),
-                    'fokus' => array(
-                        'text' => 'Fokus',
-                        'options' => array(
-                            array('value' => '1', 'label' => 'Kan inte koncentrera sig', 'stage' => 'ej'),
-                            array('value' => '2', 'label' => 'Kan fokusera en kort stund vid enskild tillsägelse', 'stage' => 'ej'),
-                            array('value' => '3', 'label' => 'Kan fokusera självmant tillsammans med andra', 'stage' => 'trans'),
-                            array('value' => '4', 'label' => 'Pratar om fokus och förbättrar sig', 'stage' => 'trans'),
-                            array('value' => '5', 'label' => 'Kan fokusera och koncentrera sig', 'stage' => 'full'),
-                        ),
-                    ),
-                    // Additional default fields as needed...
-                ),
-            ),
-        );
+        require_once dirname(__FILE__, 2) . '/assessment-constants.php';
+        $canonical = HAM_ASSESSMENT_DEFAULT_STRUCTURE;
+        // Map canonical to API format (id, text, options only), prepend marker
+        $map_section = function($section, $context) {
+            $out = ['title' => $section['title'], 'questions' => []];
+            // Add context marker as first question
+            $out['questions']['__source__'] = [
+                'text' => '[api/class-ham-assessment-data-controller.php]',
+                'options' => [],
+            ];
+            foreach ($section['questions'] as $qid => $q) {
+                $out['questions'][$qid] = [
+                    'text' => $q['text'],
+                    'options' => $q['options'],
+                ];
+            }
+            $out['comments'] = [];
+            return $out;
+        };
+        return [
+            'anknytning' => $map_section($canonical['anknytning'], 'anknytning'),
+            'ansvar' => $map_section($canonical['ansvar'], 'ansvar'),
+        ];
     }
 
     /**

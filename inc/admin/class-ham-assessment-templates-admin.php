@@ -137,46 +137,36 @@ class HAM_Assessment_Templates_Admin
      */
     private function get_default_structure()
     {
-        return array(
-            'sections' => array(
-                array(
-                    'id' => 'anknytning',
-                    'title' => 'Anknytningstecken',
-                    'fields' => array(
-                        array(
-                            'id' => 'narvaro',
-                            'title' => 'Närvaro',
-                            'options' => array(
-                                array('value' => '1', 'label' => 'Kommer inte till skolan', 'stage' => 'ej'),
-                                array('value' => '2', 'label' => 'Kommer till skolan, ej till lektion', 'stage' => 'ej'),
-                                array('value' => '3', 'label' => 'Kommer till min lektion ibland', 'stage' => 'trans'),
-                                array('value' => '4', 'label' => 'Kommer alltid till min lektion', 'stage' => 'trans'),
-                                array('value' => '5', 'label' => 'Kommer till andras lektioner', 'stage' => 'full'),
-                            ),
-                        ),
-                        // More fields here...
-                    ),
-                ),
-                array(
-                    'id' => 'ansvar',
-                    'title' => 'Ansvarstecken',
-                    'fields' => array(
-                        array(
-                            'id' => 'impulskontroll',
-                            'title' => 'Impulskontroll',
-                            'options' => array(
-                                array('value' => '1', 'label' => 'Helt impulsstyrd', 'stage' => 'ej'),
-                                array('value' => '2', 'label' => 'Kan ibland hålla negativa känslor', 'stage' => 'ej'),
-                                array('value' => '3', 'label' => 'Skäms över negativa beteenden', 'stage' => 'trans'),
-                                array('value' => '4', 'label' => 'Kan ta mot tillsägelse', 'stage' => 'trans'),
-                                array('value' => '5', 'label' => 'Kan prata om det som hänt', 'stage' => 'full'),
-                            ),
-                        ),
-                        // More fields here...
-                    ),
-                ),
-            ),
-        );
+        require_once dirname(__FILE__, 2) . '/assessment-constants.php';
+        $canonical = HAM_ASSESSMENT_DEFAULT_STRUCTURE;
+        // Map canonical to template format (sections/fields), prepend marker
+        $section_map = function($section_id, $section, $context) {
+            $fields = [];
+            // Add context marker as first field
+            $fields[] = [
+                'id' => '__source__',
+                'title' => '[admin/class-ham-assessment-templates-admin.php]',
+                'options' => [],
+            ];
+            foreach ($section['questions'] as $qid => $q) {
+                $fields[] = [
+                    'id' => $qid,
+                    'title' => $q['text'],
+                    'options' => $q['options'],
+                ];
+            }
+            return [
+                'id' => $section_id,
+                'title' => $section['title'],
+                'fields' => $fields,
+            ];
+        };
+        return [
+            'sections' => [
+                $section_map('anknytning', $canonical['anknytning'], 'anknytning'),
+                $section_map('ansvar', $canonical['ansvar'], 'ansvar'),
+            ],
+        ];
     }
 
     /**
