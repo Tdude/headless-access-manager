@@ -4,7 +4,7 @@
  * Plugin Name: Headless Access Manager
  * Plugin URI: https://stegetfore.se
  * Description: Manages user roles, permissions, and form data for a headless WordPress site with Next.js frontend.
- * Version: 1.0.0
+ * Version: 1.0.2
  * Author: Tibor Berki
  * Author URI: https://stegetfore.se
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (! defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('HAM_VERSION', '1.0.0');
+define('HAM_VERSION', '1.0.2');
 define('HAM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('HAM_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('HAM_PLUGIN_BASENAME', plugin_basename(__FILE__));
