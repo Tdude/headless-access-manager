@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HAM_PLUGIN="wp-content/plugins/ham-plugin/ham-plugin.php"
+HAM_PLUGIN="wp-content/plugins/headless-access-manager/headless-access-manager.php"
 
 # --- GET CURRENT VERSION ---
 CUR_VERSION=$(grep -m1 -Eo 'Version: *[0-9]+\.[0-9]+\.[0-9]+' "$HAM_PLUGIN" | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
