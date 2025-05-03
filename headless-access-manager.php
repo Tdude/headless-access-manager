@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name: Headless Access Manager
  * Plugin URI: https://stegetfore.se
@@ -10,7 +9,8 @@
  * License: GPL v2 or later
  * Text Domain: headless-access-manager
  * Domain Path: /languages
- *
+ * License: GPL-3.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * @package HeadlessAccessManager
  */
 

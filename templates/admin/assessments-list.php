@@ -93,7 +93,7 @@ if (! defined('ABSPATH')) {
                                 if ($stage === 'full') {
                                     $stage_class = 'ham-stage-full';
                                     $stage_text = esc_html__('Helt etablerad', 'headless-access-manager');
-                                } elseif ($stage === 'transition') {
+                                } elseif ($stage === 'trans') {
                                     $stage_class = 'ham-stage-transition';
                                     $stage_text = esc_html__('Under utveckling', 'headless-access-manager');
                                 } else {

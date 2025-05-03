@@ -271,6 +271,25 @@ class HAM_Assessment_Manager
             // Debug: Log the assessment data structure
             error_log('Assessment data structure for post ' . $post->ID . ': ' . (is_array($assessment_data) ? json_encode(array_keys($assessment_data)) : 'not an array'));
 
+            // Fine-grained numeric evaluation logic
+            $values = array();
+            if (is_array($assessment_data)) {
+                foreach (array('anknytning', 'ansvar') as $section_key) {
+                    if (isset($assessment_data[$section_key]['questions']) && is_array($assessment_data[$section_key]['questions'])) {
+                        foreach ($assessment_data[$section_key]['questions'] as $question_id => $answer) {
+                            if ($answer !== '' && $answer !== null) {
+                                $numeric = floatval($answer);
+                                // Normalize 1-5 scale to 0-1
+                                $normalized = ($numeric - 1) / 4;
+                                $values[] = $normalized;
+                            }
+                        }
+                    }
+                }
+            }
+            $average = count($values) ? array_sum($values) / count($values) : 0;
+            $summary_stage = self::map_average_to_stage($average);
+
             $completion_percentage = self::calculate_completion_percentage($assessment_data);
 
             $assessments[] = array(
@@ -282,6 +301,8 @@ class HAM_Assessment_Manager
                 'completion'   => $completion_percentage,
                 'author_id'    => $post->post_author,
                 'author_name'  => get_the_author_meta('display_name', $post->post_author),
+                'stage'        => $summary_stage,
+                'stage_score'  => $average,
             );
         }
 
@@ -1173,6 +1194,23 @@ class HAM_Assessment_Manager
             wp_send_json_success(array('message' => 'Assessment deleted successfully.'));
         } else {
             wp_send_json_error(array('message' => 'Failed to delete assessment.'));
+        }
+    }
+
+    /**
+     * Map average score to a stage.
+     *
+     * @param float $average Average score.
+     * @return string Stage value.
+     */
+    private static function map_average_to_stage($average) {
+        // Evaluation grades
+        if ($average < 0.4) {
+            return 'ej'; // "not"
+        } elseif ($average < 0.7) {
+            return 'trans';
+        } else {
+            return 'full';
         }
     }
 }

@@ -295,6 +295,31 @@
             renderAssessmentSection('anknytning', data);
             renderAssessmentSection('ansvar', data);
 
+            // Set comments for each section (per-question)
+            function renderSectionComments(sectionName, data) {
+                const section = data.assessment_data[sectionName];
+                const structure = data.questions_structure[sectionName];
+                const $commentsContainer = $(`#ham-${sectionName}-comments`);
+                $commentsContainer.empty();
+                if (section && section.comments && typeof section.comments === 'object') {
+                    // Comments keyed by question ID
+                    Object.entries(section.comments).forEach(([qKey, comment]) => {
+                        // Try to get question text from structure
+                        let questionText = (structure && structure.questions && structure.questions[qKey] && structure.questions[qKey].text) || qKey;
+                        if (comment && comment.trim() !== '') {
+                            $commentsContainer.append(`<div class="ham-question-comment"><strong>${questionText}:</strong> ${comment}</div>`);
+                        }
+                    });
+                } else if (typeof section?.comments === 'string' && section.comments.trim() !== '') {
+                    // Fallback: single string
+                    $commentsContainer.append(`<div class="ham-question-comment">${section.comments}</div>`);
+                } else {
+                    $commentsContainer.append(`<div class="ham-question-comment ham-no-comment">${hamAssessment.texts.noComments || 'Inga kommentarer.'}</div>`);
+                }
+            }
+            renderSectionComments('anknytning', data);
+            renderSectionComments('ansvar', data);
+
             // Set comments
             $('#ham-comments').text(data.assessment_data.comments || '');
 
