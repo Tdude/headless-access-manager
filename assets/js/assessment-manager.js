@@ -402,15 +402,15 @@
                     switch(stage) {
                         case 'ej':
                             stageClass = 'ham-stage-ej';
-                            stageText = 'Ej etablerat';
+                            stageText = 'Inte etablerat';
                             break;
                         case 'trans':
                             stageClass = 'ham-stage-trans';
-                            stageText = 'I transition';
+                            stageText = 'Under utveckling';
                             break;
                         case 'full':
                             stageClass = 'ham-stage-full';
-                            stageText = 'Fullt etablerat';
+                            stageText = 'Helt etablerat';
                             break;
                     }
 
