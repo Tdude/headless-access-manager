@@ -222,6 +222,12 @@ msgstr "Bedömningsutkast uppdaterat."
 msgid "Assessment Questions"
 msgstr "Bedömningsfrågor"
 
+msgid "All Questions"
+msgstr "Frågebank"
+
+msgid "Question Bank"
+msgstr "Frågebank"
+
 msgid "Assessment Question"
 msgstr "Bedömningsfråga"
 
@@ -588,5 +594,5 @@ msgstr "Ta bort all plugin data vid inaktivering."
 msgid "Delete all plugin data upon deactivation"
 msgstr "Ta bort all plugin data vid inaktivering"
 
-msgid "WARNING: This will delete all custom roles, capabilities, and plugin settings when the plugin is deactivated. Uncheck this to keep the settings in the database."
-msgstr "VARNING: Detta kommer att ta bort alla anpassade roller, behörigheter och plugininställningar när pluginen inaktiveras. Avmarkera detta för att behålla inställningarna i databasen."
+msgid "DANGER: Checking this box will permanently delete ALL data associated with this plugin upon deactivation. This includes all Questions, Student Evaluations, Students, Teachers, Classes, Schools, and user roles. This action cannot be undone."
+msgstr "FARA: Detta kommer att radera all data såsom elever, lärare, klasser, rektorer, skolledare, bedömningar, anpassade roller, behörigheter och plugininställningar när pluginet inaktiveras. Avmarkera detta för att behålla inställningarna i databasen. Denna åtgärd kan inte återställas!"
