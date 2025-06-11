@@ -47,22 +47,22 @@ class HAM_Post_Types {
     private static function register_assessment_post_type()
     {
         $labels = array(
-            'name'                  => _x('Assessments', 'Post type general name', 'headless-access-manager'),
-            'singular_name'         => _x('Assessment', 'Post type singular name', 'headless-access-manager'),
-            'menu_name'             => _x('Assessments', 'Admin Menu text', 'headless-access-manager'),
-            'name_admin_bar'        => _x('Assessment', 'Add New on Toolbar', 'headless-access-manager'),
+            'name'                  => _x('Assessment Questions', 'Post type general name', 'headless-access-manager'),
+            'singular_name'         => _x('Assessment Question', 'Post type singular name', 'headless-access-manager'),
+            'menu_name'             => _x('Assessment Questions', 'Admin Menu text', 'headless-access-manager'),
+            'name_admin_bar'        => _x('Assessment Question', 'Add New on Toolbar', 'headless-access-manager'),
             'add_new'               => __('Add New', 'headless-access-manager'),
-            'add_new_item'          => __('Add New Assessment', 'headless-access-manager'),
-            'new_item'              => __('New Assessment', 'headless-access-manager'),
-            'edit_item'             => __('Edit Assessment', 'headless-access-manager'),
-            'view_item'             => __('View Assessment', 'headless-access-manager'),
-            'all_items'             => __('Assessments', 'headless-access-manager'),
-            'search_items'          => __('Search Assessments', 'headless-access-manager'),
-            'not_found'             => __('No assessments found.', 'headless-access-manager'),
-            'not_found_in_trash'    => __('No assessments found in Trash.', 'headless-access-manager'),
-            'filter_items_list'     => _x('Filter assessments list', 'Screen reader text for the filter links heading on the post type listing screen', 'headless-access-manager'),
-            'items_list_navigation' => _x('Assessments list navigation', 'Screen reader text for the pagination heading on the post type listing screen', 'headless-access-manager'),
-            'items_list'            => _x('Assessments list', 'Screen reader text for the items list heading on the post type listing screen', 'headless-access-manager'),
+            'add_new_item'          => __('Add New Assessment Question', 'headless-access-manager'),
+            'new_item'              => __('New Assessment Question', 'headless-access-manager'),
+            'edit_item'             => __('Edit Assessment Question', 'headless-access-manager'),
+            'view_item'             => __('View Assessment Question', 'headless-access-manager'),
+            'all_items'             => __('All Assessment Questions', 'headless-access-manager'),
+            'search_items'          => __('Search Assessment Questions', 'headless-access-manager'),
+            'not_found'             => __('No assessment questions found.', 'headless-access-manager'),
+            'not_found_in_trash'    => __('No assessment questions found in Trash.', 'headless-access-manager'),
+            'filter_items_list'     => _x('Filter assessment questions list', 'Screen reader text for the filter links heading on the post type listing screen', 'headless-access-manager'),
+            'items_list_navigation' => _x('Assessment questions list navigation', 'Screen reader text for the pagination heading on the post type listing screen', 'headless-access-manager'),
+            'items_list'            => _x('Assessment questions list', 'Screen reader text for the items list heading on the post type listing screen', 'headless-access-manager'),
         );
 
         $args = array(

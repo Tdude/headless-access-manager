@@ -35,31 +35,31 @@ class HAM_Admin_Menu
             30
         );
 
-        // Översikt (Overview) should be the top submenu
+        // Overview submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Översikt', 'headless-access-manager'), // Page title
-            __('Översikt', 'headless-access-manager'), // Menu title
+            __('Overview', 'headless-access-manager'), // Page title
+            __('Overview', 'headless-access-manager'), // Menu title
             'manage_options',
             'headless-access-manager',
             array( __CLASS__, 'render_dashboard_page' )
         );
 
-        // Assessments submenu
+        // Evaluations submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Bedömningar', 'headless-access-manager'), // Page title
-            __('Bedömningar', 'headless-access-manager'), // Menu title
+            __('Evaluations', 'headless-access-manager'), // Page title
+            __('Evaluations', 'headless-access-manager'), // Menu title
             'manage_options',
             'ham-assessments',
             array( 'HAM_Assessment_Manager', 'render_assessments_page' )
         );
 
-        // Assessment Statistics submenu
+        // Statistics submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Statistik', 'headless-access-manager'), // Page title
-            __('Statistik', 'headless-access-manager'), // Menu title
+            __('Statistics', 'headless-access-manager'), // Page title
+            __('Statistics', 'headless-access-manager'), // Menu title
             'manage_options',
             'ham-assessment-stats',
             array( 'HAM_Assessment_Manager', 'render_statistics_page' )
@@ -68,8 +68,8 @@ class HAM_Admin_Menu
         // Settings submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Inställningar', 'headless-access-manager'), // Page title
-            __('Inställningar', 'headless-access-manager'), // Menu title
+            __('Settings', 'headless-access-manager'), // Page title
+            __('Settings', 'headless-access-manager'), // Menu title
             'manage_options',
             'ham-settings',
             array( __CLASS__, 'render_settings_page' )
@@ -102,7 +102,7 @@ class HAM_Admin_Menu
 
         <div class="ham-dashboard-stat-boxes">
             <div class="ham-stat-box">
-                <h3><?php echo esc_html__('Assessments', 'headless-access-manager'); ?></h3>
+                <h3><?php echo esc_html__('Evaluations', 'headless-access-manager'); ?></h3>
                 <div class="ham-stat-value"><?php echo esc_html($assessments_count); ?></div>
             </div>
 
@@ -145,7 +145,7 @@ class HAM_Admin_Menu
         <div class="ham-quick-links">
             <a href="<?php echo esc_url(admin_url('admin.php?page=ham-assessments')); ?>"
                 class="button button-primary">
-                <?php echo esc_html__('View Assessments', 'headless-access-manager'); ?>
+                <?php echo esc_html__('View Evaluations', 'headless-access-manager'); ?>
             </a>
 
             <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . HAM_CPT_STUDENT)); ?>"
@@ -248,7 +248,7 @@ class HAM_Admin_Menu
     {
         ?>
 <div class="wrap">
-    <h1><?php echo esc_html__('Headless Access Manager Inställningar', 'headless-access-manager'); ?></h1>
+    <h1><?php echo esc_html__('Headless Access Manager Settings', 'headless-access-manager'); ?></h1>
 
     <form method="post" action="options.php">
         <?php
@@ -272,14 +272,14 @@ class HAM_Admin_Menu
 
         add_settings_section(
             'ham_settings_jwt',
-            __('JsonWebTokens autentiseringsinställningar', 'headless-access-manager'),
+            __('JSON Web Token Authentication Settings', 'headless-access-manager'),
             array( __CLASS__, 'render_jwt_section' ),
             'ham_settings'
         );
 
         add_settings_field(
             'ham_jwt_secret',
-            __('JWT hemlig nyckel', 'headless-access-manager'),
+            __('JWT Secret Key', 'headless-access-manager'),
             array( __CLASS__, 'render_jwt_secret_field' ),
             'ham_settings',
             'ham_settings_jwt'
@@ -287,7 +287,7 @@ class HAM_Admin_Menu
 
         add_settings_field(
             'ham_jwt_expiration',
-            __('JWT utgångsdatum (dagar)', 'headless-access-manager'),
+            __('JWT Expiration (days)', 'headless-access-manager'),
             array( __CLASS__, 'render_jwt_expiration_field' ),
             'ham_settings',
             'ham_settings_jwt'
@@ -295,14 +295,14 @@ class HAM_Admin_Menu
 
         add_settings_section(
             'ham_settings_general',
-            __('Allmänna inställningar', 'headless-access-manager'),
+            __('General Settings', 'headless-access-manager'),
             array( __CLASS__, 'render_general_section' ),
             'ham_settings'
         );
 
         add_settings_field(
             'ham_cleanup_on_deactivation',
-            __('Rensa vid inaktivering', 'headless-access-manager'),
+            __('Cleanup on Deactivation', 'headless-access-manager'),
             array( __CLASS__, 'render_cleanup_field' ),
             'ham_settings',
             'ham_settings_general'
@@ -314,7 +314,7 @@ class HAM_Admin_Menu
      */
     public static function render_jwt_section()
     {
-        echo '<p>' . esc_html__('Konfigurera JWT-autentiseringsinställningar för API:et.', 'headless-access-manager') . '</p>';
+        echo '<p>' . esc_html__('Configure JWT authentication settings for the API.', 'headless-access-manager') . '</p>';
     }
 
     /**
@@ -332,7 +332,7 @@ class HAM_Admin_Menu
         ?>
 <input type="text" name="ham_jwt_secret" value="<?php echo esc_attr($jwt_secret); ?>" class="regular-text">
 <p class="description">
-    <?php echo esc_html__('Hemlig nyckel som används för att signera JWT-token. Nyckeln kräver säker förvaring och delas endast med behörig personal.', 'headless-access-manager'); ?>
+    <?php echo esc_html__('Secret key used to sign the JWT. This key should be kept secure and only shared with authorized personnel.', 'headless-access-manager'); ?>
 </p>
 <?php
     }
@@ -347,7 +347,7 @@ class HAM_Admin_Menu
 <input type="number" name="ham_jwt_expiration" value="<?php echo esc_attr($jwt_expiration); ?>" min="1" max="30"
     step="1">
 <p class="description">
-    <?php echo esc_html__('Antal dagar innan JWT-token upphör och admin behöver logga in igen.', 'headless-access-manager'); ?>
+    <?php echo esc_html__('Number of days before the JWT expires and the admin needs to log in again.', 'headless-access-manager'); ?>
 </p>
 <?php
     }
@@ -357,7 +357,7 @@ class HAM_Admin_Menu
      */
     public static function render_general_section()
     {
-        echo '<p>' . esc_html__('Allmänna plugin-inställningar. GDPR-säkert', 'headless-access-manager') . '</p>';
+        echo '<p>' . esc_html__('General plugin settings.', 'headless-access-manager') . '</p>';
     }
 
     /**
@@ -369,10 +369,10 @@ class HAM_Admin_Menu
         ?>
 <label>
     <input type="checkbox" name="ham_cleanup_on_deactivation" value="1" <?php checked($cleanup, true); ?>>
-    <?php echo esc_html__('Rensa all plugin-data vid inaktivering', 'headless-access-manager'); ?>
+    <?php echo esc_html__('Delete all plugin data upon deactivation', 'headless-access-manager'); ?>
 </label>
 <p class="description">
-    <?php echo esc_html__('VARNING: Detta kommer att rensa alla anpassade roller, behörigheter och plugin-inställningar när pluginet inaktiveras. Bocka UR för att ha kvar inställningarna i databasen.', 'headless-access-manager'); ?>
+    <?php echo esc_html__('WARNING: This will delete all custom roles, capabilities, and plugin settings when the plugin is deactivated. Uncheck this to keep the settings in the database.', 'headless-access-manager'); ?>
 </p>
 <?php
     }

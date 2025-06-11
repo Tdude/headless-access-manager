@@ -11,7 +11,7 @@ if (! defined('ABSPATH')) {
 }
 ?>
 <div class="wrap">
-    <h1><?php echo esc_html__('Bedömningar genom Tryggve', 'headless-access-manager'); ?></h1>
+    <h1><?php echo esc_html__('Evaluations by Tryggve', 'headless-access-manager'); ?></h1>
     
     <div class="ham-stats-overview">
         <div class="ham-stats-card">
@@ -20,7 +20,7 @@ if (! defined('ABSPATH')) {
             </div>
             <div class="ham-stats-data">
                 <div class="ham-stats-value"><?php echo esc_html($stats['total_assessments']); ?></div>
-                <div class="ham-stats-label"><?php echo esc_html__('Totalt antal bedömningar', 'headless-access-manager'); ?></div>
+                <div class="ham-stats-label"><?php echo esc_html__('Total Evaluations', 'headless-access-manager'); ?></div>
             </div>
         </div>
         
@@ -30,7 +30,7 @@ if (! defined('ABSPATH')) {
             </div>
             <div class="ham-stats-data">
                 <div class="ham-stats-value"><?php echo esc_html($stats['total_students']); ?></div>
-                <div class="ham-stats-label"><?php echo esc_html__('Bedömda elever', 'headless-access-manager'); ?></div>
+                <div class="ham-stats-label"><?php echo esc_html__('Assessed Students', 'headless-access-manager'); ?></div>
             </div>
         </div>
         
@@ -40,7 +40,7 @@ if (! defined('ABSPATH')) {
             </div>
             <div class="ham-stats-data">
                 <div class="ham-stats-value"><?php echo esc_html($stats['average_completion']); ?>%</div>
-                <div class="ham-stats-label"><?php echo esc_html__('Genomsnittlig slutförandegrad', 'headless-access-manager'); ?></div>
+                <div class="ham-stats-label"><?php echo esc_html__('Average Completion Rate', 'headless-access-manager'); ?></div>
             </div>
         </div>
         
@@ -59,7 +59,7 @@ if (! defined('ABSPATH')) {
                     }
                     ?>
                 </div>
-                <div class="ham-stats-label"><?php echo esc_html__('Bedömningar denna månad', 'headless-access-manager'); ?></div>
+                <div class="ham-stats-label"><?php echo esc_html__('Evaluations This Month', 'headless-access-manager'); ?></div>
             </div>
         </div>
     </div>
@@ -67,7 +67,7 @@ if (! defined('ABSPATH')) {
     <div class="ham-stats-row">
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Månadens bedömningar', 'headless-access-manager'); ?></h2>
+                <h2><?php echo esc_html__('Monthly Evaluations', 'headless-access-manager'); ?></h2>
                 <div id="monthlyChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
                     <?php
                     $monthlyData = array_map(function($item) {
@@ -78,7 +78,7 @@ if (! defined('ABSPATH')) {
                     }, $stats['monthly_submissions']);
                     
                     if (empty($monthlyData)) {
-                        echo '<p>' . esc_html__('Inga data att visa', 'headless-access-manager') . '</p>';
+                        echo '<p>' . esc_html__('No data to display', 'headless-access-manager') . '</p>';
                     } else {
                         echo '<div class="ham-simple-chart">';
                         foreach ($monthlyData as $item) {
@@ -98,22 +98,22 @@ if (! defined('ABSPATH')) {
         
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Fördelning av nuläge', 'headless-access-manager'); ?></h2>
+                <h2><?php echo esc_html__('Status Distribution', 'headless-access-manager'); ?></h2>
                 <div id="stageChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
                     <?php
                     $stageData = array(
                         array(
-                            'label' => esc_html__('Ej anknuten', 'headless-access-manager'),
+                            'label' => esc_html__('Not Established', 'headless-access-manager'),
                             'value' => $stats['stage_distribution']['ej'],
                             'color' => 'hsl(11, 97.00%, 87.10%)'
                         ),
                         array(
-                            'label' => esc_html__('Utvecklas', 'headless-access-manager'),
+                            'label' => esc_html__('Developing', 'headless-access-manager'),
                             'value' => $stats['stage_distribution']['trans'],
                             'color' => 'hsl(40, 97%, 87%)'
                         ),
                         array(
-                            'label' => esc_html__('Anknuten', 'headless-access-manager'),
+                            'label' => esc_html__('Established', 'headless-access-manager'),
                             'value' => $stats['stage_distribution']['full'],
                             'color' => 'hsl(105, 97%, 87%)'
                         )
@@ -136,17 +136,17 @@ if (! defined('ABSPATH')) {
     <div class="ham-stats-row">
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Snitt per bedömningssektion', 'headless-access-manager'); ?></h2>
+                <h2><?php echo esc_html__('Average per Assessment Section', 'headless-access-manager'); ?></h2>
                 <div id="sectionChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
                     <?php
                     $sectionData = array(
                         array(
-                            'label' => esc_html__('Anknytning', 'headless-access-manager'),
+                            'label' => esc_html__('Connection', 'headless-access-manager'),
                             'value' => $stats['section_averages']['anknytning'],
                             'color' => '#0073aa'
                         ),
                         array(
-                            'label' => esc_html__('Ansvar', 'headless-access-manager'),
+                            'label' => esc_html__('Responsibility', 'headless-access-manager'),
                             'value' => $stats['section_averages']['ansvar'],
                             'color' => '#00a0d2'
                         )
@@ -170,13 +170,13 @@ if (! defined('ABSPATH')) {
     <div class="ham-stats-row">
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Bedömningsfrågor med flest anknutna', 'headless-access-manager'); ?></h2>
+                <h2><?php echo esc_html__('Top-Rated Assessment Questions', 'headless-access-manager'); ?></h2>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
-                            <th><?php echo esc_html__('Fråga', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('Sektion', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('Snittbedömning', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('Question', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('Section', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('Average Score', 'headless-access-manager'); ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -214,7 +214,7 @@ if (! defined('ABSPATH')) {
                         }
                         
                         if ($count === 0) {
-                            echo '<tr><td colspan="3">' . esc_html__('Ingen frågedata tillgänglig.', 'headless-access-manager') . '</td></tr>';
+                            echo '<tr><td colspan="3">' . esc_html__('No question data available.', 'headless-access-manager') . '</td></tr>';
                         }
                         ?>
                     </tbody>

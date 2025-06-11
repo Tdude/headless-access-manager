@@ -133,10 +133,10 @@ class HAM_Admin_Loader
         add_action('manage_' . HAM_CPT_CLASS . '_posts_custom_column', array(__CLASS__, 'render_class_assigned_teachers_column'), 10, 2);
         
         // Hooks for other CPTs
+        add_filter('manage_' . HAM_CPT_ASSESSMENT . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
         add_filter('manage_' . HAM_CPT_SCHOOL . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
         add_filter('manage_' . HAM_CPT_TEACHER . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
         add_filter('manage_' . HAM_CPT_PRINCIPAL . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
-        add_filter('manage_' . HAM_CPT_ASSESSMENT . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
         add_filter('manage_' . HAM_CPT_SCHOOL_HEAD . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
 
 
@@ -158,6 +158,9 @@ class HAM_Admin_Loader
 
         // Restrict admin area access for custom roles
         add_action('admin_init', array(__CLASS__, 'restrict_admin_area_access'));
+
+        // Set primary column for CPTs to ensure row actions are present
+        add_filter('list_table_primary_column', array(__CLASS__, 'set_primary_column'), 10, 2);
     }
 
     /**
@@ -198,6 +201,29 @@ class HAM_Admin_Loader
     public static function filter_cpt_by_school($query) {
         global $pagenow, $typenow;
         if (!is_admin() || $pagenow !== 'edit.php') return;
+    }
+
+    /**
+     * Sets the primary column for our CPTs to ensure row actions are displayed correctly.
+     *
+     * @param string $default   The default primary column.
+     * @param string $screen_id The current screen ID.
+     * @return string The primary column name.
+     */
+    public static function set_primary_column($default, $screen_id) {
+        $cpts = [
+            'edit-' . HAM_CPT_SCHOOL,
+            'edit-' . HAM_CPT_TEACHER,
+            'edit-' . HAM_CPT_PRINCIPAL,
+            'edit-' . HAM_CPT_ASSESSMENT,
+            'edit-' . HAM_CPT_SCHOOL_HEAD,
+        ];
+
+        if (in_array($screen_id, $cpts, true)) {
+            return 'title';
+        }
+
+        return $default;
         $cpts = array(HAM_CPT_CLASS, HAM_CPT_PRINCIPAL); // Removed HAM_CPT_TEACHER
         if (!in_array($typenow, $cpts)) return;
         if (!empty($_GET['ham_school_filter'])) {
@@ -448,35 +474,35 @@ class HAM_Admin_Loader
     }
 
     /**
-     * Generic column modifier for CPTs (renames title, removes date).
+     * Returns a map of CPTs to their desired admin column titles.
+     *
+     * @return array
+     */
+    private static function get_cpt_column_titles() {
+        return [
+            HAM_CPT_SCHOOL      => __('School Name', 'headless-access-manager'),
+            HAM_CPT_TEACHER     => __('Teacher Name', 'headless-access-manager'),
+            HAM_CPT_PRINCIPAL   => __('Principal Name', 'headless-access-manager'),
+            HAM_CPT_ASSESSMENT  => __('Assessment Title', 'headless-access-manager'),
+            HAM_CPT_SCHOOL_HEAD => __('School Head Name', 'headless-access-manager'),
+        ];
+    }
+
+    /**
+     * Modify admin columns for generic CPTs.
      *
      * @param array $columns Existing columns.
      * @return array Modified columns.
      */
     public static function modify_generic_cpt_columns($columns) {
         global $typenow;
-        $cpt_name = '';
-        switch ($typenow) {
-            case HAM_CPT_SCHOOL:
-                $cpt_name = __('School Name', 'headless-access-manager');
-                break;
-            case HAM_CPT_TEACHER:
-                $cpt_name = __('Teacher Name', 'headless-access-manager');
-                break;
-            case HAM_CPT_PRINCIPAL:
-                $cpt_name = __('Principal Name', 'headless-access-manager');
-                break;
-            case HAM_CPT_ASSESSMENT:
-                $cpt_name = __('Assessment Title', 'headless-access-manager');
-                break;
-            case HAM_CPT_SCHOOL_HEAD:
-                $cpt_name = __('School Head Name', 'headless-access-manager');
-                break;
-        }
 
-        if (!empty($cpt_name) && isset($columns['title'])) {
-            $columns['title'] = $cpt_name;
+        $cpt_column_titles = self::get_cpt_column_titles();
+
+        if (isset($cpt_column_titles[$typenow]) && isset($columns['title'])) {
+            $columns['title'] = $cpt_column_titles[$typenow];
         }
+        
         unset($columns['date']);
 
         if (isset($columns['cb'])) {
@@ -484,6 +510,7 @@ class HAM_Admin_Loader
             unset($columns['cb']);
             $columns = array_merge(['cb' => $cb], $columns);
         }
+
         return $columns;
     }
 
