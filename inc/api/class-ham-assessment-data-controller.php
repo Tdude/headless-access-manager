@@ -198,7 +198,7 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
         if ($assessment_id === 0) {
             // Create new assessment
             $assessment_title = sprintf(
-                __('Evaluation for %s - %s', 'headless-access-manager'),
+                __('Utvärdering för %s - %s', 'headless-access-manager'),
                 $student ? $student->display_name : 'Student ' . $student_id,
                 current_time('Y-m-d')
             );
@@ -236,7 +236,7 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
         return new WP_REST_Response(
             array(
                 'id'      => $assessment_id,
-                'message' => __('Evaluation saved successfully.', 'headless-access-manager'),
+                'message' => __('Utvärdering sparad.', 'headless-access-manager'),
             ),
             200
         );

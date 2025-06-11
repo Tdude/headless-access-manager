@@ -401,16 +401,16 @@
 
                     switch(stage) {
                         case 'ej':
-                            stageClass = 'ham-stage-ej';
-                            stageText = 'Inte etablerat';
+                            stageClass = 'ham-stage-not';
+                            stageText = 'Ej etablerad';
                             break;
                         case 'trans':
                             stageClass = 'ham-stage-trans';
-                            stageText = 'Under utveckling';
+                            stageText = 'Utvecklas';
                             break;
                         case 'full':
                             stageClass = 'ham-stage-full';
-                            stageText = 'Helt etablerat';
+                            stageText = 'Etablerad';
                             break;
                     }
 
@@ -429,36 +429,7 @@
                     $container.append(tableRow);
                 });
 
-                // Add CSS for stage badges if needed
-                if (!$('#ham-stage-styles').length) {
-                    $('<style id="ham-stage-styles">')
-                        .text(`
-                            .ham-stage-badge {
-                                display: inline-block;
-                                padding: 3px 8px;
-                                border-radius: 4px;
-                                font-size: 12px;
-                                font-weight: bold;
-                                text-align: center;
-                            }
 
-                            .ham-stage-ej {
-                                background-color: #ffcccb;
-                                color: #d32f2f;
-                            }
-
-                            .ham-stage-trans {
-                                background-color: #fff9c4;
-                                color: #f57f17;
-                            }
-
-                            .ham-stage-full {
-                                background-color: #c8e6c9;
-                                color: #2e7d32;
-                            }
-                        `)
-                        .appendTo('head');
-                }
             }
         }
     }

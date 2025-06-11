@@ -20,6 +20,10 @@ define('HAM_API_NAMESPACE', 'ham/v1');
 define('HAM_CPT_SCHOOL', 'ham_school');
 define('HAM_CPT_CLASS', 'ham_class');
 define('HAM_CPT_ASSESSMENT', 'ham_assessment');
+define('HAM_CPT_TEACHER', 'ham_teacher');
+define('HAM_CPT_STUDENT', 'ham_student');
+define('HAM_CPT_PRINCIPAL', 'ham_principal');
+define('HAM_CPT_SCHOOL_HEAD', 'ham_school_head');
 
 // User roles
 define('HAM_ROLE_STUDENT', 'ham_student');

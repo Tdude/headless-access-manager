@@ -130,3 +130,148 @@
 .ham-delete-option:hover {
     color: #dc3232;
 }
+
+/*
+ * Headless Access Manager CPT Admin Theming
+ * ------------------------------------------
+ * Applies custom color schemes to CPT list tables and edit screens.
+ * Note: Ensure this CSS file is enqueued on all relevant admin pages for these CPTs.
+ * Assumed CPT slugs: ham_student, ham_teacher, ham_principal, ham_school_head. Adjust if necessary.
+ */
+
+:root {
+    /* Student Colors (Pale Red) */
+    --ham-student-header-bg: hsl(0, 80%, 92%);
+    --ham-student-bg-tint: hsla(0, 80%, 92%, 0.2);
+    --ham-student-accent: hsl(0, 75%, 80%);
+    --ham-student-text-color: #502020;
+
+    /* Teacher Colors (Pale Orange) */
+    --ham-teacher-header-bg: hsl(30, 85%, 92%);
+    --ham-teacher-bg-tint: hsla(30, 85%, 92%, 0.2);
+    --ham-teacher-accent: hsl(30, 80%, 80%);
+    --ham-teacher-text-color: #5d3a1a;
+
+    /* Class Colors (Pale Yellow) */
+    --ham-class-header-bg: hsl(55, 85%, 92%);
+    --ham-class-bg-tint: hsla(55, 85%, 92%, 0.2);
+    --ham-class-accent: hsl(55, 80%, 80%);
+    --ham-class-text-color: #504a1f;
+
+    /* School Colors (Pale Green) */
+    --ham-school-header-bg: hsl(130, 70%, 92%);
+    --ham-school-bg-tint: hsla(130, 70%, 92%, 0.2);
+    --ham-school-accent: hsl(130, 60%, 80%);
+    --ham-school-text-color: #2a4b34;
+
+    /* Principal Colors (Pale Teal/Cyan) */
+    --ham-principal-header-bg: hsl(180, 70%, 92%);
+    --ham-principal-bg-tint: hsla(180, 70%, 92%, 0.2);
+    --ham-principal-accent: hsl(180, 60%, 80%);
+    --ham-principal-text-color: #1f4c4c;
+
+    /* School Head Colors (Pale Blue) */
+    --ham-school-head-header-bg: hsl(220, 80%, 92%);
+    --ham-school-head-bg-tint: hsla(220, 80%, 92%, 0.2);
+    --ham-school-head-accent: hsl(220, 75%, 80%);
+    --ham-school-head-text-color: #2c3b5e;
+
+
+    --ham-general-header-text-color: #2c3338;
+}
+
+/* --- General CPT Admin Styles --- */
+.wp-list-table thead th {
+    font-weight: 600;
+}
+
+/* --- Student CPT Styles (ham_student) --- */
+body.post-type-ham_student .wp-list-table thead,
+body.post-type-ham_student.post-php .postbox-header {
+    background-color: var(--ham-student-header-bg);
+    color: var(--ham-general-header-text-color);
+    border-bottom-color: var(--ham-student-accent);
+}
+body.post-type-ham_student.post-php #poststuff {
+    background-color: var(--ham-student-bg-tint);
+}
+body.post-type-ham_student .wp-list-table tbody tr:nth-child(even) th,
+body.post-type-ham_student .wp-list-table tbody tr:nth-child(even) td {
+    background-color: var(--ham-student-bg-tint);
+}
+
+/* --- Teacher CPT Styles (ham_teacher) --- */
+body.post-type-ham_teacher .wp-list-table thead,
+body.post-type-ham_teacher.post-php .postbox-header {
+    background-color: var(--ham-teacher-header-bg);
+    color: var(--ham-general-header-text-color);
+    border-bottom-color: var(--ham-teacher-accent);
+}
+body.post-type-ham_teacher.post-php #poststuff {
+    background-color: var(--ham-teacher-bg-tint);
+}
+body.post-type-ham_teacher .wp-list-table tbody tr:nth-child(even) th,
+body.post-type-ham_teacher .wp-list-table tbody tr:nth-child(even) td {
+    background-color: var(--ham-teacher-bg-tint);
+}
+
+/* --- Principal CPT Styles (ham_principal) --- */
+body.post-type-ham_principal .wp-list-table thead,
+body.post-type-ham_principal.post-php .postbox-header {
+    background-color: var(--ham-principal-header-bg);
+    color: var(--ham-general-header-text-color);
+    border-bottom-color: var(--ham-principal-accent);
+}
+body.post-type-ham_principal.post-php #poststuff {
+    background-color: var(--ham-principal-bg-tint);
+}
+body.post-type-ham_principal .wp-list-table tbody tr:nth-child(even) th,
+body.post-type-ham_principal .wp-list-table tbody tr:nth-child(even) td {
+    background-color: var(--ham-principal-bg-tint);
+}
+
+/* --- School Head CPT Styles (ham_school_head) --- */
+body.post-type-ham_school_head .wp-list-table thead,
+body.post-type-ham_school_head.post-php .postbox-header {
+    background-color: var(--ham-school-head-header-bg);
+    color: var(--ham-general-header-text-color);
+    border-bottom-color: var(--ham-school-head-accent);
+}
+body.post-type-ham_school_head.post-php #poststuff {
+    background-color: var(--ham-school-head-bg-tint);
+}
+body.post-type-ham_school_head .wp-list-table tbody tr:nth-child(even) th,
+body.post-type-ham_school_head .wp-list-table tbody tr:nth-child(even) td {
+    background-color: var(--ham-school-head-bg-tint);
+}
+
+/* --- School  CPT Styles (ham_school) --- */
+body.post-type-ham_school .wp-list-table thead,
+body.post-type-ham_school.post-php .postbox-header {
+    background-color: var(--ham-school-header-bg);
+    color: var(--ham-general-header-text-color);
+    border-bottom-color: var(--ham-school-accent);
+}
+body.post-type-ham_school.post-php #poststuff {
+    background-color: var(--ham-school-bg-tint);
+}
+body.post-type-ham_school .wp-list-table tbody tr:nth-child(even) th,
+body.post-type-ham_school .wp-list-table tbody tr:nth-child(even) td {
+    background-color: var(--ham-school-bg-tint);
+}
+
+/* --- Class CPT Styles (ham_class) --- */
+body.post-type-ham_class .wp-list-table thead,
+body.post-type-ham_class.post-php .postbox-header {
+    background-color: var(--ham-class-header-bg);
+    color: var(--ham-general-header-text-color);
+    border-bottom-color: var(--ham-class-accent);
+}
+body.post-type-ham_class.post-php #poststuff {
+    background-color: var(--ham-class-bg-tint);
+}
+body.post-type-ham_class .wp-list-table tbody tr:nth-child(even) th,
+body.post-type-ham_class .wp-list-table tbody tr:nth-child(even) td {
+    background-color: var(--ham-class-bg-tint);
+}
+

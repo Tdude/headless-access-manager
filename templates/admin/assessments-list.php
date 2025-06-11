@@ -11,7 +11,7 @@ if (! defined('ABSPATH')) {
 }
 ?>
 <div class="wrap">
-    <h1><?php echo esc_html__('Studentbedömningar', 'headless-access-manager'); ?></h1>
+    <h1><?php echo esc_html__('Elevbedömningar', 'headless-access-manager'); ?></h1>
     
     <div class="ham-assessments-filters">
         <div class="ham-filter-group">
@@ -45,8 +45,8 @@ if (! defined('ABSPATH')) {
             <select id="ham-filter-completion">
                 <option value=""><?php echo esc_html__('Alla', 'headless-access-manager'); ?></option>
                 <option value="full"><?php echo esc_html__('Helt etablerad', 'headless-access-manager'); ?></option>
-                <option value="transition"><?php echo esc_html__('Under utveckling', 'headless-access-manager'); ?></option>
-                <option value="not"><?php echo esc_html__('Inte etablerad', 'headless-access-manager'); ?></option>
+                <option value="transition"><?php echo esc_html__('Utvecklas', 'headless-access-manager'); ?></option>
+                <option value="not"><?php echo esc_html__('Ej etablerad', 'headless-access-manager'); ?></option>
             </select>
         </div>
         
@@ -92,13 +92,13 @@ if (! defined('ABSPATH')) {
                                 
                                 if ($stage === 'full') {
                                     $stage_class = 'ham-stage-full';
-                                    $stage_text = esc_html__('Helt etablerad', 'headless-access-manager');
+                                    $stage_text = esc_html__('Etablerad', 'headless-access-manager');
                                 } elseif ($stage === 'trans') {
-                                    $stage_class = 'ham-stage-transition';
-                                    $stage_text = esc_html__('Under utveckling', 'headless-access-manager');
+                                    $stage_class = 'ham-stage-trans';
+                                    $stage_text = esc_html__('Utvecklas', 'headless-access-manager');
                                 } else {
                                     $stage_class = 'ham-stage-not';
-                                    $stage_text = esc_html__('Inte etablerad', 'headless-access-manager');
+                                    $stage_text = esc_html__('Ej etablerad', 'headless-access-manager');
                                 }
                                 ?>
                                 <span class="ham-stage-badge <?php echo esc_attr($stage_class); ?>">

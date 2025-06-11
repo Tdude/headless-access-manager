@@ -11,7 +11,7 @@ if (! defined('ABSPATH')) {
 }
 ?>
 <div class="wrap">
-    <h1><?php echo esc_html__('Bedömningsstatistik', 'headless-access-manager'); ?></h1>
+    <h1><?php echo esc_html__('Bedömningar genom Tryggve', 'headless-access-manager'); ?></h1>
     
     <div class="ham-stats-overview">
         <div class="ham-stats-card">
@@ -67,7 +67,7 @@ if (! defined('ABSPATH')) {
     <div class="ham-stats-row">
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Månatliga inlämningar', 'headless-access-manager'); ?></h2>
+                <h2><?php echo esc_html__('Månadens bedömningar', 'headless-access-manager'); ?></h2>
                 <div id="monthlyChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
                     <?php
                     $monthlyData = array_map(function($item) {
@@ -105,17 +105,17 @@ if (! defined('ABSPATH')) {
                         array(
                             'label' => esc_html__('Ej anknuten', 'headless-access-manager'),
                             'value' => $stats['stage_distribution']['ej'],
-                            'color' => '#ffecec'
+                            'color' => 'hsl(11, 97.00%, 87.10%)'
                         ),
                         array(
-                            'label' => esc_html__('Under utveckling', 'headless-access-manager'),
+                            'label' => esc_html__('Utvecklas', 'headless-access-manager'),
                             'value' => $stats['stage_distribution']['trans'],
-                            'color' => '#fcf8e3'
+                            'color' => 'hsl(40, 97%, 87%)'
                         ),
                         array(
-                            'label' => esc_html__('Helt anknuten', 'headless-access-manager'),
+                            'label' => esc_html__('Anknuten', 'headless-access-manager'),
                             'value' => $stats['stage_distribution']['full'],
-                            'color' => '#ecf8ec'
+                            'color' => 'hsl(105, 97%, 87%)'
                         )
                     );
                     
@@ -136,7 +136,7 @@ if (! defined('ABSPATH')) {
     <div class="ham-stats-row">
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Snitt per sektion', 'headless-access-manager'); ?></h2>
+                <h2><?php echo esc_html__('Snitt per bedömningssektion', 'headless-access-manager'); ?></h2>
                 <div id="sectionChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
                     <?php
                     $sectionData = array(
@@ -170,7 +170,7 @@ if (! defined('ABSPATH')) {
     <div class="ham-stats-row">
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Toppfrågor', 'headless-access-manager'); ?></h2>
+                <h2><?php echo esc_html__('Bedömningsfrågor med flest anknutna', 'headless-access-manager'); ?></h2>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
@@ -186,7 +186,7 @@ if (! defined('ABSPATH')) {
                         arsort($question_averages);
                         
                         // Get questions structure
-                        $questions_structure = (new HAM_Evaluation_Manager())->get_questions_structure();
+                        $questions_structure = (new HAM_Assessment_Manager())->get_questions_structure();
                         
                         // Display top 10 questions
                         $count = 0;

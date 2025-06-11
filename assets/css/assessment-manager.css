@@ -208,20 +208,27 @@
     text-transform: uppercase;
 }
 
+
 .ham-stage-not {
-    background-color: #ffecec;
-    color: #d63638;
+    background-color: hsl(0, 80%, 92%);
+    color: #d32f2f;
 }
 
-.ham-stage-transition {
-    background-color: #fcf8e3;
-    color: #8a6d3b;
+.ham-stage-trans {
+    background-color: hsl(30, 85%, 92%);
+    color: #f57f17;
 }
 
 .ham-stage-full {
-    background-color: #ecf8ec;
-    color: #2a9d2a;
+    background-color: hsl(130, 70%, 92%);
+    color: #2e7d32;
 }
+
+
+
+
+
+
 
 /* Statistics Page Styles */
 .ham-stats-overview {

@@ -20,21 +20,11 @@ if (! defined('ABSPATH')) {
 class HAM_Meta_Boxes
 {
     /**
-     * Register meta boxes.
+     * Register assessment meta boxes.
+     *
+     * @param WP_Post $post Current post object.
      */
-    public static function register_meta_boxes()
-    {
-        // Class meta box for school selection
-        add_meta_box(
-            'ham_class_school',
-            __('School', 'headless-access-manager'),
-            array( __CLASS__, 'render_class_school_meta_box' ),
-            HAM_CPT_CLASS,
-            'side',
-            'high'
-        );
-
-        // Assessment meta box for student selection
+    public static function register_assessment_meta_boxes($post) {
         add_meta_box(
             'ham_assessment_student',
             __('Student', 'headless-access-manager'),
@@ -43,8 +33,6 @@ class HAM_Meta_Boxes
             'side',
             'high'
         );
-
-        // Assessment meta box for assessment data
         add_meta_box(
             'ham_assessment_data',
             __('Assessment Data', 'headless-access-manager'),
@@ -53,38 +41,6 @@ class HAM_Meta_Boxes
             'normal',
             'high'
         );
-    }
-
-    /**
-     * Render class school meta box.
-     *
-     * @param WP_Post $post Current post object.
-     */
-    public static function render_class_school_meta_box($post)
-    {
-        // Add nonce for security
-        wp_nonce_field('ham_class_school_meta_box', 'ham_class_school_meta_box_nonce');
-
-        // Get current value
-        $school_id = get_post_meta($post->ID, '_ham_school_id', true);
-
-        // Get all schools
-        $schools = ham_get_schools();
-
-        // Output field
-        ?>
-<p>
-    <label for="ham_school_id"><?php echo esc_html__('Select School:', 'headless-access-manager'); ?></label>
-    <select name="ham_school_id" id="ham_school_id" class="widefat">
-        <option value=""><?php echo esc_html__('— Select School —', 'headless-access-manager'); ?></option>
-        <?php foreach ($schools as $school) : ?>
-        <option value="<?php echo esc_attr($school->ID); ?>" <?php selected($school_id, $school->ID); ?>>
-            <?php echo esc_html($school->post_title); ?>
-        </option>
-        <?php endforeach; ?>
-    </select>
-</p>
-<?php
     }
 
     /**
@@ -172,39 +128,8 @@ class HAM_Meta_Boxes
         }
 
         // Check the post type
-        if (get_post_type($post_id) === HAM_CPT_CLASS) {
-            self::save_class_meta_box($post_id);
-        } elseif (get_post_type($post_id) === HAM_CPT_ASSESSMENT) {
+        if (get_post_type($post_id) === HAM_CPT_ASSESSMENT) {
             self::save_assessment_meta_boxes($post_id);
-        }
-    }
-
-    /**
-     * Save class meta box data.
-     *
-     * @param int $post_id Post ID.
-     */
-    private static function save_class_meta_box($post_id)
-    {
-        // Check nonce
-        if (! isset($_POST['ham_class_school_meta_box_nonce']) || ! wp_verify_nonce($_POST['ham_class_school_meta_box_nonce'], 'ham_class_school_meta_box')) {
-            return;
-        }
-
-        // Check permissions
-        if (! current_user_can('edit_post', $post_id)) {
-            return;
-        }
-
-        // Save school ID
-        if (isset($_POST['ham_school_id'])) {
-            $school_id = absint($_POST['ham_school_id']);
-
-            if ($school_id > 0) {
-                update_post_meta($post_id, '_ham_school_id', $school_id);
-            } else {
-                delete_post_meta($post_id, '_ham_school_id');
-            }
         }
     }
 
@@ -215,53 +140,86 @@ class HAM_Meta_Boxes
      */
     private static function save_assessment_meta_boxes($post_id)
     {
-        // Check student meta box nonce
-        if (isset($_POST['ham_assessment_student_meta_box_nonce']) && wp_verify_nonce($_POST['ham_assessment_student_meta_box_nonce'], 'ham_assessment_student_meta_box')) {
-            // Check permissions
-            if (current_user_can('edit_post', $post_id)) {
-                // Save student ID
-                if (isset($_POST['ham_student_id'])) {
-                    $student_id = absint($_POST['ham_student_id']);
+        // Check nonce
+        if (!isset($_POST['ham_assessment_meta_box_nonce']) || !wp_verify_nonce($_POST['ham_assessment_meta_box_nonce'], 'ham_assessment_meta_box')) {
+            return;
+        }
 
-                    if ($student_id > 0) {
-                        update_post_meta($post_id, HAM_ASSESSMENT_META_STUDENT_ID, $student_id);
-                    } else {
-                        delete_post_meta($post_id, HAM_ASSESSMENT_META_STUDENT_ID);
-                    }
-                }
+        // Check permissions
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
+        }
+
+        // Save student ID
+        if (isset($_POST['ham_student_id'])) {
+            $student_id = absint($_POST['ham_student_id']);
+
+            if ($student_id > 0) {
+                update_post_meta($post_id, HAM_ASSESSMENT_META_STUDENT_ID, $student_id);
+            } else {
+                delete_post_meta($post_id, HAM_ASSESSMENT_META_STUDENT_ID);
             }
         }
 
-        // Check assessment data meta box nonce
-        if (isset($_POST['ham_assessment_data_meta_box_nonce']) && wp_verify_nonce($_POST['ham_assessment_data_meta_box_nonce'], 'ham_assessment_data_meta_box')) {
-            // Check permissions
-            if (current_user_can('edit_post', $post_id)) {
-                // Save assessment date
-                if (isset($_POST['ham_assessment_date'])) {
-                    $assessment_date = sanitize_text_field($_POST['ham_assessment_date']);
+        // Save assessment date
+        if (isset($_POST['ham_assessment_date'])) {
+            $assessment_date = sanitize_text_field($_POST['ham_assessment_date']);
 
-                    if (! empty($assessment_date)) {
-                        update_post_meta($post_id, HAM_ASSESSMENT_META_DATE, $assessment_date);
-                    } else {
-                        delete_post_meta($post_id, HAM_ASSESSMENT_META_DATE);
-                    }
+            if (!empty($assessment_date)) {
+                update_post_meta($post_id, HAM_ASSESSMENT_META_DATE, $assessment_date);
+            } else {
+                delete_post_meta($post_id, HAM_ASSESSMENT_META_DATE);
+            }
+        }
+
+        // Save assessment data
+        if (isset($_POST['ham_assessment_data'])) {
+            $assessment_data_json = wp_unslash($_POST['ham_assessment_data']);
+
+            if (!empty($assessment_data_json)) {
+                $assessment_data = json_decode($assessment_data_json, true);
+
+                if ($assessment_data !== null) {
+                    update_post_meta($post_id, HAM_ASSESSMENT_META_DATA, $assessment_data);
                 }
-
-                // Save assessment data
-                if (isset($_POST['ham_assessment_data'])) {
-                    $assessment_data_json = wp_unslash($_POST['ham_assessment_data']);
-
-                    if (! empty($assessment_data_json)) {
-                        $assessment_data = json_decode($assessment_data_json, true);
-
-                        if ($assessment_data !== null) {
-                            update_post_meta($post_id, HAM_ASSESSMENT_META_DATA, $assessment_data);
-                        }
-                    } else {
-                        delete_post_meta($post_id, HAM_ASSESSMENT_META_DATA);
-                    }
-                }
+            } else {
+                delete_post_meta($post_id, HAM_ASSESSMENT_META_DATA);
             }
         }
     }
+
+    /**
+     * Initialize meta boxes for different CPTs.
+     */
+    public static function init() {
+        // Hook for School CPT meta boxes
+        add_action('add_meta_boxes_' . HAM_CPT_SCHOOL, ['HAM_School_Meta_Boxes', 'register_meta_boxes']);
+        add_action('save_post_' . HAM_CPT_SCHOOL, ['HAM_School_Meta_Boxes', 'save_meta_boxes']);
+
+        // Hook for Class CPT meta boxes
+        add_action('add_meta_boxes_' . HAM_CPT_CLASS, ['HAM_Class_Meta_Boxes', 'register_meta_boxes']);
+        add_action('save_post_' . HAM_CPT_CLASS, ['HAM_Class_Meta_Boxes', 'save_meta_boxes']);
+
+        // Hook for Teacher CPT meta boxes
+        add_action('add_meta_boxes_' . HAM_CPT_TEACHER, ['HAM_Teacher_Meta_Boxes', 'register_meta_boxes']);
+        add_action('save_post_' . HAM_CPT_TEACHER, ['HAM_Teacher_Meta_Boxes', 'save_meta_boxes']);
+
+        // Hook for Principal CPT meta boxes
+        add_action('add_meta_boxes_' . HAM_CPT_PRINCIPAL, ['HAM_Principal_Meta_Boxes', 'register_meta_boxes']);
+        add_action('save_post_' . HAM_CPT_PRINCIPAL, ['HAM_Principal_Meta_Boxes', 'save_meta_boxes']);
+
+        // Hook for Student CPT meta boxes
+        add_action('add_meta_boxes_' . HAM_CPT_STUDENT, ['HAM_Student_Meta_Boxes', 'register_meta_boxes']);
+        add_action('save_post_' . HAM_CPT_STUDENT, ['HAM_Student_Meta_Boxes', 'save_meta_boxes']);
+
+        // Add other CPT meta box hooks here
+    }
 }
+
+require_once HAM_PLUGIN_DIR . 'inc/admin/meta-boxes/class-ham-school-meta-boxes.php';
+require_once HAM_PLUGIN_DIR . 'inc/admin/meta-boxes/class-ham-class-meta-boxes.php';
+require_once HAM_PLUGIN_DIR . 'inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php';
+require_once HAM_PLUGIN_DIR . 'inc/admin/meta-boxes/class-ham-principal-meta-boxes.php';
+require_once HAM_PLUGIN_DIR . 'inc/admin/meta-boxes/class-ham-student-meta-boxes.php';
+
+HAM_Meta_Boxes::init();

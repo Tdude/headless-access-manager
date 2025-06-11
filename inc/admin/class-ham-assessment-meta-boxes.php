@@ -25,7 +25,7 @@ class HAM_Assessment_Meta_Boxes
     public function __construct()
     {
         // Add meta boxes
-        add_action('add_meta_boxes', array( $this, 'add_meta_boxes' ));
+        add_action('add_meta_boxes_' . HAM_CPT_ASSESSMENT, array( $this, 'add_meta_boxes' ));
 
         // Save post handler
         add_action('save_post_' . HAM_CPT_ASSESSMENT, array( $this, 'save_post' ), 10, 2);

@@ -13,6 +13,9 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
 /**
  * Class HAM_Auth_Controller
  *
@@ -158,49 +161,82 @@ class HAM_Auth_Controller extends HAM_Base_Controller
      */
     protected function generate_jwt_token($user)
     {
-        // This is a placeholder for JWT token generation logic
-        // You'll need to implement this with a proper JWT library
+        try {
+            $issued_at = time();
+            $expiration = $issued_at + ( DAY_IN_SECONDS * 7 ); // Token valid for 7 days
 
-        // Example implementation using FireBase JWT library:
-        // try {
-        //     $issued_at = time();
-        //     $expiration = $issued_at + ( DAY_IN_SECONDS * 7 ); // Token valid for 7 days
-        //
-        //     $payload = array(
-        //         'iss'  => get_bloginfo( 'url' ),
-        //         'iat'  => $issued_at,
-        //         'nbf'  => $issued_at,
-        //         'exp'  => $expiration,
-        //         'data' => array(
-        //             'user_id' => $user->ID,
-        //         ),
-        //     );
-        //
-        //     $secret_key = get_option( 'ham_jwt_secret', false );
-        //
-        //     if ( ! $secret_key ) {
-        //         // Generate a secret key if not exists
-        //         $secret_key = bin2hex( random_bytes( 32 ) );
-        //         update_option( 'ham_jwt_secret', $secret_key );
-        //     }
-        //
-        //     $token = JWT::encode( $payload, $secret_key, 'HS256' );
-        //
-        //     return $token;
-        // } catch ( Exception $e ) {
-        //     return new WP_Error(
-        //         'ham_jwt_encode_error',
-        //         $e->getMessage(),
-        //         array( 'status' => 500 )
-        //     );
-        // }
+            $payload = array(
+                'iss'  => get_bloginfo( 'url' ),
+                'iat'  => $issued_at,
+                'nbf'  => $issued_at,
+                'exp'  => $expiration,
+                'user_id' => $user->ID,
+            );
 
-        // For demonstration, return a simple placeholder token
-        // This is NOT secure and should be replaced with proper JWT implementation
-        return base64_encode(json_encode(array(
-            'user_id' => $user->ID,
-            'exp'     => time() + (DAY_IN_SECONDS * 7),
-        )));
+            if (defined('HAM_JWT_SECRET_KEY')) {
+                $secret_key = HAM_JWT_SECRET_KEY;
+            } else {
+                return new WP_Error(
+                    'ham_jwt_no_secret',
+                    __('JWT secret key is not set.', 'headless-access-manager'),
+                    array('status' => 500)
+                );
+            }
+
+            $token = JWT::encode($payload, $secret_key, 'HS256');
+            return $token;
+        } catch (Exception $e) {
+            return new WP_Error(
+                'ham_jwt_encode_error',
+                $e->getMessage(),
+                array('status' => 500)
+            );
+        }
+    }
+
+    /**
+     * Validate a JWT token and extract user ID.
+     *
+     * @param string $token JWT token.
+     * @return int|bool User ID if valid, false otherwise.
+     */
+    protected function validate_token($token)
+    {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            // In development mode, accept any valid JWT
+            try {
+                if (defined('HAM_JWT_SECRET_KEY')) {
+                    $secret_key = HAM_JWT_SECRET_KEY;
+                } else {
+                    return false;
+                }
+                $decoded = JWT::decode($token, new Key($secret_key, 'HS256'));
+                if (isset($decoded->user_id) && is_numeric($decoded->user_id)) {
+                    return (int) $decoded->user_id;
+                }
+            } catch (Exception $e) {
+                return false;
+            }
+        } else {
+            try {
+                if (defined('HAM_JWT_SECRET_KEY')) {
+                    $secret_key = HAM_JWT_SECRET_KEY;
+                } else {
+                    return false;
+                }
+                $decoded = JWT::decode($token, new Key($secret_key, 'HS256'));
+                if (!isset($decoded->user_id) || !isset($decoded->exp)) {
+                    return false;
+                }
+                if ($decoded->exp < time()) {
+                    return false;
+                }
+                return (int) $decoded->user_id;
+            } catch (Exception $e) {
+                return false;
+            }
+        }
+        return false;
     }
 
     /**
@@ -284,59 +320,6 @@ class HAM_Auth_Controller extends HAM_Base_Controller
                 $e->getMessage(),
                 array('status' => 401)
             );
-        }
-    }
-    
-    /**
-     * Validate a JWT token and extract user ID.
-     *
-     * @param string $token JWT token.
-     * @return int|bool User ID if valid, false otherwise.
-     */
-    protected function validate_token($token)
-    {
-        // In development mode, accept any token
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            // Try to decode token to get user ID if possible
-            try {
-                $data = json_decode(base64_decode($token), true);
-                if (isset($data['user_id']) && is_numeric($data['user_id'])) {
-                    return (int) $data['user_id'];
-                }
-            } catch (Exception $e) {
-                // Fall back to admin user in development
-                error_log('HAM Auth: Failed to decode token in development mode: ' . $e->getMessage());
-            }
-            
-            // Return the first admin user in development mode if token invalid
-            $admins = get_users(['role' => 'administrator', 'number' => 1]);
-            if (!empty($admins)) {
-                error_log('HAM Auth: Using first admin user in development mode: ' . $admins[0]->ID);
-                return $admins[0]->ID;
-            }
-            
-            // Final fallback - user ID 1
-            return 1;
-        }
-        
-        // For production environments, use proper token validation
-        try {
-            // Decode the token (using our simple base64 encoding for this example)
-            $data = json_decode(base64_decode($token), true);
-            
-            if (!$data || !isset($data['user_id']) || !isset($data['exp'])) {
-                return false;
-            }
-            
-            // Check if token has expired
-            if ($data['exp'] < time()) {
-                return false;
-            }
-            
-            return (int) $data['user_id'];
-        } catch (Exception $e) {
-            error_log('HAM Auth: Token validation error: ' . $e->getMessage());
-            return false;
         }
     }
     

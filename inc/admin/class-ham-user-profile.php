@@ -143,14 +143,22 @@ class HAM_User_Profile
         $classes = ham_get_classes();
 
         // Determine which fields to show based on role
-        $show_school = in_array($user->roles[0], array( HAM_ROLE_STUDENT, HAM_ROLE_TEACHER, HAM_ROLE_PRINCIPAL ));
-        $show_classes = in_array($user->roles[0], array( HAM_ROLE_STUDENT, HAM_ROLE_TEACHER ));
-        $show_managed_schools = ($user->roles[0] === HAM_ROLE_SCHOOL_HEAD);
+        $current_user_roles = $user->roles; // $user->roles is an array
+        $is_student = in_array(HAM_ROLE_STUDENT, $current_user_roles);
+        $is_teacher = in_array(HAM_ROLE_TEACHER, $current_user_roles);
+        $is_principal = in_array(HAM_ROLE_PRINCIPAL, $current_user_roles);
+        $is_school_head = in_array(HAM_ROLE_SCHOOL_HEAD, $current_user_roles);
+
+        $show_school_field = $is_student || $is_teacher || $is_principal;
+        $show_classes_field = $is_student || $is_teacher;
+        // Condition for showing the "Managed Schools" list display
+        // This list is shown if the user is a School Head OR a Principal, AND they have managed schools assigned.
+        $show_managed_schools_list = ($is_school_head || $is_principal) && !empty($managed_school_ids) && is_array($managed_school_ids);
 
         ?>
 <h2><?php echo esc_html__('Headless Access Manager', 'headless-access-manager'); ?></h2>
 <table class="form-table">
-    <?php if ($show_school) : ?>
+    <?php if ($show_school_field) : ?>
     <tr>
         <th><label for="ham_school_id"><?php echo esc_html__('School', 'headless-access-manager'); ?></label></th>
         <td>
@@ -166,7 +174,7 @@ class HAM_User_Profile
     </tr>
     <?php endif; ?>
 
-    <?php if ($show_classes) : ?>
+    <?php if ($show_classes_field) : ?>
     <tr>
         <th><label for="ham_class_ids"><?php echo esc_html__('Classes', 'headless-access-manager'); ?></label></th>
         <td>
@@ -195,7 +203,32 @@ class HAM_User_Profile
     </tr>
     <?php endif; ?>
 
-    <?php if ($show_managed_schools) : ?>
+    <?php if ($show_managed_schools_list) : ?>
+    <tr>
+        <th><label
+                for="ham_managed_school_ids_display"><?php echo esc_html__('Managed Schools', 'headless-access-manager'); ?></label>
+        </th>
+        <td>
+            <?php // $managed_school_ids is already fetched at the top of the function ?>
+            <?php if (!empty($managed_school_ids) && is_array($managed_school_ids)) : ?>
+                <ul>
+                    <?php foreach ($managed_school_ids as $school_id_item) : ?>
+                        <?php $school_item = get_post($school_id_item); ?>
+                        <?php if ($school_item && $school_item->post_type === HAM_CPT_SCHOOL) : ?>
+                            <li><a href="<?php echo esc_url(get_edit_post_link($school_item->ID)); ?>"><?php echo esc_html($school_item->post_title); ?></a></li>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </ul>
+            <?php else : ?>
+                <?php // This case should ideally not be reached if $show_managed_schools_list is true due to !empty($managed_school_ids) check, but kept for robustness ?>
+                <p><?php echo esc_html__('This user does not manage any schools.', 'headless-access-manager'); ?></p>
+            <?php endif; ?>
+            <p class="description"><?php echo esc_html__('Schools managed by this user. This is typically set when assigning the user to a school (e.g., as a School Head).', 'headless-access-manager'); ?></p>
+        </td>
+    </tr>
+    <?php endif; ?>
+
+    <?php if ($is_school_head || $is_principal) : ?>
     <tr>
         <th><label
                 for="ham_managed_school_ids"><?php echo esc_html__('Managed Schools', 'headless-access-manager'); ?></label>

@@ -1,0 +1,15 @@
+{
+    "name": "stegetfore/headless-access-manager",
+    "description": "Manages user roles, permissions, and form data for a headless WordPress site.",
+    "type": "wordpress-plugin",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Tibor Berki",
+            "email": "tibor.berki@stegetfore.se"
+        }
+    ],
+    "require": {
+        "firebase/php-jwt": "^6.0"
+    }
+}

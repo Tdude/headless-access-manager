@@ -35,11 +35,11 @@ class HAM_Admin_Menu
             30
         );
 
-        // Dashboard submenu
+        // Översikt (Overview) should be the top submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Dashboard', 'headless-access-manager'),
-            __('Översikt', 'headless-access-manager'),
+            __('Översikt', 'headless-access-manager'), // Page title
+            __('Översikt', 'headless-access-manager'), // Menu title
             'manage_options',
             'headless-access-manager',
             array( __CLASS__, 'render_dashboard_page' )
@@ -48,8 +48,8 @@ class HAM_Admin_Menu
         // Assessments submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Assessments', 'headless-access-manager'),
-            __('Bedömningar', 'headless-access-manager'),
+            __('Bedömningar', 'headless-access-manager'), // Page title
+            __('Bedömningar', 'headless-access-manager'), // Menu title
             'manage_options',
             'ham-assessments',
             array( 'HAM_Assessment_Manager', 'render_assessments_page' )
@@ -58,8 +58,8 @@ class HAM_Admin_Menu
         // Assessment Statistics submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Assessment Statistics', 'headless-access-manager'),
-            __('Statistik', 'headless-access-manager'),
+            __('Statistik', 'headless-access-manager'), // Page title
+            __('Statistik', 'headless-access-manager'), // Menu title
             'manage_options',
             'ham-assessment-stats',
             array( 'HAM_Assessment_Manager', 'render_statistics_page' )
@@ -68,8 +68,8 @@ class HAM_Admin_Menu
         // Settings submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Settings', 'headless-access-manager'),
-            __('Inställningar', 'headless-access-manager'),
+            __('Inställningar', 'headless-access-manager'), // Page title
+            __('Inställningar', 'headless-access-manager'), // Menu title
             'manage_options',
             'ham-settings',
             array( __CLASS__, 'render_settings_page' )
@@ -102,13 +102,13 @@ class HAM_Admin_Menu
 
         <div class="ham-dashboard-stat-boxes">
             <div class="ham-stat-box">
-                <h3><?php echo esc_html__('Schools', 'headless-access-manager'); ?></h3>
-                <div class="ham-stat-value"><?php echo esc_html($schools_count); ?></div>
+                <h3><?php echo esc_html__('Assessments', 'headless-access-manager'); ?></h3>
+                <div class="ham-stat-value"><?php echo esc_html($assessments_count); ?></div>
             </div>
 
             <div class="ham-stat-box">
-                <h3><?php echo esc_html__('Classes', 'headless-access-manager'); ?></h3>
-                <div class="ham-stat-value"><?php echo esc_html($classes_count); ?></div>
+                <h3><?php echo esc_html__('Students', 'headless-access-manager'); ?></h3>
+                <div class="ham-stat-value"><?php echo esc_html($students_count); ?></div>
             </div>
 
             <div class="ham-stat-box">
@@ -117,8 +117,13 @@ class HAM_Admin_Menu
             </div>
 
             <div class="ham-stat-box">
-                <h3><?php echo esc_html__('Students', 'headless-access-manager'); ?></h3>
-                <div class="ham-stat-value"><?php echo esc_html($students_count); ?></div>
+                <h3><?php echo esc_html__('Classes', 'headless-access-manager'); ?></h3>
+                <div class="ham-stat-value"><?php echo esc_html($classes_count); ?></div>
+            </div>
+
+            <div class="ham-stat-box">
+                <h3><?php echo esc_html__('Schools', 'headless-access-manager'); ?></h3>
+                <div class="ham-stat-value"><?php echo esc_html($schools_count); ?></div>
             </div>
 
             <div class="ham-stat-box">
@@ -131,10 +136,6 @@ class HAM_Admin_Menu
                 <div class="ham-stat-value"><?php echo esc_html($school_heads_count); ?></div>
             </div>
 
-            <div class="ham-stat-box">
-                <h3><?php echo esc_html__('Assessments', 'headless-access-manager'); ?></h3>
-                <div class="ham-stat-value"><?php echo esc_html($assessments_count); ?></div>
-            </div>
         </div>
     </div>
 
@@ -142,25 +143,44 @@ class HAM_Admin_Menu
         <h2><?php echo esc_html__('Quick Links', 'headless-access-manager'); ?></h2>
 
         <div class="ham-quick-links">
-            <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . HAM_CPT_SCHOOL)); ?>"
+            <a href="<?php echo esc_url(admin_url('admin.php?page=ham-assessments')); ?>"
                 class="button button-primary">
-                <?php echo esc_html__('Manage Schools', 'headless-access-manager'); ?>
+                <?php echo esc_html__('View Assessments', 'headless-access-manager'); ?>
             </a>
+
+            <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . HAM_CPT_STUDENT)); ?>"
+                class="button button-primary">
+                <?php echo esc_html__('Manage Students', 'headless-access-manager'); ?>
+            </a>
+
+            <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . HAM_CPT_TEACHER)); ?>"
+                class="button button-primary">
+                <?php echo esc_html__('Manage Teachers', 'headless-access-manager'); ?>
+            </a>    
 
             <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . HAM_CPT_CLASS)); ?>"
                 class="button button-primary">
                 <?php echo esc_html__('Manage Classes', 'headless-access-manager'); ?>
             </a>
 
+            <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . HAM_CPT_SCHOOL)); ?>"
+                class="button button-primary">
+                <?php echo esc_html__('Manage Schools', 'headless-access-manager'); ?>
+            </a>
+
+            <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . HAM_CPT_PRINCIPAL)); ?>"
+                class="button button-primary">
+                <?php echo esc_html__('Manage Principals', 'headless-access-manager'); ?>
+            </a>
+
+            <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . HAM_CPT_SCHOOL_HEAD)); ?>"
+                class="button button-primary">
+                <?php echo esc_html__('Manage School Heads', 'headless-access-manager'); ?>
+            </a>
+
             <a href="<?php echo esc_url(admin_url('users.php')); ?>" class="button button-primary">
                 <?php echo esc_html__('Manage Users', 'headless-access-manager'); ?>
             </a>
-
-            <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . HAM_CPT_ASSESSMENT)); ?>"
-                class="button button-primary">
-                <?php echo esc_html__('View Assessments', 'headless-access-manager'); ?>
-            </a>
-
             <a href="<?php echo esc_url(admin_url('admin.php?page=ham-settings')); ?>" class="button button-secondary">
                 <?php echo esc_html__('Settings', 'headless-access-manager'); ?>
             </a>
@@ -252,14 +272,14 @@ class HAM_Admin_Menu
 
         add_settings_section(
             'ham_settings_jwt',
-            __('JWT Autentiseringsinställningar', 'headless-access-manager'),
+            __('JsonWebTokens autentiseringsinställningar', 'headless-access-manager'),
             array( __CLASS__, 'render_jwt_section' ),
             'ham_settings'
         );
 
         add_settings_field(
             'ham_jwt_secret',
-            __('JWT Hemlig Nyckel', 'headless-access-manager'),
+            __('JWT hemlig nyckel', 'headless-access-manager'),
             array( __CLASS__, 'render_jwt_secret_field' ),
             'ham_settings',
             'ham_settings_jwt'
@@ -267,7 +287,7 @@ class HAM_Admin_Menu
 
         add_settings_field(
             'ham_jwt_expiration',
-            __('JWT Upphörande (dagar)', 'headless-access-manager'),
+            __('JWT utgångsdatum (dagar)', 'headless-access-manager'),
             array( __CLASS__, 'render_jwt_expiration_field' ),
             'ham_settings',
             'ham_settings_jwt'
@@ -275,7 +295,7 @@ class HAM_Admin_Menu
 
         add_settings_section(
             'ham_settings_general',
-            __('Allmänna Inställningar', 'headless-access-manager'),
+            __('Allmänna inställningar', 'headless-access-manager'),
             array( __CLASS__, 'render_general_section' ),
             'ham_settings'
         );
@@ -312,7 +332,7 @@ class HAM_Admin_Menu
         ?>
 <input type="text" name="ham_jwt_secret" value="<?php echo esc_attr($jwt_secret); ?>" class="regular-text">
 <p class="description">
-    <?php echo esc_html__('Hemlig nyckel som används för att signera JWT-token. Detta bör hållas säkert.', 'headless-access-manager'); ?>
+    <?php echo esc_html__('Hemlig nyckel som används för att signera JWT-token. Nyckeln kräver säker förvaring och delas endast med behörig personal.', 'headless-access-manager'); ?>
 </p>
 <?php
     }
@@ -327,7 +347,7 @@ class HAM_Admin_Menu
 <input type="number" name="ham_jwt_expiration" value="<?php echo esc_attr($jwt_expiration); ?>" min="1" max="30"
     step="1">
 <p class="description">
-    <?php echo esc_html__('Antal dagar innan JWT-token upphör.', 'headless-access-manager'); ?>
+    <?php echo esc_html__('Antal dagar innan JWT-token upphör och admin behöver logga in igen.', 'headless-access-manager'); ?>
 </p>
 <?php
     }
@@ -352,7 +372,7 @@ class HAM_Admin_Menu
     <?php echo esc_html__('Rensa all plugin-data vid inaktivering', 'headless-access-manager'); ?>
 </label>
 <p class="description">
-    <?php echo esc_html__('VARNING: Detta kommer att rensa all anpassad roller, förmågor och plugin-inställningar när pluginen inaktiveras.', 'headless-access-manager'); ?>
+    <?php echo esc_html__('VARNING: Detta kommer att rensa alla anpassade roller, behörigheter och plugin-inställningar när pluginet inaktiveras. Bocka UR för att ha kvar inställningarna i databasen.', 'headless-access-manager'); ?>
 </p>
 <?php
     }

@@ -28,7 +28,7 @@ class HAM_Assessment_Templates_Admin
         add_action('init', array( $this, 'register_assessment_template_post_type' ));
 
         // Add meta boxes for template structure
-        add_action('add_meta_boxes', array( $this, 'add_template_meta_boxes' ));
+        add_action('add_meta_boxes_' . HAM_CPT_ASSESSMENT_TPL, array( $this, 'add_template_meta_boxes' ));
 
         // Save template meta data
         add_action('save_post_ham_assessment_tpl', array( $this, 'save_template_meta' ));
