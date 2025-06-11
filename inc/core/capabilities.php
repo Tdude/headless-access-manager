@@ -3,7 +3,7 @@
 /**
  * File: inc/core/capabilities.php
  *
- * Defines and manages plugin-specific capabilities.
+ * Manages custom capabilities for the plugin.
  *
  * @package HeadlessAccessManager
  */
@@ -12,6 +12,8 @@
 if (! defined('ABSPATH')) {
     exit;
 }
+
+
 
 /**
  * Class HAM_Capabilities
@@ -111,6 +113,15 @@ class HAM_Capabilities
                 'edit_others_ham_schools',
                 'publish_ham_schools',
                 'read_private_ham_schools',
+            ),
+            'ham_assessment' => array(
+                'edit_ham_assessment',
+                'read_ham_assessment',
+                'delete_ham_assessment',
+                'edit_ham_assessments',
+                'edit_others_ham_assessments',
+                'publish_ham_assessments',
+                'read_private_ham_assessments',
             ),
         );
     }

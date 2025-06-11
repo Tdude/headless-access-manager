@@ -371,8 +371,8 @@ class HAM_Admin_Menu
     <input type="checkbox" name="ham_cleanup_on_deactivation" value="1" <?php checked($cleanup, true); ?>>
     <?php echo esc_html__('Delete all plugin data upon deactivation', 'headless-access-manager'); ?>
 </label>
-<p class="description">
-    <?php echo esc_html__('WARNING: This will delete all custom roles, capabilities, and plugin settings when the plugin is deactivated. Uncheck this to keep the settings in the database.', 'headless-access-manager'); ?>
+<p class="description" style="color: red; font-weight: bold;">
+    <?php echo esc_html__('DANGER: Checking this box will permanently delete ALL data associated with this plugin upon deactivation. This includes all Questions, Student Evaluations, Students, Teachers, Classes, Schools, and user roles. This action cannot be undone.', 'headless-access-manager'); ?>
 </p>
 <?php
     }

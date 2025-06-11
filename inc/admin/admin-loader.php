@@ -161,6 +161,8 @@ class HAM_Admin_Loader
 
         // Set primary column for CPTs to ensure row actions are present
         add_filter('list_table_primary_column', array(__CLASS__, 'set_primary_column'), 10, 2);
+
+
     }
 
     /**
@@ -200,7 +202,32 @@ class HAM_Admin_Loader
      */
     public static function filter_cpt_by_school($query) {
         global $pagenow, $typenow;
-        if (!is_admin() || $pagenow !== 'edit.php') return;
+        if (!is_admin() || $pagenow !== 'edit.php' || !$query->is_main_query()) {
+            return;
+        }
+
+        $cpts = array(HAM_CPT_CLASS, HAM_CPT_PRINCIPAL); // CPTs that use this filter
+        if (!in_array($typenow, $cpts)) {
+            return;
+        }
+
+        if (!empty($_GET['ham_school_filter'])) {
+            $school_id = intval($_GET['ham_school_filter']);
+            if ($typenow === HAM_CPT_PRINCIPAL) {
+                // Principals: filter by managed schools (meta is array or CSV)
+                $query->set('meta_query', array(
+                    array(
+                        'key' => '_ham_managed_school_ids',
+                        'value' => '"' . $school_id . '"',
+                        'compare' => 'LIKE'
+                    )
+                ));
+            } else {
+                // Classes: filter by _ham_school_id
+                $query->set('meta_key', '_ham_school_id');
+                $query->set('meta_value', $school_id);
+            }
+        }
     }
 
     /**
@@ -224,26 +251,9 @@ class HAM_Admin_Loader
         }
 
         return $default;
-        $cpts = array(HAM_CPT_CLASS, HAM_CPT_PRINCIPAL); // Removed HAM_CPT_TEACHER
-        if (!in_array($typenow, $cpts)) return;
-        if (!empty($_GET['ham_school_filter'])) {
-            $school_id = intval($_GET['ham_school_filter']);
-            if ($typenow === HAM_CPT_PRINCIPAL) {
-                // Principals: filter by managed schools (meta is array or CSV)
-                $query->set('meta_query', array(
-                    array(
-                        'key' => '_ham_managed_school_ids',
-                        'value' => '"'.$school_id.'"',
-                        'compare' => 'LIKE'
-                    )
-                ));
-            } else {
-                // Teachers, Students, Classes: filter by _ham_school_id
-                $query->set('meta_key', '_ham_school_id');
-                $query->set('meta_value', $school_id);
-            }
-        }
     }
+
+
 
     /**
      * Include admin files.
@@ -299,6 +309,8 @@ class HAM_Admin_Loader
         if (!in_array($typenow, $cpts)) return;
         echo '<button type="button" class="button button-primary" id="ham-crud-add-new" style="margin-right: 10px;">' . __('Add New', 'headless-access-manager') . '</button>';
     }
+
+
 
     public static function setup_admin_menu()
     {
@@ -496,20 +508,17 @@ class HAM_Admin_Loader
      */
     public static function modify_generic_cpt_columns($columns) {
         global $typenow;
-
         $cpt_column_titles = self::get_cpt_column_titles();
 
+        // Rename 'title' column
         if (isset($cpt_column_titles[$typenow]) && isset($columns['title'])) {
             $columns['title'] = $cpt_column_titles[$typenow];
         }
-        
+
+        // Remove 'date' column
         unset($columns['date']);
 
-        if (isset($columns['cb'])) {
-            $cb = $columns['cb'];
-            unset($columns['cb']);
-            $columns = array_merge(['cb' => $cb], $columns);
-        }
+        // The 'cb' checkbox column is left untouched to let WordPress handle it.
 
         return $columns;
     }
