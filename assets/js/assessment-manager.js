@@ -259,26 +259,26 @@
          * @param {Object} data Assessment data.
          */
         function displayAssessmentDetails(data) {
-            console.log('Displaying assessment details:', data);
+            // console.log('Displaying assessment details:', data);
 
             // =============================
             // COMPREHENSIVE DATA STRUCTURE LOG
             // =============================
-            console.log('%c ========= ASSESSMENT DATA STRUCTURE ANALYSIS =========', 'background: #222; color: #bada55; font-size: 16px');
-
-            // Log key data structure components
-            console.log('Raw Question Structure:', JSON.stringify(data.questions_structure, null, 2));
-            console.log('Raw Assessment Data:', JSON.stringify(data.assessment_data, null, 2));
-
-            // Critical check: How are the question keys formatted?
-            if (data.questions_structure && data.questions_structure.anknytning && data.questions_structure.anknytning.questions) {
-                console.log('Question keys in structure:', Object.keys(data.questions_structure.anknytning.questions));
-            }
-
-            // Critical check: How are the answer keys formatted?
-            if (data.assessment_data && data.assessment_data.anknytning && data.assessment_data.anknytning.questions) {
-                console.log('Answer keys in data:', Object.keys(data.assessment_data.anknytning.questions));
-            }
+            // console.log('%c ========= ASSESSMENT DATA STRUCTURE ANALYSIS =========', 'background: #222; color: #bada55; font-size: 16px');
+// 
+            // // Log key data structure components
+            // console.log('Raw Question Structure:', JSON.stringify(data.questions_structure, null, 2));
+            // console.log('Raw Assessment Data:', JSON.stringify(data.assessment_data, null, 2));
+// 
+            // // Critical check: How are the question keys formatted?
+            // if (data.questions_structure && data.questions_structure.anknytning && data.questions_structure.anknytning.questions) {
+            //     console.log('Question keys in structure:', Object.keys(data.questions_structure.anknytning.questions));
+            // }
+// 
+            // // Critical check: How are the answer keys formatted?
+            // if (data.assessment_data && data.assessment_data.anknytning && data.assessment_data.anknytning.questions) {
+            //     console.log('Answer keys in data:', Object.keys(data.assessment_data.anknytning.questions));
+            // }
 
             console.log('%c =================================================', 'background: #222; color: #bada55; font-size: 16px');
             // =============================
