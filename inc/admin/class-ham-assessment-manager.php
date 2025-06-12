@@ -770,27 +770,25 @@ class HAM_Assessment_Manager
             )
         );
 
-        // Build a proper structure for each section
-        foreach (array('anknytning', 'ansvar') as $section) {
+        // Build a proper structure for each section, ensuring correct order from the predefined list
+        foreach ($question_texts as $section => $section_questions) {
             $questions = array();
 
-            // Add question structure with text and options for each key in assessment data
-            if (!empty($processed_assessment_data[$section]['questions'])) {
-                foreach ($processed_assessment_data[$section]['questions'] as $qkey => $qdata) {
-                    // Normalize key
-                    $qkey = strtolower($qkey);
+            // Iterate over the DEFINED questions in order to maintain the correct sequence
+            foreach ($section_questions as $qkey => $qtext) {
+                // Normalize key just in case, though it should be consistent
+                $qkey = strtolower($qkey);
 
-                    // Add question with proper text and options
-                    $questions[$qkey] = array(
-                        'text' => isset($question_texts[$section][$qkey]) ? $question_texts[$section][$qkey] : ucfirst($qkey),
-                        'options' => $default_options
-                    );
-                }
+                // Add question with proper text and options
+                $questions[$qkey] = array(
+                    'text'    => $qtext,
+                    'options' => $default_options,
+                );
             }
 
             $questions_structure[$section] = array(
-                'title' => $section == 'anknytning' ? 'Anknytningstecken' : 'Ansvarstecken',
-                'questions' => $questions
+                'title'     => $section == 'anknytning' ? 'Anknytningstecken' : 'Ansvarstecken',
+                'questions' => $questions,
             );
         }
 

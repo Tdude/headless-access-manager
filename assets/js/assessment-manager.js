@@ -331,66 +331,61 @@
                 const sectionData = data.assessment_data[sectionName];
                 const sectionStructure = data.questions_structure[sectionName];
 
-                // Skip if no data
-                if (!sectionData || !sectionData.questions) {
-                    console.log(`Missing data for section: ${sectionName}`);
-                    return;
-                }
-
-                // Also need structure
+                // Skip if no structure is available
                 if (!sectionStructure || !sectionStructure.questions) {
                     console.log(`Missing structure for section: ${sectionName}`);
+                    $container.html(`<tr><td colspan="3">${hamAssessment.texts.noQuestions || 'No questions configured.'}</td></tr>`);
                     return;
                 }
 
-                const questions = sectionData.questions || {};
-                const questionKeys = Object.keys(questions);
-                console.log(`Processing ${sectionName} questions:`, questionKeys);
+                const answeredQuestions = (sectionData && sectionData.questions) ? sectionData.questions : {};
+                const structureQuestions = sectionStructure.questions;
+                
+                // FIX: Iterate over the keys from the STRUCTURE to maintain the correct order
+                const questionKeysInOrder = Object.keys(structureQuestions);
+                console.log(`Processing ${sectionName} questions in order from structure:`, questionKeysInOrder);
 
-                if (questionKeys.length === 0) {
-                    console.log(`No questions found for ${sectionName}`);
+                if (questionKeysInOrder.length === 0) {
+                    $container.html(`<tr><td colspan="3">${hamAssessment.texts.noQuestions || 'No questions configured.'}</td></tr>`);
                     return;
                 }
 
-                const structureQuestions = sectionStructure.questions || {};
-
-                // Process each question
-                questionKeys.forEach(qKey => {
-                    // Get answer data
-                    const answerData = questions[qKey];
-
-                    // Get question structure - this should now contain text and options
-                    const questionStructure = structureQuestions[qKey.toLowerCase()] || {};
-
-                    // Extract question text
+                // Process each question based on the structure's order
+                questionKeysInOrder.forEach(qKey => {
+                    // Find the corresponding answered key case-insensitively
+                    const answeredKey = Object.keys(answeredQuestions).find(
+                        key => key.toLowerCase() === qKey.toLowerCase()
+                    );
+                    const answerData = answeredKey ? answeredQuestions[answeredKey] : undefined;
+                    
+                    const questionStructure = structureQuestions[qKey];
                     const questionText = questionStructure.text || qKey;
 
-                    // Extract value and stage
                     let answerValue;
                     let stage;
 
                     if (typeof answerData === 'object' && answerData !== null) {
-                        answerValue = answerData.value || answerData.selected || answerData;
+                        answerValue = answerData.value !== undefined ? answerData.value : answerData.selected;
                         stage = answerData.stage || '';
                     } else {
                         answerValue = answerData;
                         stage = '';
                     }
 
-                    // Get answer label from options
-                    let answerLabel = answerValue;
+                    let answerLabel = '—'; // Default for unanswered
 
-                    // Try to find matching option
-                    if (questionStructure.options && Array.isArray(questionStructure.options)) {
-                        const matchingOption = questionStructure.options.find(
-                            opt => String(opt.value) === String(answerValue)
-                        );
+                    if (answerValue !== undefined && answerValue !== null) {
+                        answerLabel = answerValue; // Fallback to raw value
+                        if (questionStructure.options && Array.isArray(questionStructure.options)) {
+                            const matchingOption = questionStructure.options.find(
+                                opt => String(opt.value) === String(answerValue)
+                            );
 
-                        if (matchingOption) {
-                            answerLabel = matchingOption.label || answerValue;
-                            // Use stage from option if not already set
-                            if (!stage && matchingOption.stage) {
-                                stage = matchingOption.stage;
+                            if (matchingOption) {
+                                answerLabel = matchingOption.label || answerValue;
+                                if (!stage && matchingOption.stage) {
+                                    stage = matchingOption.stage;
+                                }
                             }
                         }
                     }
