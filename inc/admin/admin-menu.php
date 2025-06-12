@@ -26,8 +26,8 @@ class HAM_Admin_Menu
     {
         // Main menu
         add_menu_page(
-            __('Headless Access Manager', 'headless-access-manager'),
-            __('HAM', 'headless-access-manager'),
+            __('Tryggve App', 'headless-access-manager'),
+            __('Tryggve App', 'headless-access-manager'),
             'manage_options',
             'headless-access-manager',
             array( __CLASS__, 'render_dashboard_page' ),
@@ -95,7 +95,7 @@ class HAM_Admin_Menu
 
         ?>
 <div class="wrap">
-    <h1><?php echo esc_html__('Headless Access Manager Dashboard', 'headless-access-manager'); ?></h1>
+        <h1><?php echo esc_html__('Handle Access Dashboard', 'headless-access-manager'); ?></h1>
 
     <div class="ham-dashboard-stats">
         <h2><?php echo esc_html__('System Overview', 'headless-access-manager'); ?></h2>

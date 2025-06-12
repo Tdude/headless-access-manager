@@ -47,10 +47,10 @@ class HAM_Post_Types {
     private static function register_assessment_post_type()
     {
         $labels = array(
-            'name'                  => _x('Question Bank', 'Post type general name', 'headless-access-manager'),
-            'singular_name'         => _x('Question', 'Post type singular name', 'headless-access-manager'),
-            'menu_name'             => _x('Question Bank', 'Admin Menu text', 'headless-access-manager'),
-            'name_admin_bar'        => _x('Question', 'Add New on Toolbar', 'headless-access-manager'),
+            'name'                  => __('Question Bank', 'headless-access-manager'),
+            'singular_name'         => __('Question', 'Post type singular name', 'headless-access-manager'),
+            'menu_name'             => __('Question Bank', 'headless-access-manager'),
+            'name_admin_bar'        => __('Question', 'Add New on Toolbar', 'headless-access-manager'),
             'add_new'               => __('Add New', 'headless-access-manager'),
             'add_new_item'          => __('Add New Question', 'headless-access-manager'),
             'new_item'              => __('New Question', 'headless-access-manager'),
@@ -60,9 +60,9 @@ class HAM_Post_Types {
             'search_items'          => __('Search Questions', 'headless-access-manager'),
             'not_found'             => __('No questions found.', 'headless-access-manager'),
             'not_found_in_trash'    => __('No questions found in Trash.', 'headless-access-manager'),
-            'filter_items_list'     => _x('Filter questions list', 'Screen reader text for the filter links heading on the post type listing screen', 'headless-access-manager'),
-            'items_list_navigation' => _x('Questions list navigation', 'Screen reader text for the pagination heading on the post type listing screen', 'headless-access-manager'),
-            'items_list'            => _x('Questions list', 'Screen reader text for the items list heading on the post type listing screen', 'headless-access-manager'),
+            'filter_items_list'     => __('Filter questions list', 'headless-access-manager'),
+            'items_list_navigation' => __('Questions list navigation', 'headless-access-manager'),
+            'items_list'            => __('Questions list', 'headless-access-manager'),
         );
 
         $args = array(
@@ -102,10 +102,10 @@ class HAM_Post_Types {
     private static function register_student_post_type()
     {
         $labels = array(
-            'name'                  => _x('Students', 'Post type general name', 'headless-access-manager'),
-            'singular_name'         => _x('Student', 'Post type singular name', 'headless-access-manager'),
-            'menu_name'             => _x('Students', 'Admin Menu text', 'headless-access-manager'),
-            'name_admin_bar'        => _x('Student', 'Add New on Toolbar', 'headless-access-manager'),
+            'name'                  => __('Students', 'headless-access-manager'),
+            'singular_name'         => __('Student', 'headless-access-manager'),
+            'menu_name'             => __('Students', 'headless-access-manager'),
+            'name_admin_bar'        => __('Student', 'headless-access-manager'),
             'add_new'               => __('Add New', 'headless-access-manager'),
             'add_new_item'          => __('Add New Student', 'headless-access-manager'),
             'new_item'              => __('New Student', 'headless-access-manager'),
@@ -115,16 +115,16 @@ class HAM_Post_Types {
             'search_items'          => __('Search Students', 'headless-access-manager'),
             'not_found'             => __('No students found.', 'headless-access-manager'),
             'not_found_in_trash'    => __('No students found in Trash.', 'headless-access-manager'),
-            'featured_image'        => _x('Student Cover Image', 'Overrides the "Featured Image" phrase', 'headless-access-manager'),
-            'set_featured_image'    => _x('Set cover image', 'Overrides the "Set featured image" phrase', 'headless-access-manager'),
-            'remove_featured_image' => _x('Remove cover image', 'Overrides the "Remove featured image" phrase', 'headless-access-manager'),
-            'use_featured_image'    => _x('Use as cover image', 'Overrides the "Use as featured image" phrase', 'headless-access-manager'),
-            'archives'              => _x('Student archives', 'The post type archive label used in nav menus', 'headless-access-manager'),
-            'insert_into_item'      => _x('Insert into student post type', 'Overrides the "Insert into post" phrase', 'headless-access-manager'),
-            'uploaded_to_this_item' => _x('Uploaded to this student post type', 'Overrides the "Uploaded to this post" phrase', 'headless-access-manager'),
-            'filter_items_list'     => _x('Filter students list', 'Screen reader text for the filter links heading on the post type listing screen', 'headless-access-manager'),
-            'items_list_navigation' => _x('Students list navigation', 'Screen reader text for the pagination heading on the post type listing screen', 'headless-access-manager'),
-            'items_list'            => _x('Students list', 'Screen reader text for the items list heading on the post type listing screen', 'headless-access-manager'),
+            'featured_image'        => __('Student Cover Image', 'headless-access-manager'),
+            'set_featured_image'    => __('Set cover image', 'headless-access-manager'),
+            'remove_featured_image' => __('Remove cover image', 'headless-access-manager'),
+            'use_featured_image'    => __('Use as cover image', 'headless-access-manager'),
+            'archives'              => __('Student archives', 'headless-access-manager'),
+            'insert_into_item'      => __('Insert into student post type', 'headless-access-manager'),
+            'uploaded_to_this_item' => __('Uploaded to this student post type', 'headless-access-manager'),
+            'filter_items_list'     => __('Filter students list', 'headless-access-manager'),
+            'items_list_navigation' => __('Students list navigation', 'headless-access-manager'),
+            'items_list'            => __('Students list', 'headless-access-manager'),
         );
 
         $args = array(
@@ -164,10 +164,10 @@ class HAM_Post_Types {
     private static function register_teacher_post_type()
     {
         $labels = array(
-            'name'                  => _x('Teachers', 'Post type general name', 'headless-access-manager'),
-            'singular_name'         => _x('Teacher', 'Post type singular name', 'headless-access-manager'),
-            'menu_name'             => _x('Teachers', 'Admin Menu text', 'headless-access-manager'),
-            'name_admin_bar'        => _x('Teacher', 'Add New on Toolbar', 'headless-access-manager'),
+            'name'                  => __('Teachers', 'headless-access-manager'),
+            'singular_name'         => __('Teacher', 'headless-access-manager'),
+            'menu_name'             => __('Teachers', 'headless-access-manager'),
+            'name_admin_bar'        => __('Teacher', 'headless-access-manager'),
             'add_new'               => __('Add New', 'headless-access-manager'),
             'add_new_item'          => __('Add New Teacher', 'headless-access-manager'),
             'new_item'              => __('New Teacher', 'headless-access-manager'),
@@ -177,16 +177,16 @@ class HAM_Post_Types {
             'search_items'          => __('Search Teachers', 'headless-access-manager'),
             'not_found'             => __('No teachers found.', 'headless-access-manager'),
             'not_found_in_trash'    => __('No teachers found in Trash.', 'headless-access-manager'),
-            'featured_image'        => _x('Teacher Cover Image', 'Overrides the "Featured Image" phrase', 'headless-access-manager'),
-            'set_featured_image'    => _x('Set cover image', 'Overrides the "Set featured image" phrase', 'headless-access-manager'),
-            'remove_featured_image' => _x('Remove cover image', 'Overrides the "Remove featured image" phrase', 'headless-access-manager'),
-            'use_featured_image'    => _x('Use as cover image', 'Overrides the "Use as featured image" phrase', 'headless-access-manager'),
-            'archives'              => _x('Teacher archives', 'The post type archive label used in nav menus', 'headless-access-manager'),
-            'insert_into_item'      => _x('Insert into teacher post type', 'Overrides the "Insert into post" phrase', 'headless-access-manager'),
-            'uploaded_to_this_item' => _x('Uploaded to this teacher post type', 'Overrides the "Uploaded to this post" phrase', 'headless-access-manager'),
-            'filter_items_list'     => _x('Filter teachers list', 'Screen reader text for the filter links heading on the post type listing screen', 'headless-access-manager'),
-            'items_list_navigation' => _x('Teachers list navigation', 'Screen reader text for the pagination heading on the post type listing screen', 'headless-access-manager'),
-            'items_list'            => _x('Teachers list', 'Screen reader text for the items list heading on the post type listing screen', 'headless-access-manager'),
+            'featured_image'        => __('Teacher Cover Image', 'headless-access-manager'),
+            'set_featured_image'    => __('Set cover image', 'headless-access-manager'),
+            'remove_featured_image' => __('Remove cover image', 'headless-access-manager'),
+            'use_featured_image'    => __('Use as cover image', 'headless-access-manager'),
+            'archives'              => __('Teacher archives', 'headless-access-manager'),
+            'insert_into_item'      => __('Insert into teacher post type', 'headless-access-manager'),
+            'uploaded_to_this_item' => __('Uploaded to this teacher post type', 'headless-access-manager'),
+            'filter_items_list'     => __('Filter teachers list', 'headless-access-manager'),
+            'items_list_navigation' => __('Teachers list navigation', 'headless-access-manager'),
+            'items_list'            => __('Teachers list', 'headless-access-manager'),
         );
 
         $args = array(
@@ -226,10 +226,10 @@ class HAM_Post_Types {
     private static function register_class_post_type()
     {
         $labels = array(
-            'name'                  => _x('Classes', 'Post type general name', 'headless-access-manager'),
-            'singular_name'         => _x('Class', 'Post type singular name', 'headless-access-manager'),
-            'menu_name'             => _x('Classes', 'Admin Menu text', 'headless-access-manager'),
-            'name_admin_bar'        => _x('Class', 'Add New on Toolbar', 'headless-access-manager'),
+            'name'                  => __('Classes', 'headless-access-manager'),
+            'singular_name'         => __('Class', 'headless-access-manager'),
+            'menu_name'             => __('Classes', 'headless-access-manager'),
+            'name_admin_bar'        => __('Class', 'headless-access-manager'),
             'add_new'               => __('Add New', 'headless-access-manager'),
             'add_new_item'          => __('Add New Class', 'headless-access-manager'),
             'new_item'              => __('New Class', 'headless-access-manager'),
@@ -239,16 +239,16 @@ class HAM_Post_Types {
             'search_items'          => __('Search Classes', 'headless-access-manager'),
             'not_found'             => __('No classes found.', 'headless-access-manager'),
             'not_found_in_trash'    => __('No classes found in Trash.', 'headless-access-manager'),
-            'featured_image'        => _x('Class Cover Image', 'Overrides the "Featured Image" phrase', 'headless-access-manager'),
-            'set_featured_image'    => _x('Set cover image', 'Overrides the "Set featured image" phrase', 'headless-access-manager'),
-            'remove_featured_image' => _x('Remove cover image', 'Overrides the "Remove featured image" phrase', 'headless-access-manager'),
-            'use_featured_image'    => _x('Use as cover image', 'Overrides the "Use as featured image" phrase', 'headless-access-manager'),
-            'archives'              => _x('Class archives', 'The post type archive label used in nav menus', 'headless-access-manager'),
-            'insert_into_item'      => _x('Insert into class', 'Overrides the "Insert into post" phrase', 'headless-access-manager'),
-            'uploaded_to_this_item' => _x('Uploaded to this class', 'Overrides the "Uploaded to this post" phrase', 'headless-access-manager'),
-            'filter_items_list'     => _x('Filter classes list', 'Screen reader text for the filter links heading on the post type listing screen', 'headless-access-manager'),
-            'items_list_navigation' => _x('Classes list navigation', 'Screen reader text for the pagination heading on the post type listing screen', 'headless-access-manager'),
-            'items_list'            => _x('Classes list', 'Screen reader text for the items list heading on the post type listing screen', 'headless-access-manager'),
+            'featured_image'        => __('Class Cover Image', 'headless-access-manager'),
+            'set_featured_image'    => __('Set cover image', 'headless-access-manager'),
+            'remove_featured_image' => __('Remove cover image', 'headless-access-manager'),
+            'use_featured_image'    => __('Use as cover image', 'headless-access-manager'),
+            'archives'              => __('Class archives', 'headless-access-manager'),
+            'insert_into_item'      => __('Insert into class', 'headless-access-manager'),
+            'uploaded_to_this_item' => __('Uploaded to this class', 'headless-access-manager'),
+            'filter_items_list'     => __('Filter classes list', 'headless-access-manager'),
+            'items_list_navigation' => __('Classes list navigation', 'headless-access-manager'),
+            'items_list'            => __('Classes list', 'headless-access-manager'),
         );
 
         $args = array(
@@ -289,10 +289,10 @@ class HAM_Post_Types {
     {
         error_log('HAM DEBUG: Attempting to register ham_school CPT.'); // DEBUG LINE
         $labels = array(
-            'name'                  => _x('Schools', 'Post type general name', 'headless-access-manager'),
-            'singular_name'         => _x('School', 'Post type singular name', 'headless-access-manager'),
-            'menu_name'             => _x('Schools', 'Admin Menu text', 'headless-access-manager'),
-            'name_admin_bar'        => _x('School', 'Add New on Toolbar', 'headless-access-manager'),
+            'name'                  => __('Schools', 'headless-access-manager'),
+            'singular_name'         => __('School', 'headless-access-manager'),
+            'menu_name'             => __('Schools', 'headless-access-manager'),
+            'name_admin_bar'        => __('School', 'headless-access-manager'),
             'add_new'               => __('Add New', 'headless-access-manager'),
             'add_new_item'          => __('Add New School', 'headless-access-manager'),
             'new_item'              => __('New School', 'headless-access-manager'),
@@ -302,16 +302,16 @@ class HAM_Post_Types {
             'search_items'          => __('Search Schools', 'headless-access-manager'),
             'not_found'             => __('No schools found.', 'headless-access-manager'),
             'not_found_in_trash'    => __('No schools found in Trash.', 'headless-access-manager'),
-            'featured_image'        => _x('School Cover Image', 'Overrides the "Featured Image" phrase', 'headless-access-manager'),
-            'set_featured_image'    => _x('Set cover image', 'Overrides the "Set featured image" phrase', 'headless-access-manager'),
-            'remove_featured_image' => _x('Remove cover image', 'Overrides the "Remove featured image" phrase', 'headless-access-manager'),
-            'use_featured_image'    => _x('Use as cover image', 'Overrides the "Use as featured image" phrase', 'headless-access-manager'),
-            'archives'              => _x('School archives', 'The post type archive label used in nav menus', 'headless-access-manager'),
-            'insert_into_item'      => _x('Insert into school', 'Overrides the "Insert into post" phrase', 'headless-access-manager'),
-            'uploaded_to_this_item' => _x('Uploaded to this school', 'Overrides the "Uploaded to this post" phrase', 'headless-access-manager'),
-            'filter_items_list'     => _x('Filter schools list', 'Screen reader text for the filter links heading on the post type listing screen', 'headless-access-manager'),
-            'items_list_navigation' => _x('Schools list navigation', 'Screen reader text for the pagination heading on the post type listing screen', 'headless-access-manager'),
-            'items_list'            => _x('Schools list', 'Screen reader text for the items list heading on the post type listing screen', 'headless-access-manager'),
+            'featured_image'        => __('School Cover Image', 'headless-access-manager'),
+            'set_featured_image'    => __('Set cover image', 'headless-access-manager'),
+            'remove_featured_image' => __('Remove cover image', 'headless-access-manager'),
+            'use_featured_image'    => __('Use as cover image', 'headless-access-manager'),
+            'archives'              => __('School archives', 'headless-access-manager'),
+            'insert_into_item'      => __('Insert into school', 'headless-access-manager'),
+            'uploaded_to_this_item' => __('Uploaded to this school', 'headless-access-manager'),
+            'filter_items_list'     => __('Filter schools list', 'headless-access-manager'),
+            'items_list_navigation' => __('Schools list navigation', 'headless-access-manager'),
+            'items_list'            => __('Schools list', 'headless-access-manager'),
         );
 
         $args = array(
@@ -353,10 +353,10 @@ class HAM_Post_Types {
     {
         error_log('HAM DEBUG: Attempting to register ham_principal CPT.'); // DEBUG LINE
         $labels = array(
-            'name'                  => _x('Principals', 'Post type general name', 'headless-access-manager'),
-            'singular_name'         => _x('Principal', 'Post type singular name', 'headless-access-manager'),
-            'menu_name'             => _x('Principals', 'Admin Menu text', 'headless-access-manager'),
-            'name_admin_bar'        => _x('Principal', 'Add New on Toolbar', 'headless-access-manager'),
+            'name'                  => __('Principals', 'headless-access-manager'),
+            'singular_name'         => __('Principal', 'headless-access-manager'),
+            'menu_name'             => __('Principals', 'headless-access-manager'),
+            'name_admin_bar'        => __('Principal', 'headless-access-manager'),
             'add_new'               => __('Add New', 'headless-access-manager'),
             'add_new_item'          => __('Add New Principal', 'headless-access-manager'),
             'new_item'              => __('New Principal', 'headless-access-manager'),
@@ -366,16 +366,16 @@ class HAM_Post_Types {
             'search_items'          => __('Search Principals', 'headless-access-manager'),
             'not_found'             => __('No principals found.', 'headless-access-manager'),
             'not_found_in_trash'    => __('No principals found in Trash.', 'headless-access-manager'),
-            'featured_image'        => _x('Principal Cover Image', 'Overrides the "Featured Image" phrase', 'headless-access-manager'),
-            'set_featured_image'    => _x('Set cover image', 'Overrides the "Set featured image" phrase', 'headless-access-manager'),
-            'remove_featured_image' => _x('Remove cover image', 'Overrides the "Remove featured image" phrase', 'headless-access-manager'),
-            'use_featured_image'    => _x('Use as cover image', 'Overrides the "Use as featured image" phrase', 'headless-access-manager'),
-            'archives'              => _x('Principal archives', 'The post type archive label used in nav menus', 'headless-access-manager'),
-            'insert_into_item'      => _x('Insert into principal post type', 'Overrides the "Insert into post" phrase', 'headless-access-manager'),
-            'uploaded_to_this_item' => _x('Uploaded to this principal post type', 'Overrides the "Uploaded to this post" phrase', 'headless-access-manager'),
-            'filter_items_list'     => _x('Filter principals list', 'Screen reader text for the filter links heading on the post type listing screen', 'headless-access-manager'),
-            'items_list_navigation' => _x('Principals list navigation', 'Screen reader text for the pagination heading on the post type listing screen', 'headless-access-manager'),
-            'items_list'            => _x('Principals list', 'Screen reader text for the items list heading on the post type listing screen', 'headless-access-manager'),
+            'featured_image'        => __('Principal Cover Image', 'headless-access-manager'),
+            'set_featured_image'    => __('Set cover image', 'headless-access-manager'),
+            'remove_featured_image' => __('Remove cover image', 'headless-access-manager'),
+            'use_featured_image'    => __('Use as cover image', 'headless-access-manager'),
+            'archives'              => __('Principal archives', 'headless-access-manager'),
+            'insert_into_item'      => __('Insert into principal post type', 'headless-access-manager'),
+            'uploaded_to_this_item' => __('Uploaded to this principal post type', 'headless-access-manager'),
+            'filter_items_list'     => __('Filter principals list', 'headless-access-manager'),
+            'items_list_navigation' => __('Principals list navigation', 'headless-access-manager'),
+            'items_list'            => __('Principals list', 'headless-access-manager'),
         );
 
         $args = array(
@@ -416,10 +416,10 @@ class HAM_Post_Types {
     private static function register_school_head_post_type()
     {
         $labels = array(
-            'name'                  => _x('School Heads', 'Post type general name', 'headless-access-manager'),
-            'singular_name'         => _x('School Head', 'Post type singular name', 'headless-access-manager'),
-            'menu_name'             => _x('School Heads', 'Admin Menu text', 'headless-access-manager'),
-            'name_admin_bar'        => _x('School Head', 'Add New on Toolbar', 'headless-access-manager'),
+            'name'                  => __('School Heads', 'headless-access-manager'),
+            'singular_name'         => __('School Head', 'headless-access-manager'),
+            'menu_name'             => __('School Heads', 'headless-access-manager'),
+            'name_admin_bar'        => __('School Head', 'headless-access-manager'),
             'add_new'               => __('Add New', 'headless-access-manager'),
             'add_new_item'          => __('Add New School Head', 'headless-access-manager'),
             'new_item'              => __('New School Head', 'headless-access-manager'),
@@ -429,16 +429,16 @@ class HAM_Post_Types {
             'search_items'          => __('Search School Heads', 'headless-access-manager'),
             'not_found'             => __('No school heads found.', 'headless-access-manager'),
             'not_found_in_trash'    => __('No school heads found in Trash.', 'headless-access-manager'),
-            'featured_image'        => _x('School Head Cover Image', 'Overrides the "Featured Image" phrase', 'headless-access-manager'),
-            'set_featured_image'    => _x('Set cover image', 'Overrides the "Set featured image" phrase', 'headless-access-manager'),
-            'remove_featured_image' => _x('Remove cover image', 'Overrides the "Remove featured image" phrase', 'headless-access-manager'),
-            'use_featured_image'    => _x('Use as cover image', 'Overrides the "Use as featured image" phrase', 'headless-access-manager'),
-            'archives'              => _x('School Head archives', 'The post type archive label used in nav menus', 'headless-access-manager'),
-            'insert_into_item'      => _x('Insert into school head post type', 'Overrides the "Insert into post" phrase', 'headless-access-manager'),
-            'uploaded_to_this_item' => _x('Uploaded to this school head post type', 'Overrides the "Uploaded to this post" phrase', 'headless-access-manager'),
-            'filter_items_list'     => _x('Filter school heads list', 'Screen reader text for the filter links heading on the post type listing screen', 'headless-access-manager'),
-            'items_list_navigation' => _x('School Heads list navigation', 'Screen reader text for the pagination heading on the post type listing screen', 'headless-access-manager'),
-            'items_list'            => _x('School Heads list', 'Screen reader text for the items list heading on the post type listing screen', 'headless-access-manager'),
+            'featured_image'        => __('School Head Cover Image', 'headless-access-manager'),
+            'set_featured_image'    => __('Set cover image', 'headless-access-manager'),
+            'remove_featured_image' => __('Remove cover image', 'headless-access-manager'),
+            'use_featured_image'    => __('Use as cover image', 'headless-access-manager'),
+            'archives'              => __('School Head archives', 'headless-access-manager'),
+            'insert_into_item'      => __('Insert into school head post type', 'headless-access-manager'),
+            'uploaded_to_this_item' => __('Uploaded to this school head post type', 'headless-access-manager'),
+            'filter_items_list'     => __('Filter school heads list', 'headless-access-manager'),
+            'items_list_navigation' => __('School Heads list navigation', 'headless-access-manager'),
+            'items_list'            => __('School Heads list', 'headless-access-manager'),
         );
 
         $args = array(
