@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Headless Access Manager\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-06 22:36+0200\n"
-"PO-Revision-Date: 2025-04-07 22:48+0200\n"
+"PO-Revision-Date: 2025-06-11 23:10+0200\n"
 "Last-Translator: Tdude <tibbecodes@gmail.com>\n"
 "Language-Team: \n"
 "Language: sv_SE\n"
@@ -87,6 +87,9 @@ msgid "Assessment"
 msgid_plural "Assessments"
 msgstr[0] "Bedömning"
 msgstr[1] "Bedömningar"
+
+msgid "Assessment Title"
+msgstr "Bedömningens titel"
 
 msgid "All Assessments"
 msgstr "Alla bedömningar"
@@ -312,7 +315,7 @@ msgid "Full"
 msgstr "Fullt etablerat"
 
 msgid "Not Established"
-msgstr "Inte etablerad"
+msgstr "Ej etablerad"
 
 msgid "In Transition"
 msgstr "Utvecklas"
@@ -337,8 +340,8 @@ msgid "Error deleting assessment."
 msgstr "Fel vid borttagning av bedömning."
 
 # Filter Options
-msgid "Filter by Stage:"
-msgstr "Filtrera efter nuläge:"
+msgid "Filter by status:"
+msgstr "Filtrera efter status:"
 
 # Student Evaluations Interface
 msgid "Student Evaluations"
@@ -374,9 +377,6 @@ msgstr "Denna termin"
 msgid "This School Year"
 msgstr "Detta skolår"
 
-msgid "Filter by Status:"
-msgstr "Filtrera efter status:"
-
 msgid "All"
 msgstr "Alla"
 
@@ -399,8 +399,46 @@ msgstr "Ansvarig pedagog"
 msgid "Status"
 msgstr "Status"
 
+#: templates/admin/assessment-statistics.php:11
+msgid "Evaluations by Tryggve"
+msgstr "Utvärderingar av Tryggve"
+
+#: templates/admin/assessment-statistics.php:19
+msgid "Total Evaluations"
+msgstr "Totalt antal utvärderingar"
+
+#: templates/admin/assessment-statistics.php:27
+msgid "Assessed Students"
+msgstr "Bedömda elever"
+
+#: templates/admin/assessment-statistics.php:35
+msgid "Average Completion Rate"
+msgstr "Genomsnittlig slutförandegrad"
+
+#: templates/admin/assessment-statistics.php
+msgid "Monthly Evaluations"
+msgstr "Månatliga utvärderingar"
+
+#: templates/admin/assessment-statistics.php:104
+msgid "Status Distribution"
+msgstr "Statusfördelning"
+
+#: templates/admin/assessment-statistics.php:132
+msgid "Average per Assessment Section"
+msgstr "Genomsnitt per bedömningsavsnitt"
+
+#: templates/admin/assessment-statistics.php
+msgid "Top-Rated Assessment Questions"
+msgstr "Högst rankade bedömningsfrågor"
+
 msgid "Actions"
 msgstr "Åtgärder"
+
+msgid "Section"
+msgstr "Avsnitt"
+
+msgid "Average Score"
+msgstr "Genomsnittligt utfall"
 
 # Evaluation Interface
 msgid "No evaluations found."
@@ -452,6 +490,9 @@ msgstr "Statistik"
 msgid "Settings"
 msgstr "Inställningar"
 
+msgid "Headless Access Manager Dashboard"
+msgstr "Tryggves kontrollpanel"
+
 msgid "System Overview"
 msgstr "Systemöversikt"
 
@@ -465,17 +506,8 @@ msgstr "Elever"
 msgid "Teachers"
 msgstr "Lärare"
 
-msgid "Classes"
-msgstr "Klasser"
-
-msgid "Schools"
-msgstr "Skolor"
-
-msgid "Principals"
-msgstr "Rektorer"
-
-msgid "School Heads"
-msgstr "Skolledare"
+msgid "School Head Name"
+msgstr "Skolledares namn"
 
 msgid "Total Students"
 msgstr "Totala antalet elever"
@@ -484,7 +516,7 @@ msgid "Total Teachers"
 msgstr "Totala antalet lärare"
 
 msgid "Active Courses"
-msgstr "Aktiva kurser"
+msgstr "Aktiva ämnen"
 
 # Management Links
 msgid "View Evaluations"
@@ -495,6 +527,12 @@ msgstr "Hantera elever"
 
 msgid "Manage Teachers"
 msgstr "Hantera lärare"
+
+msgid "Teacher Name"
+msgstr "Lärarnamn"
+
+msgid "Student Name"
+msgstr "Elevnamn"
 
 msgid "Manage Classes"
 msgstr "Hantera klasser"
@@ -528,7 +566,7 @@ msgid "General Settings"
 msgstr "Allmänna inställningar"
 
 msgid "Here you can configure the main settings for the Headless Access Manager plugin."
-msgstr "Här kan du konfigurera de huvudinställningarna för Headless Access Manager plugin."
+msgstr "Här kan du konfigurera huvudinställningarna för Headless Access Manager pluginet."
 
 # JWT Settings
 msgid "JWT Secret Key"
@@ -595,4 +633,527 @@ msgid "Delete all plugin data upon deactivation"
 msgstr "Ta bort all plugin data vid inaktivering"
 
 msgid "DANGER: Checking this box will permanently delete ALL data associated with this plugin upon deactivation. This includes all Questions, Student Evaluations, Students, Teachers, Classes, Schools, and user roles. This action cannot be undone."
-msgstr "FARA: Detta kommer att radera all data såsom elever, lärare, klasser, rektorer, skolledare, bedömningar, anpassade roller, behörigheter och plugininställningar när pluginet inaktiveras. Avmarkera detta för att behålla inställningarna i databasen. Denna åtgärd kan inte återställas!"
+msgstr "FARA: Detta kommer att radera all data såsom elever, lärare, klasser, rektorer, skolledare, bedömningar, anpassade roller, behörigheter och plugininställningar när pluginet inaktiveras. Avmarkera detta för att behålla inställningarna i databasen. Denna åtgärd kan inte återställas."
+
+#: inc/core/post-types.php
+msgid "Add New"
+msgstr "Lägg till nytt"
+
+# Student CPT
+
+
+msgid "Add New Student"
+msgstr "Lägg till ny elev"
+
+msgid "New Student"
+msgstr "Ny elev"
+
+msgid "Edit Student"
+msgstr "Redigera elev"
+
+msgid "View Student"
+msgstr "Visa elev"
+
+msgid "Search Students"
+msgstr "Sök elever"
+
+msgid "No students found."
+msgstr "Inga elever hittades."
+
+msgid "No students found in Trash."
+msgstr "Inga elever hittades i papperskorgen."
+
+msgctxt "Overrides the \"Featured Image\" phrase"
+msgid "Student Cover Image"
+msgstr "Elevens omslagsbild"
+
+msgid "Set cover image"
+msgstr "Ange omslagsbild"
+msgctxt "Overrides the \"Remove featured image\" phrase"
+msgid "Remove cover image"
+msgstr "Ta bort omslagsbild"
+
+msgctxt "Overrides the \"Use as featured image\" phrase"
+msgid "Use as cover image"
+msgstr "Använd som omslagsbild"
+msgctxt "The post type archive label used in nav menus"
+msgid "Student archives"
+msgstr "Elevarkiv"
+
+msgid "Insert into student post type"
+msgstr "Infoga i elevposttyp"
+msgctxt "Overrides the \"Uploaded to this post\" phrase"
+msgid "Uploaded to this student post type"
+msgstr "Uppladdad till denna elevposttyp"
+
+msgctxt "Screen reader text for the filter links heading on the post type listing screen"
+msgid "Filter students list"
+msgstr "Filtrera elevlista"
+msgctxt "Screen reader text for the pagination heading on the post type listing screen"
+msgid "Students list navigation"
+msgstr "Navigering elevlista"
+
+msgid "Students list"
+msgstr "Elevlista"
+
+# Teacher CPT
+#: inc/core/post-types.php
+msgctxt "Post type general name"
+msgid "Teachers"
+msgstr "Lärare"
+
+#: inc/core/post-types.php
+msgctxt "Post type singular name"
+msgid "Teacher"
+msgstr "Lärare"
+
+#: inc/core/post-types.php
+msgctxt "Admin Menu text"
+msgid "Teachers"
+msgstr "Lärare"
+
+#: inc/core/post-types.php
+msgctxt "Add New on Toolbar"
+msgid "Teacher"
+msgstr "Lärare"
+
+#: inc/core/post-types.php
+msgid "Add New Teacher"
+msgstr "Lägg till ny lärare"
+
+#: inc/core/post-types.php
+msgid "New Teacher"
+msgstr "Ny lärare"
+
+#: inc/core/post-types.php
+msgid "Edit Teacher"
+msgstr "Redigera lärare"
+
+#: inc/core/post-types.php
+msgid "View Teacher"
+msgstr "Visa lärare"
+
+#: inc/core/post-types.php
+msgid "Search Teachers"
+msgstr "Sök lärare"
+
+#: inc/core/post-types.php
+msgid "No teachers found."
+msgstr "Inga lärare hittades."
+
+#: inc/core/post-types.php
+msgid "No teachers found in Trash."
+msgstr "Inga lärare hittades i papperskorgen."
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Featured Image\" phrase"
+msgid "Teacher Cover Image"
+msgstr "Lärarens omslagsbild"
+
+#: inc/core/post-types.php
+msgctxt "The post type archive label used in nav menus"
+msgid "Teacher archives"
+msgstr "Lärararkiv"
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Insert into post\" phrase"
+msgid "Insert into teacher post type"
+msgstr "Infoga i lärarposttyp"
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Uploaded to this post\" phrase"
+msgid "Uploaded to this teacher post type"
+msgstr "Uppladdad till denna lärarposttyp"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the filter links heading on the post type listing screen"
+msgid "Filter teachers list"
+msgstr "Filtrera lärarlista"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the pagination heading on the post type listing screen"
+msgid "Teachers list navigation"
+msgstr "Navigering lärarlista"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the items list heading on the post type listing screen"
+msgid "Teachers list"
+msgstr "Lärarlista"
+
+# Class CPT
+
+
+msgid "Class"
+msgstr "Klass"
+
+msgid "Classes"
+msgstr "Klasser"
+
+msgid "Class Name"
+msgstr "Klassnamn"
+
+
+#: inc/core/post-types.php
+msgid "Add New Class"
+msgstr "Lägg till ny klass"
+
+#: inc/core/post-types.php
+msgid "New Class"
+msgstr "Ny klass"
+
+#: inc/core/post-types.php
+msgid "Edit Class"
+msgstr "Redigera klass"
+
+#: inc/core/post-types.php
+msgid "View Class"
+msgstr "Visa klass"
+
+#: inc/core/post-types.php
+msgid "Search Classes"
+msgstr "Sök klasser"
+
+#: inc/core/post-types.php
+msgid "No classes found."
+msgstr "Inga klasser hittades."
+
+#: inc/core/post-types.php
+msgid "No classes found in Trash."
+msgstr "Inga klasser hittades i papperskorgen."
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Featured Image\" phrase"
+msgid "Class Cover Image"
+msgstr "Klassens omslagsbild"
+
+#: inc/core/post-types.php
+msgctxt "The post type archive label used in nav menus"
+msgid "Class archives"
+msgstr "Klassarkiv"
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Insert into post\" phrase"
+msgid "Insert into class"
+msgstr "Infoga i klass"
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Uploaded to this post\" phrase"
+msgid "Uploaded to this class"
+msgstr "Uppladdad till denna klass"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the filter links heading on the post type listing screen"
+msgid "Filter classes list"
+msgstr "Filtrera klasslista"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the pagination heading on the post type listing screen"
+msgid "Classes list navigation"
+msgstr "Navigering klasslista"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the items list heading on the post type listing screen"
+msgid "Classes list"
+msgstr "Klasslista"
+
+# School CPT
+msgid "Schools"
+msgstr "Skolor"
+
+msgid "School"
+msgstr "Skola"
+
+
+
+
+#: inc/core/post-types.php
+msgid "Add New School"
+msgstr "Lägg till ny skola"
+
+#: inc/core/post-types.php
+msgid "New School"
+msgstr "Ny skola"
+
+msgid "School Name"
+msgstr "Skolnamn"
+
+msgid "Assigned Principals"
+msgstr "Tilldelade rektorer"
+
+msgid "Assigned School Heads"
+msgstr "Tilldelade skolledare"
+
+msgid "Assigned Classes"
+msgstr "Tilldelade klasser"
+
+msgid "Assigned Students"
+msgstr "Tilldelade elever"
+
+msgid "Assigned Teachers"
+msgstr "Tilldelade lärare"
+
+msgid "Assigned Modules"
+msgstr "Tilldelade moduler"
+
+msgid "Assigned Schools"
+msgstr "Tilldelade skolor"
+
+#: inc/core/post-types.php
+msgid "Edit School"
+msgstr "Redigera skola"
+
+#: inc/core/post-types.php
+msgid "View School"
+msgstr "Visa skola"
+
+#: inc/core/post-types.php
+msgid "Search Schools"
+msgstr "Sök skolor"
+
+#: inc/core/post-types.php
+msgid "No schools found."
+msgstr "Inga skolor hittades."
+
+#: inc/core/post-types.php
+msgid "No schools found in Trash."
+msgstr "Inga skolor hittades i papperskorgen."
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Featured Image\" phrase"
+msgid "School Cover Image"
+msgstr "Skolans omslagsbild"
+
+#: inc/core/post-types.php
+msgctxt "The post type archive label used in nav menus"
+msgid "School archives"
+msgstr "Skolarkiv"
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Insert into post\" phrase"
+msgid "Insert into school"
+msgstr "Infoga i skola"
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Uploaded to this post\" phrase"
+msgid "Uploaded to this school"
+msgstr "Uppladdad till denna skola"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the filter links heading on the post type listing screen"
+msgid "Filter schools list"
+msgstr "Filtrera skollista"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the pagination heading on the post type listing screen"
+msgid "Schools list navigation"
+msgstr "Navigering skollista"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the items list heading on the post type listing screen"
+msgid "Schools list"
+msgstr "Skollista"
+
+# Principal CPT
+msgid "Principals"
+msgstr "Rektorer"
+
+msgid "Principal"
+msgstr "Rektor"
+
+#: inc/core/post-types.php
+msgid "Add New Principal"
+msgstr "Lägg till ny rektor"
+
+msgid "Principal Name"
+msgstr "Rektors namn"
+
+#: inc/core/post-types.php
+msgid "New Principal"
+msgstr "Ny rektor"
+
+#: inc/core/post-types.php
+msgid "Edit Principal"
+msgstr "Redigera rektor"
+
+#: inc/core/post-types.php
+msgid "View Principal"
+msgstr "Visa rektor"
+
+#: inc/core/post-types.php
+msgid "Search Principals"
+msgstr "Sök rektorer"
+
+#: inc/core/post-types.php
+msgid "No principals found."
+msgstr "Inga rektorer hittades."
+
+#: inc/core/post-types.php
+msgid "No principals found in Trash."
+msgstr "Inga rektorer hittades i papperskorgen."
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Featured Image\" phrase"
+msgid "Principal Cover Image"
+msgstr "Rektorns omslagsbild"
+
+#: inc/core/post-types.php
+msgctxt "The post type archive label used in nav menus"
+msgid "Principal archives"
+msgstr "Rektorsarkiv"
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Insert into post\" phrase"
+msgid "Insert into principal post type"
+msgstr "Infoga i rektorsposttyp"
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Uploaded to this post\" phrase"
+msgid "Uploaded to this principal post type"
+msgstr "Uppladdad till denna rektorsposttyp"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the filter links heading on the post type listing screen"
+msgid "Filter principals list"
+msgstr "Filtrera rektorslista"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the pagination heading on the post type listing screen"
+msgid "Principals list navigation"
+msgstr "Navigering rektorslista"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the items list heading on the post type listing screen"
+msgid "Principals list"
+msgstr "Rektorslista"
+
+# School Head CPT
+msgid "School Heads"
+msgstr "Skolledare"
+
+msgid "School Head"
+msgstr "Skolledare"
+
+#: inc/core/post-types.php
+msgctxt "Add New on Toolbar"
+msgid "School Head"
+msgstr "Skolledare"
+
+#: inc/core/post-types.php
+msgid "Add New School Head"
+msgstr "Lägg till ny skolledare"
+
+#: inc/core/post-types.php
+msgid "New School Head"
+msgstr "Ny skolledare"
+
+#: inc/core/post-types.php
+msgid "Edit School Head"
+msgstr "Redigera skolledare"
+
+#: inc/core/post-types.php
+msgid "View School Head"
+msgstr "Visa skolledare"
+
+#: inc/core/post-types.php
+msgid "Search School Heads"
+msgstr "Sök skolledare"
+
+#: inc/core/post-types.php
+msgid "No school heads found."
+msgstr "Inga skolledare hittades."
+
+#: inc/core/post-types.php
+msgid "No school heads found in Trash."
+msgstr "Inga skolledare hittades i papperskorgen."
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Featured Image\" phrase"
+msgid "School Head Cover Image"
+msgstr "Skolledarens omslagsbild"
+
+#: inc/core/post-types.php
+msgctxt "The post type archive label used in nav menus"
+msgid "School Head archives"
+msgstr "Skolledararkiv"
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Insert into post\" phrase"
+msgid "Insert into school head post type"
+msgstr "Infoga i skolledarposttyp"
+
+#: inc/core/post-types.php
+msgctxt "Overrides the \"Uploaded to this post\" phrase"
+msgid "Uploaded to this school head post type"
+msgstr "Uppladdad till denna skolledarposttyp"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the filter links heading on the post type listing screen"
+msgid "Filter school heads list"
+msgstr "Filtrera skolledarlista"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the pagination heading on the post type listing screen"
+msgid "School Heads list navigation"
+msgstr "Navigering skolledarlista"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the items list heading on the post type listing screen"
+msgid "School Heads list"
+msgstr "Skolledarlista"
+
+# Assessment (Question Bank) CPT specific labels from post-types.php
+#: inc/core/post-types.php
+msgctxt "Post type singular name"
+msgid "Question"
+msgstr "Fråga"
+
+#: inc/core/post-types.php
+msgctxt "Add New on Toolbar"
+msgid "Question"
+msgid_plural "Questions"
+msgstr[0] "Fråga"
+msgstr[1] "Frågor"
+
+#: inc/core/post-types.php
+msgid "Add New Question"
+msgstr "Lägg till ny fråga"
+
+#: inc/core/post-types.php
+msgid "New Question"
+msgstr "Ny fråga"
+
+#: inc/core/post-types.php
+msgid "Edit Question"
+msgstr "Redigera fråga"
+
+#: inc/core/post-types.php
+msgid "View Question"
+msgstr "Visa fråga"
+
+#: inc/core/post-types.php
+msgid "Search Questions"
+msgstr "Sök frågor"
+
+#: inc/core/post-types.php
+msgid "No questions found."
+msgstr "Inga frågor hittades."
+
+#: inc/core/post-types.php
+msgid "No questions found in Trash."
+msgstr "Inga frågor hittades i papperskorgen."
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the filter links heading on the post type listing screen"
+msgid "Filter questions list"
+msgstr "Filtrera frågelista"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the pagination heading on the post type listing screen"
+msgid "Questions list navigation"
+msgstr "Navigering frågelista"
+
+#: inc/core/post-types.php
+msgctxt "Screen reader text for the items list heading on the post type listing screen"
+msgid "Questions list"
+msgstr "Frågelista"
+

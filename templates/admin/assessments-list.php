@@ -41,7 +41,7 @@ if (! defined('ABSPATH')) {
         </div>
         
         <div class="ham-filter-group">
-            <label for="ham-filter-completion"><?php echo esc_html__('Filter by Status:', 'headless-access-manager'); ?></label>
+            <label for="ham-filter-completion"><?php echo esc_html__('Filter by status:', 'headless-access-manager'); ?></label>
             <select id="ham-filter-completion">
                 <option value=""><?php echo esc_html__('All', 'headless-access-manager'); ?></option>
                 <option value="full"><?php echo esc_html__('Fully Established', 'headless-access-manager'); ?></option>

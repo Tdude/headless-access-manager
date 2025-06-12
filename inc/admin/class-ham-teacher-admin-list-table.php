@@ -37,7 +37,7 @@ class HAM_Teacher_Admin_List_Table {
             $new_columns[$key] = $value;
             if ($key === 'title') { // Insert after Title
                 $new_columns['school'] = __('School', 'headless-access-manager');
-                $new_columns['classes'] = __('Class(es)', 'headless-access-manager');
+                $new_columns['classes'] = __('Class', 'headless-access-manager');
             }
         }
         return $new_columns;
