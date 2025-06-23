@@ -10,13 +10,13 @@ Headless Access Manager (HAM) is a WordPress plugin designed to serve as a backe
   - Principal
   - School Head
 - **Custom Data Types**:
- - Assessments (finished)
-  - Schools (started task)
-  - Classes (started task)
-  - Students (yet to start)
-  - Teachers (yet to start)
-  - Principals (yet to start)
-  - School Heads (yet to start)
+ - Assessments
+  - Schools
+  - Classes
+  - Students
+  - Teachers
+  - Principals
+  - School Heads
 - **JWT Authentication**:
   - Secure token-based authentication
   - Configurable token expiration
@@ -91,7 +91,7 @@ The plugin creates multiple REST API endpoints:
 - `GET /wp-json/ham/v1/stats/school/{id}` - School statistics
 - `GET /wp-json/ham/v1/stats/schools` - Multi-school statistics
 
-## Frequently Asked Questions
+## FAQ
 ### Does this plugin handle frontend rendering?
 No, this plugin is designed as a backend for a headless WordPress site. It provides API endpoints that can be consumed by a frontend application (like Next.js).
 
@@ -99,7 +99,7 @@ No, this plugin is designed as a backend for a headless WordPress site. It provi
 Authentication uses JWT (JSON Web Tokens). Users authenticate with username/password to get a token, which is then included in subsequent API requests.
 
 ### Can I extend the plugin with custom roles or data types?
-The plugin is built to be extensible. You can add custom roles or modify data structures by extending the plugin's classes or using WordPress hooks.
+Yaa, the plugin is built to be extensible. You can add custom roles or modify data structures by extending the plugin's classes or using WordPress hooks.
 
 ### Is the plugin GDPR compliant?
 The plugin stores only the data necessary for its functionality. Personal data handling should comply with your organization's GDPR policies.
