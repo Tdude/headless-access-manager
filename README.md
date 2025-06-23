@@ -1,20 +1,6 @@
 # Headless Access Manager – README 2.0
 
 
-## Project Status
-- **Assessments, their handling, and API:** Finished and in production. Do not alter.
-- **Custom Post Types (CPTs) for Schools and Classes:** Experimental, in-progress.
-- **Relations and Admin Interface:** In progress, see below for requirements.
-
-## What To Do
-- Work ONLY on Schools, Classes, their relations, and the admin interface as described below.
-- Follow the planned relationships and permissions model (see Admin Interface & Relations).
-- Keep code modular and document all changes.
-
-## What NOT To Do
-- **DO NOT** touch, refactor, or alter any code or documentation related to assessments or their API endpoints/logic.
-- **DO NOT** change authentication or core user/role logic.
-- **DO NOT** break REST API compatibility.
 
 ## Directory Structure (Key Parts)
 - `README.md` – This file (contributor guidelines, project status, requirements)
