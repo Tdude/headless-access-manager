@@ -1,6 +1,5 @@
 # Headless Access Manager – README 2.0
 
-**IMPORTANT: Assessments and their API are PRODUCTION READY. DO NOT MODIFY.**
 
 ## Project Status
 - **Assessments, their handling, and API:** Finished and in production. Do not alter.
