@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Headless Access Manager\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-06 22:36+0200\n"
-"PO-Revision-Date: 2025-06-11 23:10+0200\n"
+"PO-Revision-Date: 2025-06-17 21:55+0200\n"
 "Last-Translator: Tdude <tibbecodes@gmail.com>\n"
 "Language-Team: \n"
 "Language: sv_SE\n"
@@ -12,6 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.6\n"
+"X-Poedit-KeywordsList: __;_e;_x;_n;_ex;_nx;esc_html__;esc_html_e;esc_attr__;esc_attr_e;wp_kses_post\n"
 
 # Assessment List Interface
 #: templates/admin/assessments-list.php:14
@@ -402,7 +403,6 @@ msgstr "Ansvarig pedagog"
 msgid "Status"
 msgstr "Status"
 
-
 #: templates/admin/assessment-statistics.php:19
 msgid "Total Evaluations"
 msgstr "Totalt antal utvärderingar"
@@ -634,7 +634,6 @@ msgid "Add New"
 msgstr "Lägg till nytt"
 
 # Student CPT
-
 msgid "Add New Student"
 msgstr "Lägg till ny elev"
 
@@ -693,7 +692,6 @@ msgid "Teachers"
 msgstr "Lärare"
 
 # Teacher CPT
-
 #: inc/core/post-types.php
 msgid "Add New Teacher"
 msgstr "Lägg till ny lärare"
@@ -746,7 +744,6 @@ msgid "Teachers list"
 msgstr "Lärarlista"
 
 # Class CPT
-
 msgid "Class"
 msgstr "Klass"
 
@@ -1059,4 +1056,3 @@ msgstr "Navigering frågelista"
 #: inc/core/post-types.php
 msgid "Questions list"
 msgstr "Frågelista"
-
