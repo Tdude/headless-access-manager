@@ -26,6 +26,15 @@ class HAM_Student_Meta_Boxes {
      * Register meta boxes for the Student CPT.
      */
     public static function register_meta_boxes() {
+        add_meta_box(
+            'ham_student_evaluation_stats',
+            __('Evaluation Statistics', 'headless-access-manager'),
+            [__CLASS__, 'render_evaluation_statistics_meta_box'],
+            HAM_CPT_STUDENT,
+            'normal',
+            'default'
+        );
+
         // User capability check - e.g., only Admins or relevant roles can assign school
         // For now, let's assume admin or school head can do this.
         $user = wp_get_current_user();
@@ -64,6 +73,43 @@ class HAM_Student_Meta_Boxes {
             'side',
             'low' // Place below school assignment
         );
+    }
+
+    /**
+     * Render the evaluation statistics meta box for students.
+     *
+     * @param WP_Post $post Current post object (student post).
+     */
+    public static function render_evaluation_statistics_meta_box($post) {
+        $stats_manager = new HAM_Statistics_Manager();
+        $evaluations = $stats_manager->get_student_evaluations($post->ID);
+
+        if (empty($evaluations)) {
+            echo '<p>' . esc_html__('No evaluations found for this student.', 'headless-access-manager') . '</p>';
+            return;
+        }
+        ?>
+        <table class="widefat striped">
+            <thead>
+                <tr>
+                    <th><?php esc_html_e('Date', 'headless-access-manager'); ?></th>
+                    <th><?php esc_html_e('Teacher', 'headless-access-manager'); ?></th>
+                    <th><?php esc_html_e('Grade', 'headless-access-manager'); ?></th>
+                    <th><?php esc_html_e('Comments', 'headless-access-manager'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($evaluations as $eval) : ?>
+                    <tr>
+                        <td><?php echo esc_html($eval['date']); ?></td>
+                        <td><?php echo esc_html($eval['teacher']); ?></td>
+                        <td><?php echo esc_html($eval['grade']); ?></td>
+                        <td><?php echo wp_kses_post($eval['comments']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php
     }
 
     /**
@@ -184,7 +230,7 @@ class HAM_Student_Meta_Boxes {
      */
     public static function save_meta_boxes($post_id) {
         // Check nonce
-        if (!isset($_POST['ham_student_school_assignment_meta_box_nonce']) || !wp_verify_nonce($_POST['ham_student_school_assignment_meta_box_nonce'], 'ham_student_school_assignment_meta_box_nonce')) {
+                if (!isset($_POST['ham_student_school_assignment_meta_box_nonce']) || !wp_verify_nonce($_POST['ham_student_school_assignment_meta_box_nonce'], 'ham_student_school_assignment_meta_box_nonce')) {
             return;
         }
         // Autosave check

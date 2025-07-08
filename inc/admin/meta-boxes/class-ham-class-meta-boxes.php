@@ -47,6 +47,15 @@ class HAM_Class_Meta_Boxes
             'normal',
             'default'
         );
+
+        add_meta_box(
+            'ham_class_statistics',
+            __('Class Statistics', 'headless-access-manager'),
+            [__CLASS__, 'render_class_statistics_meta_box'],
+            HAM_CPT_CLASS,
+            'normal',
+            'low'
+        );
     }
 
     /**
@@ -189,6 +198,55 @@ class HAM_Class_Meta_Boxes
             echo '</ul>';
         } else {
             echo '<p>' . esc_html__('No teachers are currently assigned to this class.', 'headless-access-manager') . '</p>';
+        }
+    }
+
+    /**
+     * Render Class Statistics meta box.
+     *
+     * @param WP_Post $post The post object.
+     */
+    public static function render_class_statistics_meta_box($post)
+    {
+        $class_id = $post->ID;
+        $average_score = HAM_Statistics_Manager::get_class_average_score($class_id);
+        $evaluations = HAM_Statistics_Manager::get_class_evaluations($class_id);
+
+        echo '<h3>' . esc_html__('Average Class Score', 'headless-access-manager') . '</h3>';
+        if ($average_score > 0) {
+            echo '<p><strong>' . number_format($average_score, 2) . '</strong></p>';
+        } else {
+            echo '<p>' . esc_html__('No evaluations recorded for this class yet.', 'headless-access-manager') . '</p>';
+        }
+
+        echo '<h3>' . esc_html__('All Evaluations', 'headless-access-manager') . '</h3>';
+        if (!empty($evaluations)) {
+            ?>
+            <table class="widefat striped">
+                <thead>
+                    <tr>
+                        <th><?php esc_html_e('Date', 'headless-access-manager'); ?></th>
+                        <th><?php esc_html_e('Student', 'headless-access-manager'); ?></th>
+                        <th><?php esc_html_e('Teacher', 'headless-access-manager'); ?></th>
+                        <th><?php esc_html_e('Grade', 'headless-access-manager'); ?></th>
+                        <th><?php esc_html_e('Comments', 'headless-access-manager'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($evaluations as $eval) : ?>
+                        <tr>
+                            <td><?php echo esc_html($eval['date']); ?></td>
+                            <td><?php echo esc_html($eval['student_name']); ?></td>
+                            <td><?php echo esc_html($eval['teacher_name']); ?></td>
+                            <td><?php echo esc_html($eval['grade']); ?></td>
+                            <td><?php echo wp_kses_post($eval['comments']); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <?php
+        } else {
+            echo '<p>' . esc_html__('No evaluations found for the students in this class.', 'headless-access-manager') . '</p>';
         }
     }
 

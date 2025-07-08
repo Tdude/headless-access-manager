@@ -65,6 +65,15 @@ class HAM_Teacher_Meta_Boxes {
                 'side',
                 'default'
             );
+
+            add_meta_box(
+                'ham_teacher_evaluation_stats',
+                __('Evaluation Statistics', 'headless-access-manager'),
+                [__CLASS__, 'render_evaluation_statistics_meta_box'],
+                HAM_CPT_TEACHER,
+                'normal',
+                'low'
+            );
         }
     }
 
@@ -196,6 +205,50 @@ class HAM_Teacher_Meta_Boxes {
         }
         echo '</select>';
         echo '<p class="description">' . esc_html__('Select the WordPress user account for this teacher.', 'headless-access-manager') . '</p>';
+    }
+
+    /**
+     * Render the evaluation statistics meta box for teachers.
+     *
+     * @param WP_Post $post Current post object (teacher post).
+     */
+    public static function render_evaluation_statistics_meta_box($post) {
+        $linked_user_id = get_post_meta($post->ID, '_ham_user_id', true);
+
+        if (empty($linked_user_id)) {
+            echo '<p>' . esc_html__('This teacher is not linked to a WordPress user. No statistics can be shown.', 'headless-access-manager') . '</p>';
+            return;
+        }
+
+        $stats_manager = new HAM_Statistics_Manager();
+        $evaluations = $stats_manager->get_teacher_evaluations($linked_user_id);
+
+        if (empty($evaluations)) {
+            echo '<p>' . esc_html__('No evaluations found for this teacher.', 'headless-access-manager') . '</p>';
+            return;
+        }
+        ?>
+        <table class="widefat striped">
+            <thead>
+                <tr>
+                    <th><?php esc_html_e('Date', 'headless-access-manager'); ?></th>
+                    <th><?php esc_html_e('Student', 'headless-access-manager'); ?></th>
+                    <th><?php esc_html_e('Grade', 'headless-access-manager'); ?></th>
+                    <th><?php esc_html_e('Comments', 'headless-access-manager'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($evaluations as $eval) : ?>
+                    <tr>
+                        <td><?php echo esc_html($eval['date']); ?></td>
+                        <td><?php echo esc_html($eval['student_name']); ?></td>
+                        <td><?php echo esc_html($eval['grade']); ?></td>
+                        <td><?php echo wp_kses_post($eval['comments']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php
     }
 
     /**
