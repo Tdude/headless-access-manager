@@ -284,9 +284,12 @@
             // =============================
 
             // Set student name and date
-            $('#ham-student-name').text(data.student_name);
+            console.log('SETTING STUDENT NAME:', data.student_name);
+            console.log('CURRENT STUDENT ELEMENT:', $('#ham-assessment-student').length, $('#ham-assessment-student').text());
+            $('#ham-assessment-student').text(data.student_name);
+            console.log('AFTER SETTING:', $('#ham-assessment-student').text());
             $('#ham-assessment-date').text(data.date);
-            $('#ham-author-name').text(data.author_name);
+            $('#ham-assessment-author').text(data.author_name);
 
             // Clear existing questions
             $('#ham-anknytning-questions, #ham-ansvar-questions').empty();

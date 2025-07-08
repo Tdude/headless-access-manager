@@ -19,9 +19,15 @@ if (! defined('ABSPATH')) {
             <select id="ham-filter-student">
                 <option value=""><?php echo esc_html__('All Students', 'headless-access-manager'); ?></option>
                 <?php
-                $students = get_users(array('role' => HAM_ROLE_STUDENT));
+                // Use Student CPTs instead of WordPress users for consistency
+                $students = get_posts(array(
+                    'post_type'      => HAM_CPT_STUDENT,
+                    'posts_per_page' => -1,
+                    'orderby'        => 'title',
+                    'order'          => 'ASC',
+                ));
                 foreach ($students as $student) {
-                    echo '<option value="' . esc_attr($student->ID) . '">' . esc_html($student->display_name) . '</option>';
+                    echo '<option value="' . esc_attr($student->ID) . '">' . esc_html($student->post_title) . '</option>';
                 }
                 ?>
             </select>

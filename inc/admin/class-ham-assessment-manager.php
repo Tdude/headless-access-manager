@@ -192,11 +192,118 @@ class HAM_Assessment_Manager
     }
 
     /**
+     * Helper function to resolve teacher name and ID from student ID and/or post author
+     * This ensures consistent teacher resolution across list and modal views.
+     *
+     * @param int $student_id The student CPT ID
+     * @param int $post_author The post author ID (fallback)
+     * @return array Array with teacher_id and teacher_name keys
+     */
+    public static function resolve_teacher($student_id, $post_author = 0) {
+        $teacher_name = esc_html__('Unknown Teacher', 'headless-access-manager');
+        $teacher_id = $post_author; // Default to post_author for backward compatibility
+        
+        // Find all classes the student is part of
+        $student_class_ids = array();
+        $class_args = array(
+            'post_type' => HAM_CPT_CLASS,
+            'posts_per_page' => -1,
+            'meta_query' => array(
+                array(
+                    'key' => '_ham_student_ids',
+                    // Search for the student ID as an integer element in the serialized array
+                    'value' => 'i:' . $student_id . ';',
+                    'compare' => 'LIKE'
+                )
+            )
+        );
+        
+        $class_query = new WP_Query($class_args);
+        
+        if ($class_query->have_posts()) {
+            while ($class_query->have_posts()) {
+                $class_query->the_post();
+                $student_class_ids[] = get_the_ID();
+            }
+            wp_reset_postdata();
+        }
+        
+        // If student is in classes, find teachers assigned to those classes
+        if (!empty($student_class_ids)) {
+            $teacher_args = array(
+                'post_type' => HAM_CPT_TEACHER,
+                'posts_per_page' => 1, // Just get the first matching teacher
+                'meta_query' => array()
+            );
+            
+            // Build the meta query to find teachers in the same classes as the student
+            $meta_query_clauses = array('relation' => 'OR');
+            foreach ($student_class_ids as $class_id) {
+                $meta_query_clauses[] = array(
+                    'key' => '_ham_class_ids',
+                    'value' => 'i:' . $class_id . ';',
+                    'compare' => 'LIKE'
+                );
+            }
+            $teacher_args['meta_query'] = $meta_query_clauses;
+            
+            $teacher_query = new WP_Query($teacher_args);
+            
+            if ($teacher_query->have_posts()) {
+                $teacher_query->the_post();
+                $teacher_cpt_id = get_the_ID();
+                $teacher_name = get_the_title();
+                
+                // Get the WP user ID associated with this teacher CPT
+                $wp_user_id = get_post_meta($teacher_cpt_id, '_ham_user_id', true);
+                if (!empty($wp_user_id)) {
+                    $teacher_id = $wp_user_id;
+                }
+                
+                wp_reset_postdata();
+            }
+        }
+        
+        // Fallback: If no teacher found via class relationship, use post_author
+        if ($teacher_name === esc_html__('Unknown Teacher', 'headless-access-manager') && !empty($post_author)) {
+            $teacher_name = get_the_author_meta('display_name', $post_author);
+            
+            // Additional fallback: If author name is empty, try to find teacher CPT by user ID
+            if (empty($teacher_name)) {
+                $teacher_cpt_args = array(
+                    'post_type' => HAM_CPT_TEACHER,
+                    'posts_per_page' => 1,
+                    'meta_query' => array(
+                        array(
+                            'key' => '_ham_user_id',
+                            'value' => $post_author,
+                            'compare' => '='
+                        )
+                    )
+                );
+                
+                $teacher_cpt_query = new WP_Query($teacher_cpt_args);
+                if ($teacher_cpt_query->have_posts()) {
+                    $teacher_cpt_query->the_post();
+                    $teacher_name = get_the_title();
+                    wp_reset_postdata();
+                }
+            }
+        }
+        
+        return array(
+            'teacher_id' => $teacher_id,
+            'teacher_name' => $teacher_name
+        );
+    }
+    
+    /**
      * Get all assessments with student information.
      *
      * @param string $source Optional. Filter by assessment source ('admin', 'frontend', or 'all'). Default 'all'.
      * @return array Array of assessment data.
      */
+
     public static function get_assessments($source = 'all')
     {
         $args = array(
@@ -262,9 +369,13 @@ class HAM_Assessment_Manager
                 error_log('Skipping post ' . $post->ID . ' - no student ID');
                 continue;
             }
-
-            $student = get_user_by('id', $student_id);
-            $student_name = $student ? $student->display_name : esc_html__('Unknown Student', 'headless-access-manager');
+            
+            // Student is a CPT, not a WordPress user - get the student name from the CPT
+            $student_post = get_post($student_id);
+            $student_name = $student_post ? $student_post->post_title : esc_html__('Unknown Student', 'headless-access-manager');
+            
+            // Debug information about the student CPT
+            error_log('Student CPT found: ' . ($student_post ? 'Yes' : 'No') . ', Name: ' . $student_name);
 
             $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
 
@@ -292,6 +403,99 @@ class HAM_Assessment_Manager
 
             $completion_percentage = self::calculate_completion_percentage($assessment_data);
 
+            // Get teacher info - first check based on class relationship, fallback to post_author
+            $teacher_name = esc_html__('Unknown Teacher', 'headless-access-manager');
+            $teacher_id = $post->post_author; // Default to post_author for backward compatibility
+            
+            // Find all classes the student is part of
+            $student_classes = array();
+            $class_args = array(
+                'post_type' => HAM_CPT_CLASS,
+                'posts_per_page' => -1,
+                'meta_query' => array(
+                    array(
+                        'key' => '_ham_student_ids',
+                        // Search for the student ID as an integer element in the serialized array
+                        'value' => 'i:' . $student_id . ';',
+                        'compare' => 'LIKE'
+                    )
+                )
+            );
+            
+            $class_query = new WP_Query($class_args);
+            $student_class_ids = array();
+            
+            if ($class_query->have_posts()) {
+                while ($class_query->have_posts()) {
+                    $class_query->the_post();
+                    $student_class_ids[] = get_the_ID();
+                }
+                wp_reset_postdata();
+            }
+            
+            // If student is in classes, find teachers assigned to those classes
+            if (!empty($student_class_ids)) {
+                $teacher_args = array(
+                    'post_type' => HAM_CPT_TEACHER,
+                    'posts_per_page' => 1, // Just get the first matching teacher
+                    'meta_query' => array()
+                );
+                
+                // Build the meta query to find teachers in the same classes as the student
+                $meta_query_clauses = array('relation' => 'OR');
+                foreach ($student_class_ids as $class_id) {
+                    $meta_query_clauses[] = array(
+                        'key' => '_ham_class_ids',
+                        'value' => 'i:' . $class_id . ';',
+                        'compare' => 'LIKE'
+                    );
+                }
+                $teacher_args['meta_query'] = $meta_query_clauses;
+                
+                $teacher_query = new WP_Query($teacher_args);
+                
+                if ($teacher_query->have_posts()) {
+                    $teacher_query->the_post();
+                    $teacher_cpt_id = get_the_ID();
+                    $teacher_name = get_the_title();
+                    
+                    // Get the WP user ID associated with this teacher CPT
+                    $wp_user_id = get_post_meta($teacher_cpt_id, '_ham_user_id', true);
+                    if (!empty($wp_user_id)) {
+                        $teacher_id = $wp_user_id;
+                    }
+                    
+                    wp_reset_postdata();
+                }
+            }
+            
+            // Fallback: If no teacher found via class relationship, use post_author
+            if ($teacher_name === esc_html__('Unknown Teacher', 'headless-access-manager') && !empty($post->post_author)) {
+                $teacher_name = get_the_author_meta('display_name', $post->post_author);
+                
+                // Additional fallback: If author name is empty, try to find teacher CPT by user ID
+                if (empty($teacher_name)) {
+                    $teacher_cpt_args = array(
+                        'post_type' => HAM_CPT_TEACHER,
+                        'posts_per_page' => 1,
+                        'meta_query' => array(
+                            array(
+                                'key' => '_ham_user_id',
+                                'value' => $post->post_author,
+                                'compare' => '='
+                            )
+                        )
+                    );
+                    
+                    $teacher_cpt_query = new WP_Query($teacher_cpt_args);
+                    if ($teacher_cpt_query->have_posts()) {
+                        $teacher_cpt_query->the_post();
+                        $teacher_name = get_the_title();
+                        wp_reset_postdata();
+                    }
+                }
+            }
+            
             $assessments[] = array(
                 'id'           => $post->ID,
                 'title'        => $post->post_title,
@@ -299,8 +503,8 @@ class HAM_Assessment_Manager
                 'student_id'   => $student_id,
                 'student_name' => $student_name,
                 'completion'   => $completion_percentage,
-                'author_id'    => $post->post_author,
-                'author_name'  => get_the_author_meta('display_name', $post->post_author),
+                'author_id'    => $teacher_id,
+                'author_name'  => $teacher_name,
                 'stage'        => $summary_stage,
                 'stage_score'  => $average,
             );
@@ -635,62 +839,105 @@ class HAM_Assessment_Manager
         );
     }
 
-    /**
-     * Debug function to dump data to a file.
-     *
-     * @param mixed $data The data to dump.
-     * @param string $prefix A prefix for the log file.
-     */
-    private function debug_dump($data, $prefix = 'debug')
-    {
-        $file = HAM_PLUGIN_DIR . 'logs/' . $prefix . '-' . date('Y-m-d-H-i-s') . '.log';
 
-        // Create logs directory if it doesn't exist
-        if (!file_exists(HAM_PLUGIN_DIR . 'logs/')) {
-            mkdir(HAM_PLUGIN_DIR . 'logs/', 0755, true);
-        }
 
-        file_put_contents($file, print_r($data, true));
+/**
+ * Debug function to dump data to a file.
+ *
+ * @param mixed $data The data to dump.
+ * @param string $prefix A prefix for the log file.
+ */
+private function debug_dump($data, $prefix = 'debug')
+{
+    $file = HAM_PLUGIN_DIR . 'logs/' . $prefix . '-' . date('Y-m-d-H-i-s') . '.log';
+
+    // Create logs directory if it doesn't exist
+    if (!file_exists(HAM_PLUGIN_DIR . 'logs/')) {
+        mkdir(HAM_PLUGIN_DIR . 'logs/', 0755, true);
+    }
+    
+    file_put_contents($file, print_r($data, true));
+}
+
+
+/**
+ * AJAX handler for getting assessment details.
+ */
+public function ajax_get_assessment_details()
+{
+    // Check nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'ham_assessment_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
     }
 
-    /**
-     * AJAX handler for getting assessment details.
-     */
-    public function ajax_get_assessment_details()
-    {
-        // Check nonce
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'ham_assessment_nonce')) {
-            wp_send_json_error('Invalid nonce');
-            return;
+    // Check permissions
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Insufficient permissions');
+        return;
+    }
+
+    // Check assessment ID
+    if (!isset($_POST['assessment_id']) || empty($_POST['assessment_id'])) {
+        wp_send_json_error('Missing assessment ID');
+        return;
+    }
+
+    $assessment_id = intval($_POST['assessment_id']);
+
+    // Debug information
+    error_log('Processing assessment details request for ID: ' . $assessment_id);
+
+    // Get assessment data
+    $assessment = get_post($assessment_id);
+
+    // Get student ID from assessment meta
+    $student_id = get_post_meta($assessment_id, HAM_ASSESSMENT_META_STUDENT_ID, true);
+
+    // Debug information
+    error_log("MODAL - All meta for assessment {$assessment_id}: " . print_r(get_post_meta($assessment_id), true));
+
+    if (!empty($student_id)) {
+        $student_post = get_post($student_id);
+        if ($student_post) {
+            $student_name = $student_post->post_title;
+            error_log("MODAL - Found student post: {$student_post->ID}, post_type: {$student_post->post_type}, title: {$student_post->post_title}");
+        } else {
+            error_log("MODAL - Could not find student post with ID: {$student_id}");
+            
+            // Debug - try again with a different approach
+            // Students are custom post types, not WordPress users
+            // Check both potential meta keys for student ID
+            $student_id = get_post_meta($post->ID, HAM_ASSESSMENT_META_STUDENT_ID, true);
+            $alt_student_id = get_post_meta($post->ID, 'student_id', true);
+            
+            // Use whichever meta key has a value
+            if (empty($student_id) && !empty($alt_student_id)) {
+                $student_id = $alt_student_id;
+            }
+            
+            $student_name = esc_html__("Unknown Student", "headless-access-manager");
+            
+            if (!empty($student_id)) {
+                $student_post = get_post($student_id);
+                $student_post = $wpdb->get_row(
+                    $wpdb->prepare("SELECT ID, post_title, post_type FROM {$wpdb->posts} WHERE ID = %d", $student_id)
+                );
+                if ($student_post) {
+                    error_log("MODAL - Direct DB query found: ID: {$student_post->ID}, title: {$student_post->post_title}, type: {$student_post->post_type}");
+                } else {
+                    error_log("MODAL - Direct DB query found nothing for ID: {$student_id}");
+                }
+            } else {
+                error_log("MODAL - No student ID found for assessment: {$assessment_id}");
+            }
         }
-
-        // Check permissions
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error('Insufficient permissions');
-            return;
-        }
-
-        // Check assessment ID
-        if (!isset($_POST['assessment_id']) || empty($_POST['assessment_id'])) {
-            wp_send_json_error('Missing assessment ID');
-            return;
-        }
-
-        $assessment_id = intval($_POST['assessment_id']);
-
-        // Debug information
-        error_log('Processing assessment details request for ID: ' . $assessment_id);
-
-        // Get assessment data
-        $assessment = get_post($assessment_id);
-        if (!$assessment || $assessment->post_type !== HAM_CPT_ASSESSMENT) {
-            wp_send_json_error('Assessment not found');
-            return;
-        }
-
-        $student_id = get_post_meta($assessment_id, HAM_ASSESSMENT_META_STUDENT_ID, true);
-        $student = get_user_by('id', $student_id);
-        $student_name = $student ? $student->display_name : esc_html__('Unknown Student', 'headless-access-manager');
+    } else {
+        error_log("MODAL - No student ID found for assessment: {$assessment_id}");
+    }
+        
+        // Debug
+        error_log('Student ID: ' . $student_id . ', Student name resolved: ' . $student_name);
 
         $assessment_data = get_post_meta($assessment_id, HAM_ASSESSMENT_META_DATA, true);
 
@@ -800,14 +1047,109 @@ class HAM_Assessment_Manager
         error_log('Raw assessment data: ' . print_r($assessment_data, true));
         error_log('Processed assessment data: ' . print_r($processed_assessment_data, true));
 
+        // Get teacher info - first check based on class relationship, fallback to post_author
+        $teacher_name = esc_html__('Unknown Teacher', 'headless-access-manager');
+        $teacher_id = $assessment->post_author; // Default to post_author for backward compatibility
+        
+        // Find all classes the student is part of
+        $student_classes = array();
+        $class_args = array(
+            'post_type' => HAM_CPT_CLASS,
+            'posts_per_page' => -1,
+            'meta_query' => array(
+                array(
+                    'key' => '_ham_student_ids',
+                    // Search for the student ID as an integer element in the serialized array
+                    'value' => 'i:' . $student_id . ';',
+                    'compare' => 'LIKE'
+                )
+            )
+        );
+        
+        $class_query = new WP_Query($class_args);
+        $student_class_ids = array();
+        
+        if ($class_query->have_posts()) {
+            while ($class_query->have_posts()) {
+                $class_query->the_post();
+                $student_class_ids[] = get_the_ID();
+            }
+            wp_reset_postdata();
+        }
+        
+        // If student is in classes, find teachers assigned to those classes
+        if (!empty($student_class_ids)) {
+            $teacher_args = array(
+                'post_type' => HAM_CPT_TEACHER,
+                'posts_per_page' => 1, // Just get the first matching teacher
+                'meta_query' => array()
+            );
+            
+            // Build the meta query to find teachers in the same classes as the student
+            $meta_query_clauses = array('relation' => 'OR');
+            foreach ($student_class_ids as $class_id) {
+                $meta_query_clauses[] = array(
+                    'key' => '_ham_class_ids',
+                    'value' => 'i:' . $class_id . ';',
+                    'compare' => 'LIKE'
+                );
+            }
+            $teacher_args['meta_query'] = $meta_query_clauses;
+            
+            $teacher_query = new WP_Query($teacher_args);
+            
+            if ($teacher_query->have_posts()) {
+                $teacher_query->the_post();
+                $teacher_cpt_id = get_the_ID();
+                $teacher_name = get_the_title();
+                
+                // Get the WP user ID associated with this teacher CPT
+                $wp_user_id = get_post_meta($teacher_cpt_id, '_ham_user_id', true);
+                if (!empty($wp_user_id)) {
+                    $teacher_id = $wp_user_id;
+                }
+                
+                wp_reset_postdata();
+            }
+        }
+        
+        // Fallback: If no teacher found via class relationship, use post_author
+        if ($teacher_name === esc_html__('Unknown Teacher', 'headless-access-manager') && !empty($assessment->post_author)) {
+            $teacher_name = get_the_author_meta('display_name', $assessment->post_author);
+            
+            // Additional fallback: If author name is empty, try to find teacher CPT by user ID
+            if (empty($teacher_name)) {
+                $teacher_cpt_args = array(
+                    'post_type' => HAM_CPT_TEACHER,
+                    'posts_per_page' => 1,
+                    'meta_query' => array(
+                        array(
+                            'key' => '_ham_user_id',
+                            'value' => $assessment->post_author,
+                            'compare' => '='
+                        )
+                    )
+                );
+                
+                $teacher_cpt_query = new WP_Query($teacher_cpt_args);
+                if ($teacher_cpt_query->have_posts()) {
+                    $teacher_cpt_query->the_post();
+                    $teacher_name = get_the_title();
+                    wp_reset_postdata();
+                }
+            }
+        }
+        
+        error_log('Modal display - Teacher resolution: Student ID: ' . $student_id . ', Classes: ' . implode(',', $student_class_ids) . ', Teacher name: ' . $teacher_name);
+        
         $response = array(
             'id' => $assessment_id,
             'title' => $assessment->post_title,
             'date' => get_the_date('Y-m-d H:i:s', $assessment_id),
             'student_id' => $student_id,
             'student_name' => $student_name,
-            'author_id' => $assessment->post_author,
-            'author_name' => get_the_author_meta('display_name', $assessment->post_author),
+            'author_id' => $teacher_id,
+            'author_name' => $teacher_name,
             'assessment_data' => $processed_assessment_data,
             'questions_structure' => $questions_structure,
             'source' => $source // Include the source in the response for reference
