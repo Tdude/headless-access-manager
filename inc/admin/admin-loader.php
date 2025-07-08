@@ -131,6 +131,7 @@ class HAM_Admin_Loader
         // Hook for modifying class columns and rendering the custom column
         add_filter('manage_' . HAM_CPT_CLASS . '_posts_columns', array(__CLASS__, 'modify_class_admin_columns'));
         add_action('manage_' . HAM_CPT_CLASS . '_posts_custom_column', array(__CLASS__, 'render_class_assigned_teachers_column'), 10, 2);
+        add_action('manage_' . HAM_CPT_CLASS . '_posts_custom_column', array(__CLASS__, 'render_class_school_column'), 10, 2);
         
         // Hooks for other CPTs
         add_filter('manage_' . HAM_CPT_ASSESSMENT . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
@@ -433,6 +434,7 @@ class HAM_Admin_Loader
         foreach ($columns as $key => $value) {
             $new_columns[$key] = $value;
             if ($key === 'title') { // Place after the renamed title
+                $new_columns['ham_school_name'] = __('School', 'headless-access-manager');
                 $new_columns['ham_assigned_teachers'] = __('Assigned Teachers', 'headless-access-manager');
             }
         }
@@ -481,6 +483,31 @@ class HAM_Admin_Loader
                 echo implode(', ', $teacher_links);
             } else {
                 echo '—'; // Using em dash for no data
+            }
+        }
+    }
+
+    /**
+     * Render content for the 'School' column in the Class CPT list table.
+     *
+     * @param string $column_name The name of the custom column.
+     * @param int    $class_id    The ID of the current class post.
+     */
+    public static function render_class_school_column($column_name, $class_id) {
+        if ($column_name === 'ham_school_name') {
+            // Get the associated school ID from class meta
+            $school_id = get_post_meta($class_id, '_ham_school_id', true);
+            
+            if (!empty($school_id)) {
+                // Get the school name
+                $school = get_post($school_id);
+                if ($school && $school->post_type === HAM_CPT_SCHOOL) {
+                    echo '<a href="' . get_edit_post_link($school_id) . '">' . esc_html($school->post_title) . '</a>';
+                } else {
+                    echo '<span class="ham-meta-empty">' . esc_html__('School not found', 'headless-access-manager') . '</span>';
+                }
+            } else {
+                echo '<span class="ham-meta-empty">' . esc_html__('No school assigned', 'headless-access-manager') . '</span>';
             }
         }
     }
