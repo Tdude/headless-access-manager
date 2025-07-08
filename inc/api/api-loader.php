@@ -40,6 +40,7 @@ class HAM_API_Loader
         require_once HAM_PLUGIN_DIR . 'inc/api/class-ham-data-controller.php';
         require_once HAM_PLUGIN_DIR . 'inc/api/class-ham-assessment-controller.php';
         require_once HAM_PLUGIN_DIR . 'inc/api/class-ham-stats-controller.php';
+        require_once HAM_PLUGIN_DIR . 'inc/api/class-ham-student-controller.php';
 
         // Assessment template controllers
         require_once HAM_PLUGIN_DIR . 'inc/api/class-ham-assessment-templates-controller.php';
@@ -56,6 +57,7 @@ class HAM_API_Loader
         HAM_Data_Controller::register_routes();
         HAM_Assessment_Controller::register_routes();
         HAM_Stats_Controller::register_routes();
+        HAM_Student_Controller::register_routes();
         HAM_Assessment_Templates_Controller::register_routes();
         HAM_Assessment_Data_Controller::register_routes();
     }

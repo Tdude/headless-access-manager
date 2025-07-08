@@ -140,8 +140,14 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
         // Get parameters
         $student_id = $request->get_param('student_id');
         $form_data = $request->get_param('formData');
+        // Get the teacher ID from current user or from request
+        $teacher_id = get_current_user_id();
+        if ($request->get_param('teacher_id')) {
+            $teacher_id = $request->get_param('teacher_id');
+        }
         
         error_log('Student ID: ' . print_r($student_id, true));
+        error_log('Teacher ID: ' . print_r($teacher_id, true));
         error_log('Form data: ' . print_r($form_data, true));
         
         // If formData is a JSON string, decode it
@@ -172,6 +178,23 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
                 return new WP_Error(
                     'invalid_student',
                     __('Invalid student ID.', 'headless-access-manager'),
+                    array( 'status' => 400 )
+                );
+            }
+        }
+        
+        // Validate teacher
+        $teacher = get_user_by('id', $teacher_id);
+        if (! $teacher || ! in_array(HAM_ROLE_TEACHER, (array) $teacher->roles)) {
+            error_log('Invalid teacher ID or not a teacher: ' . $teacher_id);
+            
+            // For development purposes, allow any user ID
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('DEBUG MODE: Allowing non-teacher user ID: ' . $teacher_id);
+            } else {
+                return new WP_Error(
+                    'invalid_teacher',
+                    __('Invalid teacher ID.', 'headless-access-manager'),
                     array( 'status' => 400 )
                 );
             }
@@ -209,7 +232,7 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
                 'post_title'   => $assessment_title,
                 'post_type'    => HAM_CPT_ASSESSMENT,
                 'post_status'  => 'publish',
-                'post_author'  => get_current_user_id(),
+                'post_author'  => $teacher_id, // Use the teacher ID as the post author
             ));
 
             if (is_wp_error($assessment_id)) {

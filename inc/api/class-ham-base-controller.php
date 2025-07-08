@@ -45,7 +45,7 @@ abstract class HAM_Base_Controller
      * @param WP_REST_Request $request Full data about the request.
      * @return bool|WP_Error True if the authentication is valid, WP_Error otherwise.
      */
-    protected function validate_jwt($request)
+    public function validate_jwt($request)
     {
         // Get token from authorization header
         $auth_header = $request->get_header('Authorization');
@@ -90,40 +90,56 @@ abstract class HAM_Base_Controller
      */
     protected function validate_token($token)
     {
-        // This is a placeholder for JWT validation logic
-        // You'll need to implement this with a proper JWT library
+        // Use the firebase/php-jwt library to validate the token.
+        // Ensure the library is loaded via Composer.
+        if (!class_exists('Firebase\JWT\JWT')) {
+            return new WP_Error(
+                'ham_jwt_missing_library',
+                __('JWT library not found. Please run composer install.', 'headless-access-manager'),
+                array('status' => 500)
+            );
+        }
 
-        // Example implementation using FireBase JWT library:
-        // try {
-        //     // Decode token
-        //     $payload = JWT::decode( $token, $secret_key, array( 'HS256' ) );
-        //
-        //     // Check if user still exists
-        //     $user = get_user_by( 'id', $payload->user_id );
-        //
-        //     if ( ! $user ) {
-        //         return new WP_Error(
-        //             'ham_jwt_auth_user_not_found',
-        //             __( 'User not found.', 'headless-access-manager' ),
-        //             array( 'status' => 401 )
-        //         );
-        //     }
-        //
-        //     return $user->ID;
-        // } catch ( Exception $e ) {
-        //     return new WP_Error(
-        //         'ham_jwt_auth_invalid_token',
-        //         $e->getMessage(),
-        //         array( 'status' => 401 )
-        //     );
-        // }
+        if (!defined('HAM_JWT_SECRET_KEY')) {
+            return new WP_Error(
+                'ham_jwt_no_secret',
+                __('JWT secret key is not configured.', 'headless-access-manager'),
+                array('status' => 500)
+            );
+        }
 
-        // For now, simply return an error
-        return new WP_Error(
-            'ham_jwt_auth_not_implemented',
-            __('JWT validation not yet implemented.', 'headless-access-manager'),
-            array( 'status' => 501 )
-        );
+        try {
+            // Decode token
+            $payload = \Firebase\JWT\JWT::decode($token, new \Firebase\JWT\Key(HAM_JWT_SECRET_KEY, 'HS256'));
+
+            // Check if user_id exists in payload and is numeric
+            if (!isset($payload->user_id) || !is_numeric($payload->user_id)) {
+                return new WP_Error(
+                    'ham_jwt_auth_invalid_payload',
+                    __('Invalid token payload.', 'headless-access-manager'),
+                    array('status' => 401)
+                );
+            }
+
+            // Check if user still exists
+            $user = get_user_by('id', $payload->user_id);
+
+            if (!$user) {
+                return new WP_Error(
+                    'ham_jwt_auth_user_not_found',
+                    __('User not found.', 'headless-access-manager'),
+                    array('status' => 401)
+                );
+            }
+
+            return $user->ID;
+        } catch (Exception $e) {
+            return new WP_Error(
+                'ham_jwt_auth_invalid_token',
+                $e->getMessage(),
+                array('status' => 401)
+            );
+        }
     }
 
     /**

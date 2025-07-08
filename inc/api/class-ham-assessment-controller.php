@@ -430,4 +430,121 @@ class HAM_Assessment_Controller extends HAM_Base_Controller
 
         return new WP_REST_Response($response, 200);
     }
+
+    /**
+     * Prepare assessment data for response.
+     *
+     * @param WP_Post $assessment Assessment post object.
+     * @return array Prepared assessment data.
+     */
+    protected function prepare_assessment_for_response($assessment)
+    {
+        // Get student data - student ID is stored as post meta and references a CPT ID
+        $student_id = get_post_meta($assessment->ID, HAM_ASSESSMENT_META_STUDENT_ID, true);
+        $student_name = __('Unknown Student', 'headless-access-manager');
+        
+        if (!empty($student_id)) {
+            // First try: Get student name from the CPT directly
+            $student_post = get_post($student_id);
+            if ($student_post) {
+                $student_name = $student_post->post_title;
+            } else {
+                // Second try: If we can't get the CPT, check if it's a user ID
+                $student_user = get_user_by('id', $student_id);
+                if ($student_user) {
+                    $student_name = $student_user->display_name;
+                }
+            }
+        }
+        
+        // Get teacher data (the post author)
+        $teacher_id = $assessment->post_author;
+        $teacher_name = __('Unknown Teacher', 'headless-access-manager');
+        
+        if (!empty($teacher_id)) {
+            // First try: Get teacher as a user
+            $teacher_user = get_user_by('id', $teacher_id);
+            if ($teacher_user) {
+                $teacher_name = $teacher_user->display_name;
+            } else {
+                // Second try: Maybe it's a CPT ID?
+                $args = array(
+                    'post_type' => HAM_CPT_TEACHER,
+                    'meta_query' => array(
+                        array(
+                            'key' => '_ham_user_id',
+                            'value' => $teacher_id,
+                            'compare' => '='
+                        )
+                    ),
+                    'posts_per_page' => 1
+                );
+                
+                $teacher_query = new WP_Query($args);
+                if ($teacher_query->have_posts()) {
+                    $teacher_query->the_post();
+                    $teacher_name = get_the_title();
+                    wp_reset_postdata();
+                }
+            }
+        }
+        
+        // Get assessment data
+        $assessment_data = get_post_meta($assessment->ID, HAM_ASSESSMENT_META_DATA, true);
+        
+        // Determine completion status
+        $completion = 'not'; // Default to 'not established'
+        if (!empty($assessment_data)) {
+            // You may want to customize this logic based on your specific requirements
+            // This is just a simple example of determining completion status
+            $anknytning_questions = !empty($assessment_data['anknytning']['questions']) ? $assessment_data['anknytning']['questions'] : array();
+            $ansvar_questions = !empty($assessment_data['ansvar']['questions']) ? $assessment_data['ansvar']['questions'] : array();
+            
+            $total_questions = count($anknytning_questions) + count($ansvar_questions);
+            $answered_questions = 0;
+            $high_scores = 0; // Scores of 4-5
+            
+            foreach ($anknytning_questions as $score) {
+                if (!empty($score)) {
+                    $answered_questions++;
+                    if ((int) $score >= 4) {
+                        $high_scores++;
+                    }
+                }
+            }
+            
+            foreach ($ansvar_questions as $score) {
+                if (!empty($score)) {
+                    $answered_questions++;
+                    if ((int) $score >= 4) {
+                        $high_scores++;
+                    }
+                }
+            }
+            
+            if ($answered_questions > 0) {
+                $high_score_percentage = ($high_scores / $answered_questions) * 100;
+                if ($high_score_percentage >= 80) {
+                    $completion = 'full'; // Established
+                } elseif ($high_score_percentage >= 40) {
+                    $completion = 'trans'; // Developing
+                }
+            }
+        }
+        
+        return array(
+            'id'           => $assessment->ID,
+            'title'        => $assessment->post_title,
+            'date'         => $assessment->post_date,
+            'student_id'   => (int) $student_id,
+            'student_name' => $student_name,
+            'teacher_id'   => (int) $teacher_id,
+            'teacher_name' => $teacher_name,
+            'author_id'    => (int) $teacher_id,     // Keep for backward compatibility
+            'author_name'  => $teacher_name,         // Keep for backward compatibility
+            'completion'   => $completion,
+            'stage'        => $completion,           // Keep for backward compatibility
+            'data'         => $assessment_data,
+        );
+    }
 }

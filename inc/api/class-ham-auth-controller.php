@@ -165,12 +165,18 @@ class HAM_Auth_Controller extends HAM_Base_Controller
             $issued_at = time();
             $expiration = $issued_at + ( DAY_IN_SECONDS * 7 ); // Token valid for 7 days
 
+            // Enhanced payload with user information needed by the frontend
             $payload = array(
                 'iss'  => get_bloginfo( 'url' ),
                 'iat'  => $issued_at,
                 'nbf'  => $issued_at,
                 'exp'  => $expiration,
                 'user_id' => $user->ID,
+                // Add user information fields needed by the frontend
+                'user_display_name' => $user->display_name,
+                'user_login' => $user->user_login,
+                'user_email' => $user->user_email,
+                'roles' => $user->roles,
             );
 
             if (defined('HAM_JWT_SECRET_KEY')) {
