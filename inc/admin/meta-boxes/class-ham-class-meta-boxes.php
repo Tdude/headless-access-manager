@@ -279,18 +279,18 @@ class HAM_Class_Meta_Boxes
         if (isset($_POST['ham_class_students_meta_box_nonce']) &&
             wp_verify_nonce($_POST['ham_class_students_meta_box_nonce'], 'ham_class_students_meta_box')) {
             
-            error_log('HAM DEBUG: Student save block reached for post ID: ' . $post_id);
+            
             if (isset($_POST['ham_student_ids'])) {
                 $student_ids = array_map('intval', (array) $_POST['ham_student_ids']);
                 update_post_meta($post_id, '_ham_student_ids', $student_ids);
-                error_log('HAM DEBUG: Saved student IDs: ' . print_r($student_ids, true));
+                
             } else {
                 update_post_meta($post_id, '_ham_student_ids', []);
-                error_log('HAM DEBUG: Cleared student IDs for post ID: ' . $post_id);
+                
             }
         } else {
             if (isset($_POST['ham_class_students_meta_box_nonce'])) {
-                error_log('HAM DEBUG: Student save NONCE CHECK FAILED for post ID: ' . $post_id . '. Nonce value: ' . $_POST['ham_class_students_meta_box_nonce']);
+                
             } else {
                 error_log('HAM DEBUG: Student save NONCE NOT SET for post ID: ' . $post_id);
             }

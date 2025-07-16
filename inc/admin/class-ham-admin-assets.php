@@ -33,7 +33,10 @@ class HAM_Admin_Assets {
         // Define our CPTs that use the auto-filter feature
         $ham_cpts_with_filters = [
             HAM_CPT_STUDENT,
-            HAM_CPT_TEACHER
+            HAM_CPT_TEACHER,
+            HAM_CPT_CLASS,
+            HAM_CPT_PRINCIPAL,
+            HAM_CPT_SCHOOL
         ];
 
         // Enqueue the dynamic select populator script on specific CPT edit screens
@@ -85,12 +88,32 @@ class HAM_Admin_Assets {
 
         // Only load on edit.php for our specific CPTs
         if ('edit.php' === $hook_suffix && in_array($post_type, $ham_cpts_with_filters)) {
+            // General admin enhancements
             wp_enqueue_script(
                 'ham-admin-enhancements',
                 HAM_PLUGIN_URL . 'assets/js/ham-admin-enhancements.js',
                 ['jquery'], // Dependency
                 HAM_VERSION, // Versioning
                 true // In footer
+            );
+            
+            // AJAX table filtering
+            wp_enqueue_script(
+                'ham-ajax-table-filters',
+                HAM_PLUGIN_URL . 'assets/js/ham-ajax-table-filters.js',
+                ['jquery'], // Dependency
+                HAM_VERSION, // Versioning
+                true // In footer
+            );
+            
+            // Localize the script with data needed for AJAX requests
+            wp_localize_script(
+                'ham-ajax-table-filters',
+                'ham_ajax',
+                [
+                    'nonce' => wp_create_nonce('ham_ajax_filter_nonce'),
+                    'post_type' => $post_type,
+                ]
             );
         }
     }

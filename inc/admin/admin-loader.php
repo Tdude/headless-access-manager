@@ -31,7 +31,7 @@ class HAM_Admin_Loader
             isset($post) && $post->post_type === HAM_CPT_CLASS
         ) {
 
-            error_log('HAM DEBUG: enqueue_select2_for_class_edit IS FIRING for post ID: ' . (isset($post->ID) ? $post->ID : 'N/A') . ' on hook: ' . $hook);
+            //error_log('HAM DEBUG: enqueue_select2_for_class_edit IS FIRING for post ID: ' . (isset($post->ID) ? $post->ID : 'N/A') . ' on hook: ' . $hook);
 
             $select2_js_url = HAM_PLUGIN_URL . 'assets/vendor/select2/js/select2.min.js';
             $select2_css_url = HAM_PLUGIN_URL . 'assets/vendor/select2/css/select2.min.css';
@@ -93,19 +93,17 @@ class HAM_Admin_Loader
         add_action('add_meta_boxes_' . HAM_CPT_CLASS, ['HAM_Class_Meta_Boxes', 'register_meta_boxes']);
         add_action('save_post_' . HAM_CPT_CLASS, ['HAM_Class_Meta_Boxes', 'save_meta_boxes']);
 
-        // School CPT Meta Boxes & Columns
+        // School CPT Meta Boxes (without columns - now handled by HAM_School_Admin_List_Table)
         add_action('add_meta_boxes_' . HAM_CPT_SCHOOL, ['HAM_School_Meta_Boxes', 'register_meta_boxes']);
         add_action('save_post_' . HAM_CPT_SCHOOL, ['HAM_School_Meta_Boxes', 'save_meta_boxes']);
-        add_filter('manage_' . HAM_CPT_SCHOOL . '_posts_columns', array('HAM_School_Meta_Boxes', 'add_custom_admin_columns'));
-        add_action('manage_' . HAM_CPT_SCHOOL . '_posts_custom_column', array('HAM_School_Meta_Boxes', 'render_custom_admin_columns'), 10, 2);
 
         // Teacher CPT Meta Boxes
         add_action('add_meta_boxes_' . HAM_CPT_TEACHER, ['HAM_Teacher_Meta_Boxes', 'register_meta_boxes']);
         add_action('save_post_' . HAM_CPT_TEACHER, ['HAM_Teacher_Meta_Boxes', 'save_meta_boxes']);
 
-        // Principal CPT Columns
-        add_filter('manage_' . HAM_CPT_PRINCIPAL . '_posts_columns', ['HAM_Principal_Meta_Boxes', 'add_principal_custom_columns']);
-        add_action('manage_' . HAM_CPT_PRINCIPAL . '_posts_custom_column', ['HAM_Principal_Meta_Boxes', 'render_principal_custom_columns'], 10, 2);
+        // Principal CPT Meta Boxes (no columns - columns now handled by HAM_Principal_Admin_List_Table)
+        // Legacy column registration removed to prevent duplicate columns
+        HAM_Principal_Meta_Boxes::init(); // Initialize other functionality
         // Principal CPT Meta Boxes (New)
         add_action('add_meta_boxes_' . HAM_CPT_PRINCIPAL, ['HAM_Principal_Meta_Boxes', 'register_meta_boxes']);
         add_action('save_post_' . HAM_CPT_PRINCIPAL, ['HAM_Principal_Meta_Boxes', 'save_meta_boxes']);
@@ -113,6 +111,11 @@ class HAM_Admin_Loader
         add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue_select2_for_class_edit'));
 
         self::include_files();
+        
+        // Initialize AJAX handlers now that the file has been included
+        HAM_Ajax_Handlers::init();
+        
+        // Setup hooks
         add_action('admin_menu', array( __CLASS__, 'setup_admin_menu' ));
         // Remove old hooks for class, school, teacher meta boxes that are now handled by specific classes
         // add_action('add_meta_boxes_' . HAM_CPT_CLASS, array('HAM_Meta_Boxes', 'register_class_meta_box')); // Removed
@@ -128,16 +131,14 @@ class HAM_Admin_Loader
         add_filter('manage_' . HAM_CPT_STUDENT . '_posts_columns', array(__CLASS__, 'modify_student_admin_columns'));
         add_action('manage_' . HAM_CPT_STUDENT . '_posts_custom_column', array(__CLASS__, 'render_student_classes_column'), 10, 2);
 
-        // Hook for modifying class columns and rendering the custom column
-        add_filter('manage_' . HAM_CPT_CLASS . '_posts_columns', array(__CLASS__, 'modify_class_admin_columns'));
-        add_action('manage_' . HAM_CPT_CLASS . '_posts_custom_column', array(__CLASS__, 'render_class_assigned_teachers_column'), 10, 2);
-        add_action('manage_' . HAM_CPT_CLASS . '_posts_custom_column', array(__CLASS__, 'render_class_school_column'), 10, 2);
+        // Class columns and sorting now handled by HAM_Class_Admin_List_Table
         
         // Hooks for other CPTs
         add_filter('manage_' . HAM_CPT_ASSESSMENT . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
         add_filter('manage_' . HAM_CPT_SCHOOL . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
         add_filter('manage_' . HAM_CPT_TEACHER . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
-        add_filter('manage_' . HAM_CPT_PRINCIPAL . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
+        // Principal CPT columns now handled by HAM_Principal_Admin_List_Table
+        add_filter('manage_' . HAM_CPT_ASSESSMENT . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
         add_filter('manage_' . HAM_CPT_SCHOOL_HEAD . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
 
 
@@ -183,19 +184,53 @@ class HAM_Admin_Loader
     }
 
     /**
-     * Add a School filter dropdown to relevant CPT admin listing pages.
+     * Add a school filter dropdown to the admin list pages.
+     * This is a legacy implementation that is being phased out in favor of the new admin list table classes.
+     * 
+     * Note: All CPTs now use the modern admin list table classes with unified filtering,
+     * so this legacy filter is now disabled to prevent duplicate filters.
      */
     public static function add_school_filter_dropdown() {
         global $typenow;
-        $cpts = array(HAM_CPT_CLASS, HAM_CPT_PRINCIPAL); // Removed HAM_CPT_TEACHER
-        if (!in_array($typenow, $cpts)) return;
+        
+        // All CPTs now use the new admin list table filter system
+        // Legacy filter is disabled to prevent duplicate filters
+        return;
+        
+        // Legacy code below is kept for reference but won't execute
         $selected = isset($_GET['ham_school_filter']) ? intval($_GET['ham_school_filter']) : '';
         $schools = function_exists('ham_get_schools') ? ham_get_schools() : array();
-        echo '<select name="ham_school_filter"><option value="">'.esc_html__('All Schools', 'headless-access-manager').'</option>';
+        echo '<select name="ham_school_filter" class="ham-ajax-filter"><option value="">'.esc_html__('All Schools', 'headless-access-manager').'</option>';
         foreach ($schools as $school) {
             echo '<option value="'.esc_attr($school->ID).'"'.selected($selected, $school->ID, false).'>'.esc_html($school->post_title).'</option>';
         }
         echo '</select>';
+        
+        // Ensure JS is enqueued for AJAX filtering
+        add_action('admin_enqueue_scripts', function() {
+            global $typenow;
+            $cpts = array(HAM_CPT_CLASS, HAM_CPT_PRINCIPAL, HAM_CPT_STUDENT, HAM_CPT_TEACHER, HAM_CPT_SCHOOL);
+            if (in_array($typenow, $cpts)) {
+                wp_enqueue_script(
+                    'ham-ajax-filters',
+                    HAM_PLUGIN_URL . 'assets/js/ham-ajax-table-filters.js',
+                    ['jquery'],
+                    HAM_VERSION,
+                    true
+                );
+                
+                wp_localize_script('ham-ajax-filters', 'hamAjaxFilters', [
+                    'ajaxUrl' => admin_url('admin-ajax.php'),
+                    'nonce' => wp_create_nonce('ham_ajax_filter_nonce'),
+                    'postType' => $typenow,
+                    'i18n' => [
+                        'loading' => __('Loading...', 'headless-access-manager'),
+                        'error' => __('Error loading content', 'headless-access-manager'),
+                        'noResults' => __('No results found', 'headless-access-manager'),
+                    ]
+                ]);
+            }
+        });
     }
 
     /**
@@ -207,7 +242,7 @@ class HAM_Admin_Loader
             return;
         }
 
-        $cpts = array(HAM_CPT_CLASS, HAM_CPT_PRINCIPAL); // CPTs that use this filter
+        $cpts = array(HAM_CPT_CLASS); // CPTs that use this filter (Principal now uses generic system)
         if (!in_array($typenow, $cpts)) {
             return;
         }
@@ -264,6 +299,16 @@ class HAM_Admin_Loader
         require_once HAM_PLUGIN_DIR . 'inc/admin/admin-menu.php';
         require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-user-profile.php';
         require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-ajax-handlers.php';
+        
+        // Base admin list table class must be included first
+        require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-base-admin-list-table.php';
+        
+        // CPT-specific admin list tables
+        require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-school-admin-list-table.php';
+        require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-student-admin-list-table.php';
+        require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-teacher-admin-list-table.php';
+        require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-class-admin-list-table.php';
+        require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-principal-admin-list-table.php';
         
         // Refactored Meta Box Handlers
         require_once HAM_PLUGIN_DIR . 'inc/admin/meta-boxes/class-ham-class-meta-boxes.php';

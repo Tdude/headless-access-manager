@@ -287,7 +287,6 @@ class HAM_Post_Types {
      */
     private static function register_school_post_type()
     {
-        error_log('HAM DEBUG: Attempting to register ham_school CPT.'); // DEBUG LINE
         $labels = array(
             'name'                  => __('Schools', 'headless-access-manager'),
             'singular_name'         => __('School', 'headless-access-manager'),
@@ -343,7 +342,7 @@ class HAM_Post_Types {
         );
 
         register_post_type(HAM_CPT_SCHOOL, $args);
-        error_log('HAM DEBUG: Successfully called register_post_type for ham_school.'); // DEBUG LINE
+        //error_log('HAM DEBUG: Successfully called register_post_type for ham_school.'); // DEBUG LINE
     }
 
     /**
@@ -351,7 +350,6 @@ class HAM_Post_Types {
      */
     private static function register_principal_post_type()
     {
-        error_log('HAM DEBUG: Attempting to register ham_principal CPT.'); // DEBUG LINE
         $labels = array(
             'name'                  => __('Principals', 'headless-access-manager'),
             'singular_name'         => __('Principal', 'headless-access-manager'),
@@ -407,7 +405,7 @@ class HAM_Post_Types {
         );
 
         register_post_type(HAM_CPT_PRINCIPAL, $args);
-        error_log('HAM DEBUG: Successfully called register_post_type for ham_principal.'); // DEBUG LINE
+        //error_log('HAM DEBUG: Successfully called register_post_type for ham_principal.'); // DEBUG LINE
     }
 
     /**

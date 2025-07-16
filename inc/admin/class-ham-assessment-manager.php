@@ -350,23 +350,23 @@ class HAM_Assessment_Manager
         }
 
         // Debug: Log the query arguments
-        error_log('Assessment query args: ' . print_r($args, true));
+        //error_log('Assessment query args: ' . print_r($args, true));
 
         $assessments = array();
         $posts = get_posts($args);
 
         // Debug: Log the number of posts found
-        error_log('Number of assessment posts found: ' . count($posts));
+        //error_log('Number of assessment posts found: ' . count($posts));
 
         foreach ($posts as $post) {
             $student_id = get_post_meta($post->ID, HAM_ASSESSMENT_META_STUDENT_ID, true);
 
             // Debug: Log the post and student ID
-            error_log('Processing post ID: ' . $post->ID . ', Student ID: ' . $student_id);
+            //error_log('Processing post ID: ' . $post->ID . ', Student ID: ' . $student_id);
 
             // Skip posts without a student ID (likely templates)
             if (empty($student_id)) {
-                error_log('Skipping post ' . $post->ID . ' - no student ID');
+                //error_log('Skipping post ' . $post->ID . ' - no student ID');
                 continue;
             }
             
@@ -375,12 +375,12 @@ class HAM_Assessment_Manager
             $student_name = $student_post ? $student_post->post_title : esc_html__('Unknown Student', 'headless-access-manager');
             
             // Debug information about the student CPT
-            error_log('Student CPT found: ' . ($student_post ? 'Yes' : 'No') . ', Name: ' . $student_name);
+            //error_log('Student CPT found: ' . ($student_post ? 'Yes' : 'No') . ', Name: ' . $student_name);
 
             $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
 
             // Debug: Log the assessment data structure
-            error_log('Assessment data structure for post ' . $post->ID . ': ' . (is_array($assessment_data) ? json_encode(array_keys($assessment_data)) : 'not an array'));
+            //error_log('Assessment data structure for post ' . $post->ID . ': ' . (is_array($assessment_data) ? json_encode(array_keys($assessment_data)) : 'not an array'));
 
             // Fine-grained numeric evaluation logic
             $values = array();
@@ -511,7 +511,7 @@ class HAM_Assessment_Manager
         }
 
         // Debug: Log the final assessments array
-        error_log('Final assessments count: ' . count($assessments));
+        //error_log('Final assessments count: ' . count($assessments));
 
         return $assessments;
     }
@@ -886,7 +886,7 @@ public function ajax_get_assessment_details()
     $assessment_id = intval($_POST['assessment_id']);
 
     // Debug information
-    error_log('Processing assessment details request for ID: ' . $assessment_id);
+    //error_log('Processing assessment details request for ID: ' . $assessment_id);
 
     // Get assessment data
     $assessment = get_post($assessment_id);
@@ -895,15 +895,15 @@ public function ajax_get_assessment_details()
     $student_id = get_post_meta($assessment_id, HAM_ASSESSMENT_META_STUDENT_ID, true);
 
     // Debug information
-    error_log("MODAL - All meta for assessment {$assessment_id}: " . print_r(get_post_meta($assessment_id), true));
+    //error_log("MODAL - All meta for assessment {$assessment_id}: " . print_r(get_post_meta($assessment_id), true));
 
     if (!empty($student_id)) {
         $student_post = get_post($student_id);
         if ($student_post) {
             $student_name = $student_post->post_title;
-            error_log("MODAL - Found student post: {$student_post->ID}, post_type: {$student_post->post_type}, title: {$student_post->post_title}");
+            //error_log("MODAL - Found student post: {$student_post->ID}, post_type: {$student_post->post_type}, title: {$student_post->post_title}");
         } else {
-            error_log("MODAL - Could not find student post with ID: {$student_id}");
+            //error_log("MODAL - Could not find student post with ID: {$student_id}");
             
             // Debug - try again with a different approach
             // Students are custom post types, not WordPress users
@@ -937,7 +937,7 @@ public function ajax_get_assessment_details()
     }
         
         // Debug
-        error_log('Student ID: ' . $student_id . ', Student name resolved: ' . $student_name);
+        //error_log('Student ID: ' . $student_id . ', Student name resolved: ' . $student_name);
 
         $assessment_data = get_post_meta($assessment_id, HAM_ASSESSMENT_META_DATA, true);
 
@@ -955,10 +955,11 @@ public function ajax_get_assessment_details()
         $processed_assessment_data = $this->process_assessment_data($assessment_data);
 
         // Log processed data in a more readable way
-        error_log('PROCESSED ASSESSMENT DATA STRUCTURE:');
+        //error_log('PROCESSED ASSESSMENT DATA STRUCTURE:');
+        /*
         if (!empty($processed_assessment_data['anknytning']['questions'])) {
             foreach ($processed_assessment_data['anknytning']['questions'] as $qkey => $qdata) {
-                error_log("Question key: $qkey");
+                //error_log("Question key: $qkey");
                 if (!empty($qdata) && is_array($qdata)) {
                     if (isset($qdata['text'])) {
                         error_log(" - text: {$qdata['text']}");
@@ -981,6 +982,7 @@ public function ajax_get_assessment_details()
         } else {
             error_log("No processed anknytning questions found!");
         }
+        */
 
         // Get the questions structure - create a proper structure with question text and options
         // Do not rely on get_questions_structure() as it doesn't contain the proper structure
@@ -1044,8 +1046,8 @@ public function ajax_get_assessment_details()
         $this->debug_dump($questions_structure, 'questions-structure-' . $assessment_id);
 
         // Debug information
-        error_log('Raw assessment data: ' . print_r($assessment_data, true));
-        error_log('Processed assessment data: ' . print_r($processed_assessment_data, true));
+        //error_log('Raw assessment data: ' . print_r($assessment_data, true));
+        //error_log('Processed assessment data: ' . print_r($processed_assessment_data, true));
 
         // Get teacher info - first check based on class relationship, fallback to post_author
         $teacher_name = esc_html__('Unknown Teacher', 'headless-access-manager');
@@ -1140,7 +1142,7 @@ public function ajax_get_assessment_details()
             }
         }
         
-        error_log('Modal display - Teacher resolution: Student ID: ' . $student_id . ', Classes: ' . implode(',', $student_class_ids) . ', Teacher name: ' . $teacher_name);
+        //error_log('Modal display - Teacher resolution: Student ID: ' . $student_id . ', Classes: ' . implode(',', $student_class_ids) . ', Teacher name: ' . $teacher_name);
         
         $response = array(
             'id' => $assessment_id,
@@ -1170,7 +1172,7 @@ public function ajax_get_assessment_details()
             return array();
         }
 
-        error_log('Raw data structure: ' . json_encode($data));
+        //error_log('Raw data structure: ' . json_encode($data));
         $this->debug_dump($data, 'raw-data-structure');
 
         $processed_data = array();
@@ -1191,7 +1193,7 @@ public function ajax_get_assessment_details()
                 'comments' => isset($section_data['comments']) ? $section_data['comments'] : ''
             );
 
-            error_log('Section ' . $section . ' data: ' . json_encode($section_data));
+            //error_log('Section ' . $section . ' data: ' . json_encode($section_data));
 
             // Get questions structure for reference
             $questions_structure = self::get_questions_structure();
@@ -1202,7 +1204,7 @@ public function ajax_get_assessment_details()
             // Process questions
             if (isset($section_data['questions']) && is_array($section_data['questions'])) {
                 foreach ($section_data['questions'] as $question_id => $answer) {
-                    error_log('Question ' . $question_id . ' answer: ' . json_encode($answer));
+                    //error_log('Question ' . $question_id . ' answer: ' . json_encode($answer));
 
                     // If answer is an array, extract the relevant information
                     if (is_array($answer)) {
@@ -1216,16 +1218,16 @@ public function ajax_get_assessment_details()
 
                         if (isset($answer['value'])) {
                             $processed_answer['value'] = $answer['value'];
-                            error_log("Found value in answer: " . $answer['value']);
+                            //error_log("Found value in answer: " . $answer['value']);
                         } elseif (isset($answer['selected'])) {
                             $processed_answer['value'] = $answer['selected'];
-                            error_log("Found selected in answer: " . $answer['selected']);
+                            //error_log("Found selected in answer: " . $answer['selected']);
                         }
 
                         // Extract stage if available
                         if (isset($answer['stage'])) {
                             $processed_answer['stage'] = $answer['stage'];
-                            error_log("Found stage directly in answer: " . $answer['stage']);
+                            //error_log("Found stage directly in answer: " . $answer['stage']);
                         }
 
                         // Look for any numeric property that might be the value
@@ -1233,7 +1235,7 @@ public function ajax_get_assessment_details()
                             foreach ($answer as $key => $value) {
                                 if (is_numeric($value) && $key !== 'text') {
                                     $processed_answer['value'] = $value;
-                                    error_log("Found numeric value in answer: $key = $value");
+                                    //error_log("Found numeric value in answer: $key = $value");
                                     break;
                                 }
                             }
@@ -1247,12 +1249,12 @@ public function ajax_get_assessment_details()
 
                             $first_option = $section_structure[$question_id]['options'][0];
                             $processed_answer['value'] = $first_option['value'];
-                            error_log("Using first option value as default: " . $first_option['value']);
+                            //error_log("Using first option value as default: " . $first_option['value']);
 
                             // Also include the stage if available and not already set
                             if (!isset($processed_answer['stage']) && isset($first_option['stage'])) {
                                 $processed_answer['stage'] = $first_option['stage'];
-                                error_log("Using first option stage as default: " . $first_option['stage']);
+                                //error_log("Using first option stage as default: " . $first_option['stage']);
                             }
                         }
 
@@ -1262,11 +1264,11 @@ public function ajax_get_assessment_details()
                             isset($section_structure[$question_id]['options']) &&
                             is_array($section_structure[$question_id]['options'])) {
 
-                            error_log("Looking for option with value: " . $processed_answer['value']);
+                            //error_log("Looking for option with value: " . $processed_answer['value']);
                             $found_matching_option = false;
 
                             foreach ($section_structure[$question_id]['options'] as $option) {
-                                error_log("Checking option: " . json_encode($option));
+                                //error_log("Checking option: " . json_encode($option));
 
                                 // Convert both values to strings for comparison
                                 $option_value = (string) $option['value'];
@@ -1274,7 +1276,7 @@ public function ajax_get_assessment_details()
 
                                 if (isset($option['value']) && $option_value === $selected_value && isset($option['stage'])) {
                                     $processed_answer['stage'] = $option['stage'];
-                                    error_log("Found matching option with stage: " . $option['stage']);
+                                    //error_log("Found matching option with stage: " . $option['stage']);
                                     $found_matching_option = true;
                                     break;
                                 }
@@ -1285,23 +1287,23 @@ public function ajax_get_assessment_details()
                             }
                         }
 
-                        error_log("Final processed answer: " . json_encode($processed_answer));
+                        //error_log("Final processed answer: " . json_encode($processed_answer));
                         $processed_section['questions'][$question_id] = $processed_answer;
                     } else {
                         // If answer is not an array, keep it as is
                         $processed_answer = array('value' => $answer);
-                        error_log("Answer is a primitive: $answer");
+                        //error_log("Answer is a primitive: $answer");
 
                         // Try to find the stage from the matching option
                         if (isset($section_structure[$question_id]) &&
                             isset($section_structure[$question_id]['options']) &&
                             is_array($section_structure[$question_id]['options'])) {
 
-                            error_log("Looking for option with value: $answer");
+                            //error_log("Looking for option with value: $answer");
                             $found_matching_option = false;
 
                             foreach ($section_structure[$question_id]['options'] as $option) {
-                                error_log("Checking option: " . json_encode($option));
+                                //error_log("Checking option: " . json_encode($option));
 
                                 // Convert both values to strings for comparison
                                 $option_value = (string) $option['value'];
@@ -1309,7 +1311,7 @@ public function ajax_get_assessment_details()
 
                                 if (isset($option['value']) && $option_value === $selected_value && isset($option['stage'])) {
                                     $processed_answer['stage'] = $option['stage'];
-                                    error_log("Found matching option with stage: " . $option['stage']);
+                                    //error_log("Found matching option with stage: " . $option['stage']);
                                     $found_matching_option = true;
                                     break;
                                 }
@@ -1320,7 +1322,7 @@ public function ajax_get_assessment_details()
                             }
                         }
 
-                        error_log("Final processed answer: " . json_encode($processed_answer));
+                        //error_log("Final processed answer: " . json_encode($processed_answer));
                         $processed_section['questions'][$question_id] = $processed_answer;
                     }
                 }
@@ -1364,7 +1366,7 @@ public function ajax_get_assessment_details()
     public function enqueue_admin_assets($hook)
     {
         // Debug information
-        error_log('Enqueuing assets for hook: ' . $hook);
+        //error_log('Enqueuing assets for hook: ' . $hook);
 
         // Only enqueue on our plugin pages
         if (strpos($hook, 'ham-assessments') === false && strpos($hook, 'ham-assessment-stats') === false && strpos($hook, 'page_ham-assessment-stats') === false) {
@@ -1390,7 +1392,7 @@ public function ajax_get_assessment_details()
 
         // Add Chart.js for statistics page
         if (strpos($hook, 'ham-assessment-stats') !== false || strpos($hook, 'page_ham-assessment-stats') !== false) {
-            error_log('Loading Chart.js on hook: ' . $hook);
+            //error_log('Loading Chart.js on hook: ' . $hook);
 
             wp_enqueue_script(
                 'chart-js',

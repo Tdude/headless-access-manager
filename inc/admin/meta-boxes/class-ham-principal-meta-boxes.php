@@ -14,6 +14,121 @@ if (!defined('ABSPATH')) {
  */
 class HAM_Principal_Meta_Boxes {
     /**
+     * Initialize hooks for the Principal CPT admin columns and sorting.
+     */
+    public static function init() {
+        // Make columns sortable
+        add_filter('manage_edit-' . HAM_CPT_PRINCIPAL . '_sortable_columns', [__CLASS__, 'make_columns_sortable']);
+        
+        // Handle sorting
+        add_action('pre_get_posts', [__CLASS__, 'handle_admin_sorting']);
+    }
+    
+    /**
+     * Makes columns sortable in the admin list table.
+     *
+     * @param array $columns The sortable columns.
+     * @return array Modified sortable columns.
+     */
+    public static function make_columns_sortable($columns) {
+        $columns['ham_assigned_schools'] = 'assigned_schools';
+        return $columns;
+    }
+    
+    /**
+     * Handle sorting in the admin list table.
+     *
+     * @param WP_Query $query The current query object.
+     */
+    public static function handle_admin_sorting($query) {
+        if (!is_admin() || !$query->is_main_query()) {
+            return;
+        }
+        
+        $orderby = $query->get('orderby');
+        
+        if ('assigned_schools' === $orderby) {
+            // Add a filter to sort the results after the query
+            add_filter('the_posts', [__CLASS__, 'sort_principals_by_schools'], 10, 2);
+        }
+    }
+    
+    /**
+     * Sort principals by their assigned schools' names.
+     * This is a manual PHP sort that runs after the query.
+     *
+     * @param array    $posts Array of post objects.
+     * @param WP_Query $query The current WP_Query object.
+     * @return array Sorted posts.
+     */
+    public static function sort_principals_by_schools($posts, $query) {
+        if (!is_admin() || !isset($query->query['orderby']) || $query->query['orderby'] !== 'assigned_schools') {
+            return $posts;
+        }
+        
+        // Remove the filter to avoid infinite recursion
+        remove_filter('the_posts', [__CLASS__, 'sort_principals_by_schools']);
+        
+        // Get school names for each principal
+        $principal_schools = [];
+        foreach ($posts as $post) {
+            $linked_user_id = get_post_meta($post->ID, '_ham_user_id', true);
+            $school_names = [];
+            
+            if (!empty($linked_user_id)) {
+                // Query schools that have this principal (user) assigned
+                $args = [
+                    'post_type' => HAM_CPT_SCHOOL,
+                    'posts_per_page' => -1,
+                    'meta_query' => [
+                        [
+                            'key' => '_ham_principal_ids',
+                            'value' => 'i:' . $linked_user_id . ';',
+                            'compare' => 'LIKE',
+                        ]
+                    ]
+                ];
+                $schools_query = new WP_Query($args);
+                
+                if ($schools_query->have_posts()) {
+                    while ($schools_query->have_posts()) {
+                        $schools_query->the_post();
+                        $school_names[] = get_the_title();
+                    }
+                    wp_reset_postdata();
+                }
+                
+                // Fallback: Check user's own _ham_school_id meta
+                if (empty($school_names)) {
+                    $single_school_id = get_user_meta($linked_user_id, HAM_USER_META_SCHOOL_ID, true);
+                    if ($single_school_id) {
+                        $school_post = get_post($single_school_id);
+                        if ($school_post) {
+                            $school_names[] = $school_post->post_title;
+                        }
+                    }
+                }
+            }
+            
+            sort($school_names); // Sort school names alphabetically
+            $principal_schools[$post->ID] = implode(', ', $school_names);
+        }
+        
+        // Sort principals by school names
+        usort($posts, function($a, $b) use ($principal_schools, $query) {
+            $a_schools = isset($principal_schools[$a->ID]) ? $principal_schools[$a->ID] : '';
+            $b_schools = isset($principal_schools[$b->ID]) ? $principal_schools[$b->ID] : '';
+            
+            if ($query->get('order') === 'DESC') {
+                return strcasecmp($b_schools, $a_schools);
+            } else {
+                return strcasecmp($a_schools, $b_schools);
+            }
+        });
+        
+        return $posts;
+    }
+    /**
      * Add custom columns to the Principal CPT list table.
      *
      * @param array $columns Existing columns.

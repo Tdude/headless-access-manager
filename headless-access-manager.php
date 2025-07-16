@@ -3,7 +3,7 @@
  * Plugin Name: Headless Access Manager
  * Plugin URI: https://stegetfore.se
  * Description: Manages user roles, permissions, and form data for a headless WordPress site with Next.js frontend.
- * Version: 1.0.4
+ * Version: 1.0.5
  * Author: Tibor Berki
  * Author URI: https://stegetfore.se
  * License: GPL v2 or later
@@ -25,7 +25,7 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 }
 
 // Define plugin constants
-define('HAM_VERSION', '1.0.4');
+define('HAM_VERSION', '1.0.5');
 define('HAM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('HAM_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('HAM_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -49,8 +49,7 @@ require_once HAM_PLUGIN_DIR . 'inc/admin/meta-boxes.php';
 require_once HAM_PLUGIN_DIR . 'inc/core/class-ham-statistics-manager.php';
 require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-user-profile.php';
 // Include admin list table customization classes
-require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-student-admin-list-table.php';
-require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-teacher-admin-list-table.php';
+// Admin list tables are now loaded through admin-loader.php
 // Include admin assets loader
 require_once HAM_PLUGIN_DIR . 'inc/admin/class-ham-admin-assets.php';
 
