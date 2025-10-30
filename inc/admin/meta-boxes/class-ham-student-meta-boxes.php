@@ -212,9 +212,19 @@ class HAM_Student_Meta_Boxes {
         <p>
             <label for="ham_student_class_ids"><?php esc_html_e('Assign Class(es) to this Student:', 'headless-access-manager'); ?></label>
             <select name="ham_student_class_ids[]" id="ham_student_class_ids" class="widefat" multiple="multiple" style="min-height: 100px;">
-                <?php foreach ($selectable_classes as $class_obj) : ?>
+                <?php foreach ($selectable_classes as $class_obj) : 
+                    // Get the school name for this class
+                    $class_school_id = get_post_meta($class_obj->ID, '_ham_school_id', true);
+                    $school_name = '';
+                    if ($class_school_id) {
+                        $school_post = get_post($class_school_id);
+                        if ($school_post) {
+                            $school_name = ' (' . $school_post->post_title . ')';
+                        }
+                    }
+                ?>
                     <option value="<?php echo esc_attr($class_obj->ID); ?>" <?php selected(in_array($class_obj->ID, $assigned_class_ids)); ?>>
-                        <?php echo esc_html($class_obj->post_title); ?>
+                        <?php echo esc_html($class_obj->post_title . $school_name); ?>
                     </option>
                 <?php endforeach; ?>
             </select>
