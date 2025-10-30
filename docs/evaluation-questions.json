@@ -1,0 +1,434 @@
+{
+    "anknytning": {
+        "title": "Anknytning",
+        "questions": {
+            "a1": {
+                "text": "N\u00e4rvaro",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "Kommer inte till skolan",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "Kommer till skolan, ej till lektion",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "Kommer till min lektion ibland",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "Kommer alltid till min lektion",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "Kommer till andras lektioner",
+                        "stage": "full"
+                    }
+                ]
+            },
+            "a2": {
+                "text": "Dialog 1",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "Helt tyst",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "S\u00e4ger enstaka ord till mig",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "Vi pratar ibland",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "Har full dialog med mig",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "Har dialog med andra vuxna",
+                        "stage": "full"
+                    }
+                ]
+            },
+            "a3": {
+                "text": "Dialog 2",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "Pratar oavbrutet",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "\u00c4r tyst vid tills\u00e4gelse",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "Lyssnar p\u00e5 mig",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "Har full dialog med mig",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "Dialog med vissa andra vuxna",
+                        "stage": "full"
+                    }
+                ]
+            },
+            "a4": {
+                "text": "Blick, kroppsspr\u00e5k",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "M\u00f6ter inte min blick",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "Har gett mig ett \u00f6gonkast",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "H\u00e5ller fast \u00f6gonkontakt",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "\u201dPratar\u201d med \u00f6gonen",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "M\u00f6ter andras blickar",
+                        "stage": "full"
+                    }
+                ]
+            },
+            "a5": {
+                "text": "Ber\u00f6ring",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "Jag f\u00e5r inte n\u00e4rma mig",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "Jag f\u00e5r n\u00e4rma mig",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "Till\u00e5ter ber\u00f6ring av mig",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "S\u00f6ker fysisk kontakt, ex. kramar",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "Till\u00e5ter ber\u00f6ring av andra vuxna",
+                        "stage": "full"
+                    }
+                ]
+            },
+            "a6": {
+                "text": "Vid konflikt",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "F\u00f6rsvinner fr\u00e5n skolan vid konflikt",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "Stannar kvar p\u00e5 skolan",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "Kommer tillbaka till mig",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "F\u00f6rklarar f\u00f6r mig efter konikt",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "Kommer tillbaka till andra vuxna",
+                        "stage": "full"
+                    }
+                ]
+            },
+            "a7": {
+                "text": "F\u00f6rtroende",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "Delar inte med sig till mig",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "Delar med sig till mig ibland",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "Vill dela med sig till mig",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "Ger mig f\u00f6rtroenden",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "Ger \u00e4ven f\u00f6rtroenden till vissa andra",
+                        "stage": "full"
+                    }
+                ]
+            }
+        },
+        "comments": []
+    },
+    "ansvar": {
+        "title": "Ansvar",
+        "questions": {
+            "b1": {
+                "text": "Impulskontroll",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "Helt impulsstyrd. Ex. kan inte sitta still, f\u00f6rst\u00f6r, s\u00e4ger fula ord",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "Kan ibland h\u00e5lla negativa k\u00e4nslor utan att agera p\u00e5 dem",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "Sk\u00e4ms \u00f6ver negativa beteenden",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "Kan ta emot tills\u00e4gelse",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "Kan prata om det som h\u00e4nt",
+                        "stage": "full"
+                    }
+                ]
+            },
+            "b2": {
+                "text": "F\u00f6rberedd",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "Aldrig",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "Lyckas vara f\u00f6rberedd en f\u00f6rsta g\u00e5ng",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "F\u00f6rs\u00f6ker vara f\u00f6rberedd som andra",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "Pratar om f\u00f6rberedelse",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "Planerar och har ordning",
+                        "stage": "full"
+                    }
+                ]
+            },
+            "b3": {
+                "text": "Fokus",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "Kan inte fokusera",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "Kan fokusera en kort stund vid enskild tills\u00e4gelse",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "Kan fokusera sj\u00e4lvmant tillsammans med andra",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "Pratar om fokus och f\u00f6rb\u00e4ttrar sig",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "Kan fokusera och koncentrera sig",
+                        "stage": "full"
+                    }
+                ]
+            },
+            "b4": {
+                "text": "Turtagning",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "Klarar ej",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "Klarar av att v\u00e4nta vid tills\u00e4gelse",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "G\u00f6r som andra, r\u00e4cker upp handen",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "Kan komma \u00f6verens om hur turtagning fungerar",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "Full turtagning",
+                        "stage": "full"
+                    }
+                ]
+            },
+            "b5": {
+                "text": "Instruktion",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "Tar inte\/f\u00f6rst\u00e5r inte instruktion",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "Tar\/f\u00f6rst\u00e5r instruktion i ett led men startar inte uppgift",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "Tar\/f\u00f6rst\u00e5r instruktion i flera led, kan l\u00f6sa uppgift ibland",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "Kan prata om uppgiftsl\u00f6sning",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "Genomf\u00f6r uppgifter",
+                        "stage": "full"
+                    }
+                ]
+            },
+            "b6": {
+                "text": "Arbeta sj\u00e4lv",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "Klarar inte",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "L\u00f6ser en uppgift med st\u00f6d",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "Kan klara uppgifter sj\u00e4lvst\u00e4ndigt i klassrummet",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "G\u00f6r ofta l\u00e4xor och pratar om dem",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "Tar ansvar f\u00f6r sj\u00e4lvst\u00e4ndigt arbete utanf\u00f6r skolan",
+                        "stage": "full"
+                    }
+                ]
+            },
+            "b7": {
+                "text": "Tid",
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "Ingen tidsuppfattning",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "2",
+                        "label": "B\u00f6rjar anv\u00e4nda andra konkreta referenser",
+                        "stage": "ej"
+                    },
+                    {
+                        "value": "3",
+                        "label": "Har begrepp f\u00f6r en kvart",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "4",
+                        "label": "Kan beskriva tidsl\u00e4ngd och ordningsf\u00f6rlopp",
+                        "stage": "trans"
+                    },
+                    {
+                        "value": "5",
+                        "label": "God tidsuppfattning",
+                        "stage": "full"
+                    }
+                ]
+            }
+        },
+        "comments": []
+    }
+}

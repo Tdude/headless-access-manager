@@ -1,0 +1,44 @@
+/**
+ * Styling for HAM admin list tables and filters
+ */
+
+/* Filter dropdowns */
+.ham-ajax-filter, 
+.ham-auto-filter {
+    max-width: 200px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Loading indicator */
+.ham-ajax-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(to right, #0073aa, #46b450);
+    animation: ham-loading 1.5s infinite;
+    z-index: 999;
+}
+
+/* Filter feedback messages */
+.ham-filter-feedback {
+    display: inline-block;
+    margin-left: 10px;
+    color: #0073aa;
+    font-style: italic;
+}
+
+/* Loading animation */
+@keyframes ham-loading {
+    0% { background-position: -300px 0; }
+    100% { background-position: 300px 0; }
+}
+
+/* Highlight active filters */
+.ham-ajax-filter.active-filter,
+.ham-auto-filter.active-filter {
+    border-color: #0073aa;
+    box-shadow: 0 0 0 1px #0073aa;
+}
