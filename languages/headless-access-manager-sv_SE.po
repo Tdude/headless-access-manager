@@ -1065,9 +1065,6 @@ msgstr "Instruktioner:"
 msgid "Use the Wordpress editor above to add explanatory text that will be visible publicly. Use the tabs below to configure the assessment questions (admin only)."
 msgstr "Använd WordPress-editorn ovan för att lägga till förklarande text som kommer att synas publikt. Använd flikarna nedan för att konfigurera bedömningsfrågorna (endast admin)."
 
-msgid "Question"
-msgstr "Fråga"
-
 msgid "Option"
 msgstr "Alternativ"
 
