@@ -223,14 +223,14 @@ class HAM_Principal_Meta_Boxes {
             'high'
         );
 
-        // Meta box to display assigned school(s)
+        // Meta box to assign schools
         add_meta_box(
-            'ham_principal_assigned_schools_display',
-            __('Assigned School(s)', 'headless-access-manager'),
-            [__CLASS__, 'render_assigned_schools_display_meta_box'],
+            'ham_principal_assigned_schools',
+            __('Assign Schools', 'headless-access-manager'),
+            [__CLASS__, 'render_school_assignment_meta_box'],
             HAM_CPT_PRINCIPAL,
-            'side', // Display in the side column
-            'default'
+            'normal',
+            'high'
         );
     }
 
@@ -270,7 +270,56 @@ class HAM_Principal_Meta_Boxes {
     }
 
     /**
+     * Render the meta box to assign schools to this principal.
+     *
+     * @param WP_Post $post The current Principal CPT post object.
+     */
+    public static function render_school_assignment_meta_box(WP_Post $post) {
+        wp_nonce_field('ham_principal_schools_save', 'ham_principal_schools_nonce');
+        
+        $linked_user_id = get_post_meta($post->ID, '_ham_user_id', true);
+
+        if (empty($linked_user_id)) {
+            echo '<p>' . esc_html__('Please link a user account first before assigning schools.', 'headless-access-manager') . '</p>';
+            return;
+        }
+
+        // Get all schools
+        $all_schools = get_posts([
+            'post_type' => HAM_CPT_SCHOOL,
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+            'orderby' => 'title',
+            'order' => 'ASC'
+        ]);
+
+        // Get schools where this principal is assigned
+        $assigned_school_ids = [];
+        foreach ($all_schools as $school) {
+            $school_principal_ids = get_post_meta($school->ID, '_ham_principal_ids', true);
+            if (is_array($school_principal_ids) && in_array($linked_user_id, $school_principal_ids)) {
+                $assigned_school_ids[] = $school->ID;
+            }
+        }
+
+        ?>
+        <p>
+            <label for="ham_principal_school_ids"><?php esc_html_e('Select Schools for this Principal:', 'headless-access-manager'); ?></label>
+            <select name="ham_principal_school_ids[]" id="ham_principal_school_ids" class="widefat" multiple="multiple" style="min-height: 120px;">
+                <?php foreach ($all_schools as $school) : ?>
+                    <option value="<?php echo esc_attr($school->ID); ?>" <?php selected(in_array($school->ID, $assigned_school_ids)); ?>>
+                        <?php echo esc_html($school->post_title); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </p>
+        <p class="description"><?php esc_html_e('Hold Ctrl (Windows) or Cmd (Mac) to select multiple Schools.', 'headless-access-manager'); ?></p>
+        <?php
+    }
+
+    /**
      * Render the meta box to display schools assigned to this principal (via their linked user account).
+     * DEPRECATED - keeping for reference
      *
      * @param WP_Post $post The current Principal CPT post object.
      */
@@ -349,29 +398,65 @@ class HAM_Principal_Meta_Boxes {
      * @param int $post_id The ID of the post being saved.
      */
     public static function save_meta_boxes(int $post_id) {
-        if (!isset($_POST['ham_principal_user_link_nonce']) || !wp_verify_nonce($_POST['ham_principal_user_link_nonce'], 'ham_principal_user_link_save')) {
-            return;
-        }
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
         }
-        // Check permissions: The save_post_{post_type} hook ensures this is the correct post type.
         if (!current_user_can('edit_post', $post_id)) {
             return;
         }
-        
-        // Redundant check, but harmless: Verify this is the Principal CPT.
-        // The action hook save_post_ham_principal should already ensure this.
         if (get_post_type($post_id) !== HAM_CPT_PRINCIPAL) {
             return;
         }
 
-        if (isset($_POST['ham_principal_user_id'])) {
-            $user_id = sanitize_text_field($_POST['ham_principal_user_id']);
-            if (!empty($user_id)) {
-                update_post_meta($post_id, '_ham_user_id', absint($user_id));
-            } else {
-                delete_post_meta($post_id, '_ham_user_id');
+        // Save user link
+        if (isset($_POST['ham_principal_user_link_nonce']) && wp_verify_nonce($_POST['ham_principal_user_link_nonce'], 'ham_principal_user_link_save')) {
+            if (isset($_POST['ham_principal_user_id'])) {
+                $user_id = sanitize_text_field($_POST['ham_principal_user_id']);
+                if (!empty($user_id)) {
+                    update_post_meta($post_id, '_ham_user_id', absint($user_id));
+                } else {
+                    delete_post_meta($post_id, '_ham_user_id');
+                }
+            }
+        }
+
+        // Save school assignments
+        if (isset($_POST['ham_principal_schools_nonce']) && wp_verify_nonce($_POST['ham_principal_schools_nonce'], 'ham_principal_schools_save')) {
+            $linked_user_id = get_post_meta($post_id, '_ham_user_id', true);
+            
+            if (!empty($linked_user_id)) {
+                $new_school_ids = isset($_POST['ham_principal_school_ids']) && is_array($_POST['ham_principal_school_ids']) 
+                    ? array_map('absint', $_POST['ham_principal_school_ids']) 
+                    : [];
+
+                // Get all schools to update their principal lists
+                $all_schools = get_posts([
+                    'post_type' => HAM_CPT_SCHOOL,
+                    'posts_per_page' => -1,
+                    'post_status' => 'any'
+                ]);
+
+                foreach ($all_schools as $school) {
+                    $school_principal_ids = get_post_meta($school->ID, '_ham_principal_ids', true);
+                    $school_principal_ids = is_array($school_principal_ids) ? $school_principal_ids : [];
+                    
+                    $is_currently_assigned = in_array($linked_user_id, $school_principal_ids);
+                    $should_be_assigned = in_array($school->ID, $new_school_ids);
+
+                    if ($should_be_assigned && !$is_currently_assigned) {
+                        // Add principal to school
+                        $school_principal_ids[] = $linked_user_id;
+                        update_post_meta($school->ID, '_ham_principal_ids', array_unique($school_principal_ids));
+                    } elseif (!$should_be_assigned && $is_currently_assigned) {
+                        // Remove principal from school
+                        $school_principal_ids = array_diff($school_principal_ids, [$linked_user_id]);
+                        if (empty($school_principal_ids)) {
+                            delete_post_meta($school->ID, '_ham_principal_ids');
+                        } else {
+                            update_post_meta($school->ID, '_ham_principal_ids', array_values($school_principal_ids));
+                        }
+                    }
+                }
             }
         }
     }

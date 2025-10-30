@@ -54,8 +54,7 @@ class HAM_School_Meta_Boxes {
         ?>
         <p>
             <label for="ham_principal_ids"><?php esc_html_e('Select Principals for this School:', 'headless-access-manager'); ?></label>
-            <select name="ham_principal_ids[]" id="ham_principal_ids" class="widefat" multiple="multiple" style="min-height: 90px;">
-                <option value=""><?php esc_html_e('Select Principals', 'headless-access-manager'); ?></option>
+            <select name="ham_principal_ids[]" id="ham_principal_ids" class="widefat" multiple="multiple" style="min-height: 120px;">
                 <?php foreach ($principals as $principal) : ?>
                     <option value="<?php echo esc_attr($principal->ID); ?>" <?php selected(in_array($principal->ID, $assigned_principals)); ?>>
                         <?php echo esc_html($principal->display_name); ?> (<?php echo esc_html($principal->user_email); ?>)
