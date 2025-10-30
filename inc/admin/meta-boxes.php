@@ -210,6 +210,12 @@ class HAM_Meta_Boxes
      */
     public static function enqueue_assessment_edit_scripts($hook)
     {
+        // DEPRECATED: This function is no longer used.
+        // Assessment editor assets are now enqueued in HAM_Assessment_Meta_Boxes::enqueue_admin_assets()
+        // Keeping this function for backwards compatibility but it does nothing.
+        return;
+        
+        /* OLD CODE - DO NOT USE
         global $post;
         if (($hook == 'post-new.php' || $hook == 'post.php') && isset($post->post_type) && $post->post_type === HAM_CPT_ASSESSMENT) {
             wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', [], '4.1.0-rc.0');
@@ -221,6 +227,7 @@ class HAM_Meta_Boxes
                 'placeholder' => __('Search for a student...', 'headless-access-manager'),
             ]);
         }
+        */
     }
 
     /**
