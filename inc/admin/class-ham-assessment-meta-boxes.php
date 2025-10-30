@@ -79,6 +79,13 @@ class HAM_Assessment_Meta_Boxes
         <div id="ham-assessment-editor" class="ham-assessment-editor">
             <?php wp_nonce_field('ham_save_assessment', 'ham_assessment_nonce'); ?>
             
+            <div class="ham-editor-instructions" style="background: #f0f6fc; border-left: 4px solid #2271b1; padding: 12px 16px; margin-bottom: 20px;">
+                <p style="margin: 0; color: #1d2327;">
+                    <strong><?php _e('Instructions:', 'headless-access-manager'); ?></strong>
+                    <?php _e('Use the Wordpress editor above to add explanatory text that will be visible publicly. Use the tabs below to configure the assessment questions (admin only).', 'headless-access-manager'); ?>
+                </p>
+            </div>
+            
             <script>
                 console.log('HAM: Meta box rendered');
                 console.log('HAM: Assessment data:', <?php echo wp_json_encode($assessment_data); ?>);
@@ -95,13 +102,13 @@ class HAM_Assessment_Meta_Boxes
                 <!-- Anknytning Section -->
                 <div id="anknytning-section" class="ham-section-content" data-section="anknytning">
                     <div id="anknytning-questions" class="ham-questions"></div>
-                    <button type="button" class="button ham-add-question" data-section="anknytning">Add Question</button>
+                    <button type="button" class="button ham-add-question" data-section="anknytning"><?php _e('Add Question', 'headless-access-manager'); ?></button>
                 </div>
 
                 <!-- Ansvar Section -->
                 <div id="ansvar-section" class="ham-section-content" data-section="ansvar">
                     <div id="ansvar-questions" class="ham-questions"></div>
-                    <button type="button" class="button ham-add-question" data-section="ansvar">Add Question</button>
+                    <button type="button" class="button ham-add-question" data-section="ansvar"><?php _e('Add Question', 'headless-access-manager'); ?></button>
                 </div>
             </div>
 

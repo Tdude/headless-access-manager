@@ -1056,3 +1056,41 @@ msgstr "Navigering frågelista"
 #: inc/core/post-types.php
 msgid "Questions list"
 msgstr "Frågelista"
+
+# Assessment Editor Interface
+#: inc/admin/class-ham-assessment-meta-boxes.php
+msgid "Instructions:"
+msgstr "Instruktioner:"
+
+msgid "Use the Wordpress editor above to add explanatory text that will be visible publicly. Use the tabs below to configure the assessment questions (admin only)."
+msgstr "Använd WordPress-editorn ovan för att lägga till förklarande text som kommer att synas publikt. Använd flikarna nedan för att konfigurera bedömningsfrågorna (endast admin)."
+
+msgid "Question"
+msgstr "Fråga"
+
+msgid "Option"
+msgstr "Alternativ"
+
+msgid "Delete Question"
+msgstr "Ta bort fråga"
+
+msgid "Delete Option"
+msgstr "Ta bort alternativ"
+
+msgid "Add Option"
+msgstr "Lägg till alternativ"
+
+msgid "Value"
+msgstr "Värde"
+
+msgid "Label"
+msgstr "Etikett"
+
+msgid "Not Connected"
+msgstr "Ej anknuten"
+
+msgid "Fully Connected"
+msgstr "Fullt anknuten"
+
+msgid "Add Question"
+msgstr "Lägg till fråga"
