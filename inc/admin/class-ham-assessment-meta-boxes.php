@@ -173,10 +173,10 @@ class HAM_Assessment_Meta_Boxes
             error_log("HAM: Enqueuing assessment editor assets");
             // Enqueue JS
             wp_enqueue_script(
-                'ham-assessment-editor',
+                'ham-assessment-editor-v2',
                 plugins_url('assets/js/assessment-editor.js', HAM_PLUGIN_FILE),
                 array('jquery'),
-                '1.0.3', // Incremented to bust cache
+                '1.0.4', // Incremented to bust cache
                 true
             );
 
@@ -189,7 +189,7 @@ class HAM_Assessment_Meta_Boxes
             );
 
             // Pass data to JavaScript
-            wp_localize_script('ham-assessment-editor', 'hamAssessmentEditor', array(
+            wp_localize_script('ham-assessment-editor-v2', 'hamAssessmentEditor', array(
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('ham_save_assessment'),
                 'texts' => array(
@@ -212,7 +212,7 @@ class HAM_Assessment_Meta_Boxes
             ));
             
             // Add inline script to verify enqueue
-            wp_add_inline_script('ham-assessment-editor', 'console.log("HAM: assessment-editor.js enqueued successfully");', 'before');
+            wp_add_inline_script('ham-assessment-editor-v2', 'console.log("HAM: assessment-editor.js enqueued successfully");', 'before');
         }
     }
 
