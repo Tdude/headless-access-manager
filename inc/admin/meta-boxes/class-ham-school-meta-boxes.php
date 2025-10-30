@@ -17,15 +17,8 @@ class HAM_School_Meta_Boxes {
      * Register meta boxes for the School CPT.
      */
     public static function register_meta_boxes() {
-        // Only allow users who can edit users (typically admins or school heads with specific caps)
-        if (!current_user_can('edit_users')) {
-            return;
-        }
-        
-        // Further check: current user must be admin or school head
-        // This specific capability check might need refinement based on exact plugin roles/caps
-        $user = wp_get_current_user();
-        if (!in_array(HAM_ROLE_SCHOOL_HEAD, $user->roles) && !in_array('administrator', $user->roles)) {
+        // Allow anyone who can edit schools to see the meta boxes
+        if (!current_user_can('edit_posts')) {
             return;
         }
 
