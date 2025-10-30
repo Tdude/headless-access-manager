@@ -67,6 +67,7 @@ class HAM_Principal_Admin_List_Table extends HAM_Base_Admin_List_Table {
     public function add_admin_columns($columns) {
         // Use standardized column helper for consistent naming without prefixes
         return $this->standardize_columns($columns, [
+            'linked_user' => __('Linked User', 'headless-access-manager'),
             'schools' => __('Assigned Schools', 'headless-access-manager')
         ]);
     }
@@ -93,12 +94,31 @@ class HAM_Principal_Admin_List_Table extends HAM_Base_Admin_List_Table {
         // Mark this cell as rendered
         $rendered_cells[$cell_key] = true;
         switch ($column_name) {
+            case 'linked_user':
+                // Show the linked WordPress user account
+                $linked_user_id = get_post_meta($post_id, '_ham_user_id', true);
+                
+                if (empty($linked_user_id)) {
+                    echo '<span style="color: #d63638; font-weight: 500;">⚠ ' . esc_html__('Not linked', 'headless-access-manager') . '</span>';
+                    echo '<br><small style="color: #646970;">' . esc_html__('Link a user to assign schools', 'headless-access-manager') . '</small>';
+                } else {
+                    $user = get_userdata($linked_user_id);
+                    if ($user) {
+                        $edit_user_link = get_edit_user_link($linked_user_id);
+                        echo '<a href="' . esc_url($edit_user_link) . '">' . esc_html($user->display_name) . '</a>';
+                        echo '<br><small style="color: #646970;">' . esc_html($user->user_email) . '</small>';
+                    } else {
+                        echo '<span style="color: #d63638;">⚠ ' . esc_html__('User not found', 'headless-access-manager') . '</span>';
+                    }
+                }
+                break;
+                
             case 'schools':
                 // Get the linked user ID for this principal
                 $linked_user_id = get_post_meta($post_id, '_ham_user_id', true);
                 
                 if (empty($linked_user_id)) {
-                    echo '&mdash;';
+                    echo '<span style="color: #d63638;">' . esc_html__('No user linked', 'headless-access-manager') . '</span>';
                     return;
                 }
                 
