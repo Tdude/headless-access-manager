@@ -1,0 +1,6 @@
+logs/
+.gitignore
+/vendor/
+/assets/vendor/
+*.bak
+*.code-workspace
