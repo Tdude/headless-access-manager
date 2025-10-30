@@ -136,6 +136,8 @@ class HAM_Admin_Loader
         // Hooks for other CPTs
         add_filter('manage_' . HAM_CPT_ASSESSMENT . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
         add_filter('manage_' . HAM_CPT_SCHOOL . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
+        add_filter('manage_' . HAM_CPT_SCHOOL . '_posts_columns', array(__CLASS__, 'add_school_principals_column'));
+        add_action('manage_' . HAM_CPT_SCHOOL . '_posts_custom_column', array(__CLASS__, 'render_school_principals_column'), 10, 2);
         add_filter('manage_' . HAM_CPT_TEACHER . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
         // Principal CPT columns now handled by HAM_Principal_Admin_List_Table
         add_filter('manage_' . HAM_CPT_ASSESSMENT . '_posts_columns', array(__CLASS__, 'modify_generic_cpt_columns'));
@@ -615,6 +617,65 @@ class HAM_Admin_Loader
              $new_columns['ham_class_assigned_teachers'] = __('Assigned Teachers', 'headless-access-manager');
         }
         return $new_columns;
+    }
+
+    /**
+     * Adds the 'Principals' column to the School CPT list table.
+     *
+     * @param array $columns Existing columns.
+     * @return array Modified columns.
+     */
+    public static function add_school_principals_column($columns) {
+        $new_columns = [];
+        $inserted = false;
+        foreach ($columns as $key => $value) {
+            $new_columns[$key] = $value;
+            if ($key === 'title') { // Insert after the 'title' column
+                $new_columns['ham_school_principals'] = __('Principals', 'headless-access-manager');
+                $inserted = true;
+            }
+        }
+        if (!$inserted) { // Fallback if 'title' not found
+             $new_columns['ham_school_principals'] = __('Principals', 'headless-access-manager');
+        }
+        return $new_columns;
+    }
+
+    /**
+     * Renders the 'Principals' column content for the School CPT list table.
+     *
+     * @param string $column_name Name of the column.
+     * @param int $post_id Post ID.
+     */
+    public static function render_school_principals_column($column_name, $post_id) {
+        if ($column_name === 'ham_school_principals') {
+            // Get all principals assigned to this school
+            $principals = get_posts([
+                'post_type' => HAM_CPT_PRINCIPAL,
+                'posts_per_page' => -1,
+                'post_status' => 'publish',
+                'meta_query' => [
+                    [
+                        'key' => '_ham_school_id',
+                        'value' => $post_id,
+                        'compare' => '='
+                    ]
+                ]
+            ]);
+
+            if (!empty($principals)) {
+                $principal_links = [];
+                foreach ($principals as $principal) {
+                    $edit_link = get_edit_post_link($principal->ID);
+                    $principal_links[] = $edit_link 
+                        ? '<a href="' . esc_url($edit_link) . '">' . esc_html($principal->post_title) . '</a>' 
+                        : esc_html($principal->post_title);
+                }
+                echo implode(', ', $principal_links);
+            } else {
+                echo '<span style="color: #999;">' . esc_html__('No principals assigned', 'headless-access-manager') . '</span>';
+            }
+        }
     }
 
     /**

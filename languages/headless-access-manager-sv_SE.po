@@ -1091,3 +1091,7 @@ msgstr "Fullt anknuten"
 
 msgid "Add Question"
 msgstr "Lägg till fråga"
+
+# School List Table
+msgid "No principals assigned"
+msgstr "Inga rektorer tilldelade"
