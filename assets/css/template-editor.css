@@ -140,42 +140,43 @@
  */
 
 :root {
-    /* Student Colors (Pale Red) */
-    --ham-student-header-bg: hsl(0, 80%, 92%);
-    --ham-student-bg-tint: hsla(0, 80%, 92%, 0.2);
-    --ham-student-accent: hsl(0, 75%, 80%);
-    --ham-student-text-color: #502020;
+    /* Rainbow Colors - ROYGBIV Order */
+    
+    /* Student Colors - Red */
+    --ham-student-header-bg: hsl(0, 85%, 90%);
+    --ham-student-bg-tint: hsla(0, 85%, 90%, 0.25);
+    --ham-student-accent: hsl(0, 80%, 75%);
+    --ham-student-text-color: #5a1a1a;
 
-    /* Teacher Colors (Pale Orange) */
-    --ham-teacher-header-bg: hsl(30, 85%, 92%);
-    --ham-teacher-bg-tint: hsla(30, 85%, 92%, 0.2);
-    --ham-teacher-accent: hsl(30, 80%, 80%);
+    /* Teacher Colors - Orange */
+    --ham-teacher-header-bg: hsl(30, 90%, 88%);
+    --ham-teacher-bg-tint: hsla(30, 90%, 88%, 0.25);
+    --ham-teacher-accent: hsl(30, 85%, 72%);
     --ham-teacher-text-color: #5d3a1a;
 
-    /* Class Colors (Pale Yellow) */
-    --ham-class-header-bg: hsl(55, 85%, 92%);
-    --ham-class-bg-tint: hsla(55, 85%, 92%, 0.2);
-    --ham-class-accent: hsl(55, 80%, 80%);
-    --ham-class-text-color: #504a1f;
+    /* Class Colors - Yellow */
+    --ham-class-header-bg: hsl(50, 95%, 88%);
+    --ham-class-bg-tint: hsla(50, 95%, 88%, 0.25);
+    --ham-class-accent: hsl(50, 90%, 70%);
+    --ham-class-text-color: #5a5020;
 
-    /* School Colors (Pale Green) */
-    --ham-school-header-bg: hsl(130, 70%, 92%);
-    --ham-school-bg-tint: hsla(130, 70%, 92%, 0.2);
-    --ham-school-accent: hsl(130, 60%, 80%);
-    --ham-school-text-color: #2a4b34;
+    /* School Colors - Green */
+    --ham-school-header-bg: hsl(120, 75%, 88%);
+    --ham-school-bg-tint: hsla(120, 75%, 88%, 0.25);
+    --ham-school-accent: hsl(120, 70%, 72%);
+    --ham-school-text-color: #1a4a1a;
 
-    /* Principal Colors (Pale Teal/Cyan) */
-    --ham-principal-header-bg: hsl(180, 70%, 92%);
-    --ham-principal-bg-tint: hsla(180, 70%, 92%, 0.2);
-    --ham-principal-accent: hsl(180, 60%, 80%);
-    --ham-principal-text-color: #1f4c4c;
+    /* Principal Colors - Blue */
+    --ham-principal-header-bg: hsl(210, 85%, 90%);
+    --ham-principal-bg-tint: hsla(210, 85%, 90%, 0.25);
+    --ham-principal-accent: hsl(210, 80%, 75%);
+    --ham-principal-text-color: #1a3a5a;
 
-    /* School Head Colors (Pale Blue) */
-    --ham-school-head-header-bg: hsl(220, 80%, 92%);
-    --ham-school-head-bg-tint: hsla(220, 80%, 92%, 0.2);
-    --ham-school-head-accent: hsl(220, 75%, 80%);
-    --ham-school-head-text-color: #2c3b5e;
-
+    /* School Head Colors - Violet */
+    --ham-school-head-header-bg: hsl(270, 75%, 90%);
+    --ham-school-head-bg-tint: hsla(270, 75%, 90%, 0.25);
+    --ham-school-head-accent: hsl(270, 70%, 75%);
+    --ham-school-head-text-color: #3a1a5a;
 
     --ham-general-header-text-color: #2c3338;
 }
