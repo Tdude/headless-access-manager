@@ -34,7 +34,7 @@ class HAM_School_Meta_Boxes {
             __('Assign Principals', 'headless-access-manager'),
             [__CLASS__, 'render_principal_assignment_meta_box'],
             HAM_CPT_SCHOOL, // Ensure HAM_CPT_SCHOOL constant is defined and correct
-            'side',
+            'normal',
             'high'
         );
 
