@@ -172,7 +172,7 @@ class HAM_Assessment_Meta_Boxes
                 'ham-assessment-editor',
                 plugins_url('assets/js/assessment-editor.js', HAM_PLUGIN_FILE),
                 array('jquery'),
-                '1.0.2', // Incremented to bust cache
+                '1.0.3', // Incremented to bust cache
                 true
             );
 
