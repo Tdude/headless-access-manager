@@ -131,6 +131,41 @@ class HAM_Assessment_Templates_Admin
     }
 
     /**
+     * Enqueue admin scripts and styles.
+     *
+     * @param string $hook Current admin page.
+     */
+    public function enqueue_admin_assets($hook)
+    {
+        // Only enqueue on template edit screen
+        global $post;
+        if ($hook !== 'post.php' && $hook !== 'post-new.php') {
+            return;
+        }
+
+        if (!$post || get_post_type($post->ID) !== 'ham_assessment_tpl') {
+            return;
+        }
+
+        // Enqueue CSS
+        wp_enqueue_style(
+            'ham-template-editor',
+            plugins_url('assets/css/template-editor.css', HAM_PLUGIN_FILE),
+            array(),
+            HAM_VERSION
+        );
+
+        // Enqueue JavaScript
+        wp_enqueue_script(
+            'ham-template-editor',
+            plugins_url('assets/js/template-editor.js', HAM_PLUGIN_FILE),
+            array('jquery', 'jquery-ui-sortable'),
+            HAM_VERSION,
+            true
+        );
+    }
+
+    /**
      * Get default template structure.
      *
      * @return array Default structure.
