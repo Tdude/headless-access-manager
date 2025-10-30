@@ -160,16 +160,19 @@ class HAM_Assessment_Meta_Boxes
      */
     public function enqueue_admin_assets($hook)
     {
-        global $post;
+        global $post, $typenow;
 
         // Only enqueue on post edit/new screen for our post type
-        if (($hook == 'post.php' || $hook == 'post-new.php') && $post && get_post_type($post->ID) === HAM_CPT_ASSESSMENT) {
+        // Use $typenow for new posts, get_post_type() for existing posts
+        $current_post_type = $typenow ? $typenow : ($post ? get_post_type($post->ID) : '');
+        
+        if (($hook == 'post.php' || $hook == 'post-new.php') && $current_post_type === HAM_CPT_ASSESSMENT) {
             // Enqueue JS
             wp_enqueue_script(
                 'ham-assessment-editor',
                 plugins_url('assets/js/assessment-editor.js', HAM_PLUGIN_FILE),
                 array('jquery'),
-                '1.0.1', // Incremented to bust cache
+                '1.0.2', // Incremented to bust cache
                 true
             );
 
@@ -178,7 +181,7 @@ class HAM_Assessment_Meta_Boxes
                 'ham-assessment-editor',
                 plugins_url('assets/css/assessment-editor.css', HAM_PLUGIN_FILE),
                 array(),
-                '1.0.1' // Incremented to bust cache
+                '1.0.2' // Incremented to bust cache
             );
 
             // Pass data to JavaScript
@@ -200,8 +203,12 @@ class HAM_Assessment_Meta_Boxes
                     'trans' => __('In Transition', 'headless-access-manager'),
                     'full'  => __('Fully Connected', 'headless-access-manager'),
                 ),
-                'defaultOptionsCount' => 5
+                'defaultOptionsCount' => 5,
+                'debug' => true // Enable debug mode
             ));
+            
+            // Add inline script to verify enqueue
+            wp_add_inline_script('ham-assessment-editor', 'console.log("HAM: assessment-editor.js enqueued successfully");', 'before');
         }
     }
 
