@@ -53,11 +53,13 @@
     background-color: rgba(76, 175, 80, 0.15) !important;
     border-bottom: 2px solid rgba(76, 175, 80, 0.3);
 }
-.post-type-ham_student .wp-list-table tbody tr {
-    background-color: rgba(76, 175, 80, 0.02);
+.post-type-ham_student .wp-list-table tbody tr,
+.post-type-ham_student .wp-list-table tbody tr:nth-child(odd) {
+    background-color: rgba(76, 175, 80, 0.02) !important;
 }
-.post-type-ham_student .wp-list-table tbody tr.alternate {
-    background-color: rgba(76, 175, 80, 0.05);
+.post-type-ham_student .wp-list-table tbody tr.alternate,
+.post-type-ham_student .wp-list-table tbody tr:nth-child(even) {
+    background-color: rgba(76, 175, 80, 0.05) !important;
 }
 .post-type-ham_student .wp-list-table tbody tr:hover {
     background-color: rgba(76, 175, 80, 0.08) !important;
@@ -72,11 +74,13 @@
     background-color: rgba(33, 150, 243, 0.15) !important;
     border-bottom: 2px solid rgba(33, 150, 243, 0.3);
 }
-.post-type-ham_teacher .wp-list-table tbody tr {
-    background-color: rgba(33, 150, 243, 0.02);
+.post-type-ham_teacher .wp-list-table tbody tr,
+.post-type-ham_teacher .wp-list-table tbody tr:nth-child(odd) {
+    background-color: rgba(33, 150, 243, 0.02) !important;
 }
-.post-type-ham_teacher .wp-list-table tbody tr.alternate {
-    background-color: rgba(33, 150, 243, 0.05);
+.post-type-ham_teacher .wp-list-table tbody tr.alternate,
+.post-type-ham_teacher .wp-list-table tbody tr:nth-child(even) {
+    background-color: rgba(33, 150, 243, 0.05) !important;
 }
 .post-type-ham_teacher .wp-list-table tbody tr:hover {
     background-color: rgba(33, 150, 243, 0.08) !important;
@@ -91,11 +95,13 @@
     background-color: rgba(103, 58, 183, 0.15) !important;
     border-bottom: 2px solid rgba(103, 58, 183, 0.3);
 }
-.post-type-ham_class .wp-list-table tbody tr {
-    background-color: rgba(103, 58, 183, 0.02);
+.post-type-ham_class .wp-list-table tbody tr,
+.post-type-ham_class .wp-list-table tbody tr:nth-child(odd) {
+    background-color: rgba(103, 58, 183, 0.02) !important;
 }
-.post-type-ham_class .wp-list-table tbody tr.alternate {
-    background-color: rgba(103, 58, 183, 0.05);
+.post-type-ham_class .wp-list-table tbody tr.alternate,
+.post-type-ham_class .wp-list-table tbody tr:nth-child(even) {
+    background-color: rgba(103, 58, 183, 0.05) !important;
 }
 .post-type-ham_class .wp-list-table tbody tr:hover {
     background-color: rgba(103, 58, 183, 0.08) !important;
@@ -110,11 +116,13 @@
     background-color: rgba(156, 39, 176, 0.15) !important;
     border-bottom: 2px solid rgba(156, 39, 176, 0.3);
 }
-.post-type-ham_principal .wp-list-table tbody tr {
-    background-color: rgba(156, 39, 176, 0.02);
+.post-type-ham_principal .wp-list-table tbody tr,
+.post-type-ham_principal .wp-list-table tbody tr:nth-child(odd) {
+    background-color: rgba(156, 39, 176, 0.02) !important;
 }
-.post-type-ham_principal .wp-list-table tbody tr.alternate {
-    background-color: rgba(156, 39, 176, 0.05);
+.post-type-ham_principal .wp-list-table tbody tr.alternate,
+.post-type-ham_principal .wp-list-table tbody tr:nth-child(even) {
+    background-color: rgba(156, 39, 176, 0.05) !important;
 }
 .post-type-ham_principal .wp-list-table tbody tr:hover {
     background-color: rgba(156, 39, 176, 0.08) !important;
@@ -129,11 +137,13 @@
     background-color: rgba(255, 152, 0, 0.15) !important;
     border-bottom: 2px solid rgba(255, 152, 0, 0.3);
 }
-.post-type-ham_school .wp-list-table tbody tr {
-    background-color: rgba(255, 152, 0, 0.02);
+.post-type-ham_school .wp-list-table tbody tr,
+.post-type-ham_school .wp-list-table tbody tr:nth-child(odd) {
+    background-color: rgba(255, 152, 0, 0.02) !important;
 }
-.post-type-ham_school .wp-list-table tbody tr.alternate {
-    background-color: rgba(255, 152, 0, 0.05);
+.post-type-ham_school .wp-list-table tbody tr.alternate,
+.post-type-ham_school .wp-list-table tbody tr:nth-child(even) {
+    background-color: rgba(255, 152, 0, 0.05) !important;
 }
 .post-type-ham_school .wp-list-table tbody tr:hover {
     background-color: rgba(255, 152, 0, 0.08) !important;
@@ -148,11 +158,13 @@
     background-color: rgba(244, 67, 54, 0.15) !important;
     border-bottom: 2px solid rgba(244, 67, 54, 0.3);
 }
-.post-type-ham_school_head .wp-list-table tbody tr {
-    background-color: rgba(244, 67, 54, 0.02);
+.post-type-ham_school_head .wp-list-table tbody tr,
+.post-type-ham_school_head .wp-list-table tbody tr:nth-child(odd) {
+    background-color: rgba(244, 67, 54, 0.02) !important;
 }
-.post-type-ham_school_head .wp-list-table tbody tr.alternate {
-    background-color: rgba(244, 67, 54, 0.05);
+.post-type-ham_school_head .wp-list-table tbody tr.alternate,
+.post-type-ham_school_head .wp-list-table tbody tr:nth-child(even) {
+    background-color: rgba(244, 67, 54, 0.05) !important;
 }
 .post-type-ham_school_head .wp-list-table tbody tr:hover {
     background-color: rgba(244, 67, 54, 0.08) !important;
