@@ -166,7 +166,11 @@ class HAM_Assessment_Meta_Boxes
         // Use $typenow for new posts, get_post_type() for existing posts
         $current_post_type = $typenow ? $typenow : ($post ? get_post_type($post->ID) : '');
         
+        // Debug: Log what we're checking
+        error_log("HAM Enqueue Check - Hook: $hook, Typenow: $typenow, Post Type: $current_post_type, Expected: " . HAM_CPT_ASSESSMENT);
+        
         if (($hook == 'post.php' || $hook == 'post-new.php') && $current_post_type === HAM_CPT_ASSESSMENT) {
+            error_log("HAM: Enqueuing assessment editor assets");
             // Enqueue JS
             wp_enqueue_script(
                 'ham-assessment-editor',
