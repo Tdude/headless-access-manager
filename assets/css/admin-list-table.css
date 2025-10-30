@@ -52,8 +52,14 @@
 .post-type-ham_student .wp-list-table tfoot {
     background-color: rgba(76, 175, 80, 0.08);
 }
+.post-type-ham_student .wp-list-table tbody tr {
+    background-color: rgba(76, 175, 80, 0.02);
+}
+.post-type-ham_student .wp-list-table tbody tr.alternate {
+    background-color: rgba(76, 175, 80, 0.05);
+}
 .post-type-ham_student .wp-list-table tbody tr:hover {
-    background-color: rgba(76, 175, 80, 0.03);
+    background-color: rgba(76, 175, 80, 0.08) !important;
 }
 
 /* Teachers - Blue */
@@ -64,8 +70,14 @@
 .post-type-ham_teacher .wp-list-table tfoot {
     background-color: rgba(33, 150, 243, 0.08);
 }
+.post-type-ham_teacher .wp-list-table tbody tr {
+    background-color: rgba(33, 150, 243, 0.02);
+}
+.post-type-ham_teacher .wp-list-table tbody tr.alternate {
+    background-color: rgba(33, 150, 243, 0.05);
+}
 .post-type-ham_teacher .wp-list-table tbody tr:hover {
-    background-color: rgba(33, 150, 243, 0.03);
+    background-color: rgba(33, 150, 243, 0.08) !important;
 }
 
 /* Classes - Indigo */
@@ -76,8 +88,14 @@
 .post-type-ham_class .wp-list-table tfoot {
     background-color: rgba(103, 58, 183, 0.08);
 }
+.post-type-ham_class .wp-list-table tbody tr {
+    background-color: rgba(103, 58, 183, 0.02);
+}
+.post-type-ham_class .wp-list-table tbody tr.alternate {
+    background-color: rgba(103, 58, 183, 0.05);
+}
 .post-type-ham_class .wp-list-table tbody tr:hover {
-    background-color: rgba(103, 58, 183, 0.03);
+    background-color: rgba(103, 58, 183, 0.08) !important;
 }
 
 /* Principals - Purple */
@@ -88,8 +106,14 @@
 .post-type-ham_principal .wp-list-table tfoot {
     background-color: rgba(156, 39, 176, 0.08);
 }
+.post-type-ham_principal .wp-list-table tbody tr {
+    background-color: rgba(156, 39, 176, 0.02);
+}
+.post-type-ham_principal .wp-list-table tbody tr.alternate {
+    background-color: rgba(156, 39, 176, 0.05);
+}
 .post-type-ham_principal .wp-list-table tbody tr:hover {
-    background-color: rgba(156, 39, 176, 0.03);
+    background-color: rgba(156, 39, 176, 0.08) !important;
 }
 
 /* Schools - Orange */
@@ -100,8 +124,14 @@
 .post-type-ham_school .wp-list-table tfoot {
     background-color: rgba(255, 152, 0, 0.08);
 }
+.post-type-ham_school .wp-list-table tbody tr {
+    background-color: rgba(255, 152, 0, 0.02);
+}
+.post-type-ham_school .wp-list-table tbody tr.alternate {
+    background-color: rgba(255, 152, 0, 0.05);
+}
 .post-type-ham_school .wp-list-table tbody tr:hover {
-    background-color: rgba(255, 152, 0, 0.03);
+    background-color: rgba(255, 152, 0, 0.08) !important;
 }
 
 /* School Heads - Red */
@@ -112,6 +142,12 @@
 .post-type-ham_school_head .wp-list-table tfoot {
     background-color: rgba(244, 67, 54, 0.08);
 }
+.post-type-ham_school_head .wp-list-table tbody tr {
+    background-color: rgba(244, 67, 54, 0.02);
+}
+.post-type-ham_school_head .wp-list-table tbody tr.alternate {
+    background-color: rgba(244, 67, 54, 0.05);
+}
 .post-type-ham_school_head .wp-list-table tbody tr:hover {
-    background-color: rgba(244, 67, 54, 0.03);
+    background-color: rgba(244, 67, 54, 0.08) !important;
 }
