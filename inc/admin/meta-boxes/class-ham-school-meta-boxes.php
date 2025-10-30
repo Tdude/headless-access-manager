@@ -17,11 +17,7 @@ class HAM_School_Meta_Boxes {
      * Register meta boxes for the School CPT.
      */
     public static function register_meta_boxes() {
-        // Allow anyone who can edit schools to see the meta boxes
-        if (!current_user_can('edit_posts')) {
-            return;
-        }
-
+        // Meta boxes for school - no permission check, WordPress handles it
         add_meta_box(
             'ham_school_principals',
             __('Assign Principals', 'headless-access-manager'),
