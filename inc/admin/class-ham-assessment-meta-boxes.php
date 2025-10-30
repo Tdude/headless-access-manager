@@ -78,6 +78,11 @@ class HAM_Assessment_Meta_Boxes
 
         <div id="ham-assessment-editor" class="ham-assessment-editor">
             <?php wp_nonce_field('ham_save_assessment', 'ham_assessment_nonce'); ?>
+            
+            <script>
+                console.log('HAM: Meta box rendered');
+                console.log('HAM: Assessment data:', <?php echo wp_json_encode($assessment_data); ?>);
+            </script>
 
             <!-- Tabs -->
             <div class="ham-section-tabs">
@@ -157,14 +162,14 @@ class HAM_Assessment_Meta_Boxes
     {
         global $post;
 
-        // Only enqueue on post edit screen for our post type
-        if ($hook == 'post.php' && $post && get_post_type($post->ID) === HAM_CPT_ASSESSMENT) {
+        // Only enqueue on post edit/new screen for our post type
+        if (($hook == 'post.php' || $hook == 'post-new.php') && $post && get_post_type($post->ID) === HAM_CPT_ASSESSMENT) {
             // Enqueue JS
             wp_enqueue_script(
                 'ham-assessment-editor',
                 plugins_url('assets/js/assessment-editor.js', HAM_PLUGIN_FILE),
                 array('jquery'),
-                '1.0.0',
+                '1.0.1', // Incremented to bust cache
                 true
             );
 
@@ -173,7 +178,7 @@ class HAM_Assessment_Meta_Boxes
                 'ham-assessment-editor',
                 plugins_url('assets/css/assessment-editor.css', HAM_PLUGIN_FILE),
                 array(),
-                '1.0.0'
+                '1.0.1' // Incremented to bust cache
             );
 
             // Pass data to JavaScript
