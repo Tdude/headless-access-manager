@@ -133,7 +133,7 @@ class HAM_Class_Admin_List_Table extends HAM_Base_Admin_List_Table {
         $this->current_teacher_filter_id = intval($value);
         
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Teacher filter active for teacher ID: ' . $this->current_teacher_filter_id);
+            //error_log('Teacher filter active for teacher ID: ' . $this->current_teacher_filter_id);
         }
         
         // We don't use a regular meta query here since the relationship is stored in teacher posts
@@ -218,14 +218,14 @@ class HAM_Class_Admin_List_Table extends HAM_Base_Admin_List_Table {
                 $where .= " AND {$wpdb->posts}.ID IN ($class_ids_string)";
                 
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log("Filtered classes by teacher ID {$teacher_id}: Found " . count($teacher_class_ids) . " classes");
+                    //error_log("Filtered classes by teacher ID {$teacher_id}: Found " . count($teacher_class_ids) . " classes");
                 }
             } else {
                 // No classes assigned to this teacher, return no results
                 $where .= " AND 1=0";
                 
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log("Filtered classes by teacher ID {$teacher_id}: No classes found");
+                    //error_log("Filtered classes by teacher ID {$teacher_id}: No classes found");
                 }
             }
         }
@@ -262,7 +262,7 @@ class HAM_Class_Admin_List_Table extends HAM_Base_Admin_List_Table {
         // Skip if we've already rendered this cell (happens during AJAX filtering)
         if (defined('DOING_AJAX') && DOING_AJAX && isset($rendered_cells[$cell_key])) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("HAM CLASS TABLE: Skipping duplicate render for {$column_name} cell on post {$post_id}");
+                //error_log("HAM CLASS TABLE: Skipping duplicate render for {$column_name} cell on post {$post_id}");
             }
             return;
         }

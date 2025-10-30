@@ -116,7 +116,7 @@ class HAM_Ajax_Handlers {
             // Clear any unexpected output before checking the result
             $output = ob_get_clean();
             if (!empty($output) && defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('HAM AJAX FILTER UNEXPECTED OUTPUT: ' . $output);
+                //error_log('HAM AJAX FILTER UNEXPECTED OUTPUT: ' . $output);
             }
             
             // Only proceed with response if we have valid HTML
@@ -130,9 +130,9 @@ class HAM_Ajax_Handlers {
             
             // Success - send the HTML response
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("HAM AJAX FILTER SUCCESS: Sending response for {$post_type} with table HTML length: " . strlen($table_html));
-                error_log("HAM AJAX FILTER HTML SAMPLE: " . substr($table_html, 0, 100) . '...');
-                error_log('====== HAM AJAX FILTER REQUEST END ======');
+                //error_log("HAM AJAX FILTER SUCCESS: Sending response for {$post_type} with table HTML length: " . strlen($table_html));
+                //error_log("HAM AJAX FILTER HTML SAMPLE: " . substr($table_html, 0, 100) . '...');
+                //error_log('====== HAM AJAX FILTER REQUEST END ======');
             }
             
             wp_send_json_success($table_html);
@@ -181,7 +181,7 @@ class HAM_Ajax_Handlers {
         global $wp_filter;
         
         if (isset($wp_filter["ham_render_filtered_{$post_type}_table"])) {
-            error_log("HAM AJAX: Found registered action: ham_render_filtered_{$post_type}_table");
+            //error_log("HAM AJAX: Found registered action: ham_render_filtered_{$post_type}_table");
             
             // Get the actual callbacks registered
             $callbacks_found = 0;
@@ -191,12 +191,12 @@ class HAM_Ajax_Handlers {
                     if ($callbacks_found === 1) { // Only log the first callback
                         if (is_array($callback['function'])) {
                             if (is_object($callback['function'][0])) {
-                                error_log("HAM AJAX: Callback registered: " . get_class($callback['function'][0]) . '->' . $callback['function'][1]);
+                                //error_log("HAM AJAX: Callback registered: " . get_class($callback['function'][0]) . '->' . $callback['function'][1]);
                             } else {
-                                error_log("HAM AJAX: Callback registered: " . (is_string($callback['function'][0]) ? $callback['function'][0] : 'Unknown') . '::' . $callback['function'][1]);
+                                //error_log("HAM AJAX: Callback registered: " . (is_string($callback['function'][0]) ? $callback['function'][0] : 'Unknown') . '::' . $callback['function'][1]);
                             }
                         } else {
-                            error_log("HAM AJAX: Callback registered: " . (is_string($callback['function']) ? $callback['function'] : 'Unknown function'));
+                            //error_log("HAM AJAX: Callback registered: " . (is_string($callback['function']) ? $callback['function'] : 'Unknown function'));
                         }
                     }
                 }
@@ -207,14 +207,14 @@ class HAM_Ajax_Handlers {
         
         // Check if the admin list table class exists
         $class_name = 'HAM_' . ucfirst($post_type) . '_Admin_List_Table';
-        error_log("HAM AJAX: Checking for class: {$class_name}");
+        //error_log("HAM AJAX: Checking for class: {$class_name}");
         
         if (class_exists($class_name)) {
-            error_log("HAM AJAX: Class {$class_name} exists");
+            //error_log("HAM AJAX: Class {$class_name} exists");
             
             // Check if render_filtered_table method exists
             if (method_exists($class_name, 'render_filtered_table')) {
-                error_log("HAM AJAX: render_filtered_table method exists in {$class_name}");
+                //error_log("HAM AJAX: render_filtered_table method exists in {$class_name}");
             } else {
                 error_log("HAM AJAX FILTER ERROR: render_filtered_table method MISSING in {$class_name}");
             }

@@ -83,10 +83,11 @@ class HAM_Student_Controller extends HAM_Base_Controller
         $search_term = sanitize_text_field($request->get_param('search_term'));
         $class_id = $request->get_param('class_id') ? absint($request->get_param('class_id')) : null;
         
-        error_log("HAM Student Search - Request: search term = '{$search_term}', class filter = " . ($class_id ? $class_id : 'none'));
+        //error_log("HAM Student Search - Request: search term = '{$search_term}', class filter = " . ($class_id ? $class_id : 'none'));
         
         $current_user_id = get_current_user_id();
         if (!$current_user_id) {
+            // Only log actual security issues
             error_log("HAM Student Search - Error: User not logged in");
             return new WP_Error('ham_not_logged_in', __('You must be logged in to search students.', 'headless-access-manager'), ['status' => 401]);
         }
@@ -97,6 +98,7 @@ class HAM_Student_Controller extends HAM_Base_Controller
         // Check if user is teacher or admin
         $is_admin = current_user_can('administrator');
         if (!$teacher_cpt_id && !$is_admin) {
+            // Only log actual security issues
             error_log("HAM Student Search - Error: User is not a teacher or admin");
             return new WP_Error('ham_not_teacher', __('You must be a teacher or administrator to search students.', 'headless-access-manager'), ['status' => 403]);
         }
@@ -110,45 +112,46 @@ class HAM_Student_Controller extends HAM_Base_Controller
         if ($teacher_cpt_id) {
             $assigned_class_ids = get_post_meta($teacher_cpt_id, '_ham_class_ids', true);
             $assigned_class_ids = is_array($assigned_class_ids) ? array_filter(array_map('intval', $assigned_class_ids)) : [];
-            error_log("HAM Student Search - Teacher assigned class IDs: " . json_encode($assigned_class_ids));
+            //error_log("HAM Student Search - Teacher assigned class IDs: " . json_encode($assigned_class_ids));
             
             $assigned_school_id = get_post_meta($teacher_cpt_id, '_ham_school_id', true);
             $assigned_school_id = !empty($assigned_school_id) ? intval($assigned_school_id) : null;
-            error_log("HAM Student Search - Teacher assigned school ID: " . ($assigned_school_id ? $assigned_school_id : 'none'));
+            //error_log("HAM Student Search - Teacher assigned school ID: " . ($assigned_school_id ? $assigned_school_id : 'none'));
             
             // If specific class filter is provided, check if teacher has access to it
             if ($class_id && !in_array($class_id, $assigned_class_ids) && !$is_admin) {
+                // Only log actual security issues
                 error_log("HAM Student Search - Error: Teacher does not have access to specified class ID: {$class_id}");
                 return new WP_Error('ham_unauthorized_class', __('You do not have permission to access this class.', 'headless-access-manager'), ['status' => 403]);
             }
         } else {
             // Admin can see all students, no filter needed
-            error_log("HAM Student Search - Admin user, no class filters needed");
+            //error_log("HAM Student Search - Admin user, no class filters needed");
         }
         
         // Get student IDs based on class filter or teacher assignments
         if ($class_id) {
             // If specific class filter is used
-            error_log("HAM Student Search - Using specific class filter: {$class_id}");
+            //error_log("HAM Student Search - Using specific class filter: {$class_id}");
             $students_in_class = get_post_meta($class_id, '_ham_student_ids', true);
             if (is_array($students_in_class) && !empty($students_in_class)) {
                 $accessible_student_ids = $students_in_class;
-                error_log("HAM Student Search - Students in filtered class: " . json_encode($accessible_student_ids));
+                //error_log("HAM Student Search - Students in filtered class: " . json_encode($accessible_student_ids));
             } else {
-                error_log("HAM Student Search - No students found in filtered class or invalid meta");
+                //error_log("HAM Student Search - No students found in filtered class or invalid meta");
                 return new WP_REST_Response([], 200); // No students in this class
             }
         } else if (!$is_admin && !empty($assigned_class_ids)) {
             // Get all students from teacher's assigned classes
-            error_log("HAM Student Search - Looking for students in all assigned classes");
+            //error_log("HAM Student Search - Looking for students in all assigned classes");
             foreach ($assigned_class_ids as $class_id) {
                 $students_in_class = get_post_meta($class_id, '_ham_student_ids', true);
-                error_log("HAM Student Search - Class ID {$class_id} has students: " . json_encode($students_in_class));
+                //error_log("HAM Student Search - Class ID {$class_id} has students: " . json_encode($students_in_class));
                 if (is_array($students_in_class) && !empty($students_in_class)) {
                     $accessible_student_ids = array_merge($accessible_student_ids, $students_in_class);
                 }
             }
-            error_log("HAM Student Search - All accessible student IDs before filtering: " . json_encode($accessible_student_ids));
+            //error_log("HAM Student Search - All accessible student IDs before filtering: " . json_encode($accessible_student_ids));
             
             // No students found in assigned classes
             if (empty($accessible_student_ids) && $assigned_school_id) {
@@ -168,14 +171,14 @@ class HAM_Student_Controller extends HAM_Base_Controller
                 
                 if ($school_students_query->have_posts()) {
                     $accessible_student_ids = $school_students_query->posts;
-                    error_log("HAM Student Search - Found students by school: " . json_encode($accessible_student_ids));
+                    //error_log("HAM Student Search - Found students by school: " . json_encode($accessible_student_ids));
                 }
                 wp_reset_postdata();
             }
             
             // Still no students found
             if (empty($accessible_student_ids) && !$is_admin) {
-                error_log("HAM Student Search - No accessible students found for teacher");
+                //error_log("HAM Student Search - No accessible students found for teacher");
                 return new WP_REST_Response([], 200); // No accessible students
             }
         }
@@ -183,7 +186,7 @@ class HAM_Student_Controller extends HAM_Base_Controller
         // Clean up student IDs
         if (!empty($accessible_student_ids)) {
             $accessible_student_ids = array_unique(array_filter(array_map('intval', $accessible_student_ids)));
-            error_log("HAM Student Search - Filtered student IDs: " . json_encode($accessible_student_ids));
+            //error_log("HAM Student Search - Filtered student IDs: " . json_encode($accessible_student_ids));
         }
         
         // Now perform the search
@@ -191,7 +194,7 @@ class HAM_Student_Controller extends HAM_Base_Controller
         
         // Hard-code the student post type for absolute certainty
         $student_post_type = 'ham_student';
-        error_log("HAM Student Search - Hard-coded post type: {$student_post_type}");
+        //error_log("HAM Student Search - Hard-coded post type: {$student_post_type}");
         
         // Build the WP_Query with explicit post type
         $query_args = [
@@ -224,7 +227,7 @@ class HAM_Student_Controller extends HAM_Base_Controller
             }, 10, 2);
         }
         
-        error_log("HAM Student Search - Final query args: " . json_encode($query_args));
+        //error_log("HAM Student Search - Final query args: " . json_encode($query_args));
         $student_query = new WP_Query($query_args);
         
         // Remove the filter after the query
@@ -232,7 +235,7 @@ class HAM_Student_Controller extends HAM_Base_Controller
             remove_all_filters('posts_where');
         }
         
-        error_log("HAM Student Search - Found {$student_query->post_count} results");
+        //error_log("HAM Student Search - Found {$student_query->post_count} results");
         
         if ($student_query->have_posts()) {
             while ($student_query->have_posts()) {
@@ -245,14 +248,14 @@ class HAM_Student_Controller extends HAM_Base_Controller
                 
                 // Skip non-student posts (safety check)
                 if ($post_type !== HAM_CPT_STUDENT) {
-                    error_log("HAM Student Search - WARNING: Skipping non-student post: ID {$student_id}, post_type {$post_type}");
+                    //error_log("HAM Student Search - WARNING: Skipping non-student post: ID {$student_id}, post_type {$post_type}");
                     continue;
                 }
                 
                 // Get class information for this student
                 $class_info = self::get_student_class_info($student_id);
                 
-                error_log("HAM Student Search - Adding student: ID {$student_id}, name '{$student_title}', class name '" . ($class_info ? $class_info['name'] : 'Unknown') . "'");
+                //error_log("HAM Student Search - Adding student: ID {$student_id}, name '{$student_title}', class name '" . ($class_info ? $class_info['name'] : 'Unknown') . "'");
                 
                 $results[] = [
                     'id'   => $student_id,
@@ -380,14 +383,14 @@ class HAM_Student_Controller extends HAM_Base_Controller
      */
     public static function get_student_class_info($student_id) {
         // Debug log for troubleshooting
-        error_log("HAM Student Search - Getting class info for student ID: {$student_id}");
+        //error_log("HAM Student Search - Getting class info for student ID: {$student_id}");
         
         // First try with _ham_class_ids meta (direct assignment)
         $assigned_class_ids = get_post_meta($student_id, '_ham_class_ids', true);
         
         // If no direct assignment, try to find if the student is in any class's _ham_student_ids meta
         if (empty($assigned_class_ids) || !is_array($assigned_class_ids) || empty(array_filter($assigned_class_ids))) {
-            error_log("HAM Student Search - No direct class assignments found for student ID: {$student_id}, trying reverse lookup");
+            //error_log("HAM Student Search - No direct class assignments found for student ID: {$student_id}, trying reverse lookup");
             
             // Query classes that have this student in their _ham_student_ids meta
             $args = [
@@ -410,7 +413,7 @@ class HAM_Student_Controller extends HAM_Base_Controller
                 $class_id = get_the_ID();
                 $class_title = get_the_title();
                 
-                error_log("HAM Student Search - Found class via reverse lookup: {$class_id}, {$class_title}");
+                //error_log("HAM Student Search - Found class via reverse lookup: {$class_id}, {$class_title}");
                 
                 wp_reset_postdata();
                 
@@ -421,7 +424,7 @@ class HAM_Student_Controller extends HAM_Base_Controller
             }
             
             wp_reset_postdata();
-            error_log("HAM Student Search - No classes found for student ID: {$student_id} via either method");
+            //error_log("HAM Student Search - No classes found for student ID: {$student_id} via either method");
             return false;
         }
         
@@ -429,18 +432,18 @@ class HAM_Student_Controller extends HAM_Base_Controller
         $class_id = reset($assigned_class_ids);
         
         if (!$class_id) {
-            error_log("HAM Student Search - Invalid class ID in _ham_class_ids for student ID: {$student_id}");
+            //error_log("HAM Student Search - Invalid class ID in _ham_class_ids for student ID: {$student_id}");
             return false;
         }
         
         $class_title = get_the_title($class_id);
         
         if (!$class_title) {
-            error_log("HAM Student Search - Could not get title for class ID: {$class_id}");
+            //error_log("HAM Student Search - Could not get title for class ID: {$class_id}");
             return false;
         }
         
-        error_log("HAM Student Search - Found class directly: {$class_id}, {$class_title}");
+        //error_log("HAM Student Search - Found class directly: {$class_id}, {$class_title}");
         
         return [
             'id' => $class_id,

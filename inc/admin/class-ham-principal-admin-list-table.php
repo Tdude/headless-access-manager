@@ -85,7 +85,7 @@ class HAM_Principal_Admin_List_Table extends HAM_Base_Admin_List_Table {
         // Skip if we've already rendered this cell (happens during AJAX filtering)
         if (defined('DOING_AJAX') && DOING_AJAX && isset($rendered_cells[$cell_key])) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("HAM PRINCIPAL TABLE: Skipping duplicate render for {$column_name} cell on post {$post_id}");
+                //error_log("HAM PRINCIPAL TABLE: Skipping duplicate render for {$column_name} cell on post {$post_id}");
             }
             return;
         }
@@ -221,7 +221,7 @@ class HAM_Principal_Admin_List_Table extends HAM_Base_Admin_List_Table {
         }
         
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM Principal sort_principals_by_schools running - Post count: ' . count($posts));
+            //error_log('HAM Principal sort_principals_by_schools running - Post count: ' . count($posts));
         }
         
         // Sort the posts
@@ -233,8 +233,8 @@ class HAM_Principal_Admin_List_Table extends HAM_Base_Admin_List_Table {
             
             // Debug sorting
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('HAM Principal sorting - Principal A ID: ' . $a->ID . ', Schools: ' . implode(', ', $a_school_names));
-                error_log('HAM Principal sorting - Principal B ID: ' . $b->ID . ', Schools: ' . implode(', ', $b_school_names));
+                //error_log('HAM Principal sorting - Principal A ID: ' . $a->ID . ', Schools: ' . implode(', ', $a_school_names));
+                //error_log('HAM Principal sorting - Principal B ID: ' . $b->ID . ', Schools: ' . implode(', ', $b_school_names));
             }
             
             // If both have schools, compare first school name
@@ -380,7 +380,7 @@ class HAM_Principal_Admin_List_Table extends HAM_Base_Admin_List_Table {
         
         // Only log detailed debugging if verbose mode is enabled
         if (defined('WP_DEBUG') && WP_DEBUG && defined('HAM_DEBUG_VERBOSE') && HAM_DEBUG_VERBOSE) {
-            error_log('HAM Principal apply_school_filter - Filter applied with value: ' . $value);
+            //error_log('HAM Principal apply_school_filter - Filter applied with value: ' . $value);
         }
         
         // Get all principals assigned to this school - using both approaches
@@ -394,12 +394,12 @@ class HAM_Principal_Admin_List_Table extends HAM_Base_Admin_List_Table {
             if (is_array($school_principals)) {
                 $linked_user_ids = $school_principals;
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('HAM Principal apply_school_filter - Found school principals (array): ' . implode(', ', $linked_user_ids));
+                    //error_log('HAM Principal apply_school_filter - Found school principals (array): ' . implode(', ', $linked_user_ids));
                 }
             } else if (is_numeric($school_principals)) {
                 $linked_user_ids = [$school_principals];
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('HAM Principal apply_school_filter - Found school principal (single): ' . $school_principals);
+                    //error_log('HAM Principal apply_school_filter - Found school principal (single): ' . $school_principals);
                 }
             }
             
@@ -425,7 +425,7 @@ class HAM_Principal_Admin_List_Table extends HAM_Base_Admin_List_Table {
                 }
                 
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('HAM Principal apply_school_filter - Found principal post IDs from user IDs: ' . implode(', ', $principal_ids));
+                    //error_log('HAM Principal apply_school_filter - Found principal post IDs from user IDs: ' . implode(', ', $principal_ids));
                 }
             }
         }
@@ -465,13 +465,13 @@ class HAM_Principal_Admin_List_Table extends HAM_Base_Admin_List_Table {
             }
             
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('HAM Principal apply_school_filter - Additional principals from user meta: ' . implode(', ', $principal_ids));
+                //error_log('HAM Principal apply_school_filter - Additional principals from user meta: ' . implode(', ', $principal_ids));
             }
         }
         
         // Debug summary
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM Principal apply_school_filter - Final principal IDs: ' . implode(', ', $principal_ids));
+            //error_log('HAM Principal apply_school_filter - Final principal IDs: ' . implode(', ', $principal_ids));
         }
         
         if (!empty($principal_ids)) {
@@ -484,13 +484,13 @@ class HAM_Principal_Admin_List_Table extends HAM_Base_Admin_List_Table {
             }
             
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('HAM Principal apply_school_filter - Final query post__in: ' . implode(', ', $args['post__in']));
+                //error_log('HAM Principal apply_school_filter - Final query post__in: ' . implode(', ', $args['post__in']));
             }
         } else {
             // No principals found for this school, return no results
             $args['post__in'] = [0]; // Force no results
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('HAM Principal apply_school_filter - No principals found, forcing empty results');
+                //error_log('HAM Principal apply_school_filter - No principals found, forcing empty results');
             }
         }
     }

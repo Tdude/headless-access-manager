@@ -106,7 +106,7 @@ class HAM_Student_Admin_List_Table extends HAM_Base_Admin_List_Table {
         // Skip if we've already rendered this cell (happens during AJAX filtering)
         if (defined('DOING_AJAX') && DOING_AJAX && isset($rendered_cells[$cell_key])) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("HAM STUDENT TABLE: Skipping duplicate render for {$column_name} cell on post {$post_id}");
+                //error_log("HAM STUDENT TABLE: Skipping duplicate render for {$column_name} cell on post {$post_id}");
             }
             return;
         }

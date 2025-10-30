@@ -72,7 +72,7 @@ class HAM_Auth_Controller extends HAM_Base_Controller
         
         // Add a development-only endpoint for user information
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM Auth: Development mode enabled - registering development endpoints');
+            //error_log('HAM Auth: Development mode enabled - registering development endpoints');
             
             register_rest_route(
                 $controller->namespace,
@@ -279,7 +279,7 @@ class HAM_Auth_Controller extends HAM_Base_Controller
     {
         // Allow all access in development mode (WP_DEBUG enabled)
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM Auth: Development mode enabled - bypassing authentication validation');
+            //error_log('HAM Auth: Development mode enabled - bypassing authentication validation');
             return true;
         }
         

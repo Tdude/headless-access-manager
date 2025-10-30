@@ -135,7 +135,7 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
     {
         // Get raw data for debugging
         $raw_data = $request->get_body();
-        error_log('Raw request data: ' . $raw_data);
+        //error_log('Raw request data: ' . $raw_data);
         
         // Get parameters
         $student_id = $request->get_param('student_id');
@@ -146,16 +146,16 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
             $teacher_id = $request->get_param('teacher_id');
         }
         
-        error_log('Student ID: ' . print_r($student_id, true));
-        error_log('Teacher ID: ' . print_r($teacher_id, true));
-        error_log('Form data: ' . print_r($form_data, true));
+        //error_log('Student ID: ' . print_r($student_id, true));
+        //error_log('Teacher ID: ' . print_r($teacher_id, true));
+        //error_log('Form data: ' . print_r($form_data, true));
         
         // If formData is a JSON string, decode it
         if (is_string($form_data) && !empty($form_data)) {
             $decoded_form_data = json_decode($form_data, true);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $form_data = $decoded_form_data;
-                error_log('Decoded form data: ' . print_r($form_data, true));
+                //error_log('Decoded form data: ' . print_r($form_data, true));
             } else {
                 error_log('JSON decode error: ' . json_last_error_msg());
                 return new WP_Error(
@@ -169,11 +169,11 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
         // Validate student
         $student = get_user_by('id', $student_id);
         if (! $student || ! in_array(HAM_ROLE_STUDENT, (array) $student->roles)) {
-            error_log('Invalid student ID or not a student: ' . $student_id);
+            //error_log('Invalid student ID or not a student: ' . $student_id);
             
             // For development purposes, allow any user ID
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('DEBUG MODE: Allowing non-student user ID: ' . $student_id);
+                //error_log('DEBUG MODE: Allowing non-student user ID: ' . $student_id);
             } else {
                 return new WP_Error(
                     'invalid_student',
@@ -186,11 +186,11 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
         // Validate teacher
         $teacher = get_user_by('id', $teacher_id);
         if (! $teacher || ! in_array(HAM_ROLE_TEACHER, (array) $teacher->roles)) {
-            error_log('Invalid teacher ID or not a teacher: ' . $teacher_id);
+            //error_log('Invalid teacher ID or not a teacher: ' . $teacher_id);
             
             // For development purposes, allow any user ID
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('DEBUG MODE: Allowing non-teacher user ID: ' . $teacher_id);
+                //error_log('DEBUG MODE: Allowing non-teacher user ID: ' . $teacher_id);
             } else {
                 return new WP_Error(
                     'invalid_teacher',
@@ -211,10 +211,10 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
             // Verify assessment exists and belongs to this student
             if (! $assessment || $assessment->post_type !== HAM_CPT_ASSESSMENT ||
                  get_post_meta($assessment_id, HAM_ASSESSMENT_META_STUDENT_ID, true) != $student_id) {
-                error_log('Assessment validation failed. Creating new assessment instead.');
+                //error_log('Assessment validation failed. Creating new assessment instead.');
                 $assessment_id = 0; // Reset to create new assessment
             } else {
-                error_log('Updating existing assessment: ' . $assessment_id);
+                //error_log('Updating existing assessment: ' . $assessment_id);
             }
         }
 
@@ -226,7 +226,7 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
                 current_time('Y-m-d')
             );
 
-            error_log('Creating new assessment with title: ' . $assessment_title);
+            //error_log('Creating new assessment with title: ' . $assessment_title);
             
             $assessment_id = wp_insert_post(array(
                 'post_title'   => $assessment_title,
@@ -240,21 +240,21 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
                 return $assessment_id;
             }
 
-            error_log('New assessment created with ID: ' . $assessment_id);
+            //error_log('New assessment created with ID: ' . $assessment_id);
             
             // Make sure to save the student ID as post meta
             $meta_result = update_post_meta($assessment_id, HAM_ASSESSMENT_META_STUDENT_ID, $student_id);
-            error_log('Student ID meta update result: ' . ($meta_result ? 'true' : 'false'));
+            //error_log('Student ID meta update result: ' . ($meta_result ? 'true' : 'false'));
             
             // Double-check that the meta was saved
             $saved_student_id = get_post_meta($assessment_id, HAM_ASSESSMENT_META_STUDENT_ID, true);
-            error_log('Saved student ID meta value: ' . $saved_student_id);
+            //error_log('Saved student ID meta value: ' . $saved_student_id);
         }
 
         // Save assessment data
-        error_log('Saving assessment data for ID: ' . $assessment_id);
+        //error_log('Saving assessment data for ID: ' . $assessment_id);
         $result = update_post_meta($assessment_id, HAM_ASSESSMENT_META_DATA, $form_data);
-        error_log('Update post meta result: ' . ($result ? 'true' : 'false'));
+        //error_log('Update post meta result: ' . ($result ? 'true' : 'false'));
 
         return new WP_REST_Response(
             array(
@@ -275,7 +275,7 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
     {
         // For development purposes, allow unauthenticated requests
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('DEBUG MODE: Bypassing authentication for evaluation save');
+            //error_log('DEBUG MODE: Bypassing authentication for evaluation save');
             return true;
         }
         

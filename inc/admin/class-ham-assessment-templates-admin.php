@@ -207,3 +207,6 @@ class HAM_Assessment_Templates_Admin
         }
     }
 }
+
+// Initialize the class
+new HAM_Assessment_Templates_Admin();

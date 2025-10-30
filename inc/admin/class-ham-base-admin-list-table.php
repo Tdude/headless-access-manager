@@ -147,7 +147,7 @@ abstract class HAM_Base_Admin_List_Table {
         }
         
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log("HAM: Enqueuing scripts for {$this->post_type} admin list table");
+            //error_log("HAM: Enqueuing scripts for {$this->post_type} admin list table");
         }
         
         wp_enqueue_style(
@@ -226,8 +226,8 @@ abstract class HAM_Base_Admin_List_Table {
         
         // Enhanced debugging - log class and post type information
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM render_filtered_table CALLED for ' . $this->post_type . ' from class: ' . get_class($this));
-            error_log('HAM render_filtered_table FILTERS for ' . $this->post_type . ': ' . print_r($filters, true));
+            //error_log('HAM render_filtered_table CALLED for ' . $this->post_type . ' from class: ' . get_class($this));
+            //error_log('HAM render_filtered_table FILTERS for ' . $this->post_type . ': ' . print_r($filters, true));
             
             // CRITICAL FIX: Ensure filter_fields is an array before using array_keys
             if (!is_array($this->filter_fields)) {
@@ -235,7 +235,7 @@ abstract class HAM_Base_Admin_List_Table {
                 $this->filter_fields = is_array($this->filter_fields) ? $this->filter_fields : [];
             }
             
-            error_log('HAM registered filter fields for ' . $this->post_type . ': ' . print_r(is_array($this->filter_fields) ? array_keys($this->filter_fields) : [], true));
+            //error_log('HAM registered filter fields for ' . $this->post_type . ': ' . print_r(is_array($this->filter_fields) ? array_keys($this->filter_fields) : [], true));
         }
         
         // CRITICAL FIX: Store original _GET values
@@ -267,8 +267,8 @@ abstract class HAM_Base_Admin_List_Table {
         
         // DEBUG: Log original filters before processing
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM DEBUG - AJAX FILTERS BEFORE PROCESSING: ' . print_r($filters, true));
-            error_log('HAM DEBUG - QUERY ARGS BEFORE FILTERS: ' . print_r($args, true));
+            //error_log('HAM DEBUG - AJAX FILTERS BEFORE PROCESSING: ' . print_r($filters, true));
+            //error_log('HAM DEBUG - QUERY ARGS BEFORE FILTERS: ' . print_r($args, true));
         }
         
         // Apply filters to query args using the generic filter system
@@ -276,7 +276,7 @@ abstract class HAM_Base_Admin_List_Table {
         
         // DEBUG: Log final query args after processing
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM DEBUG - QUERY ARGS AFTER FILTERS: ' . print_r($args, true));
+            //error_log('HAM DEBUG - QUERY ARGS AFTER FILTERS: ' . print_r($args, true));
         }
         
         // Run the query
@@ -285,11 +285,11 @@ abstract class HAM_Base_Admin_List_Table {
         
         // Enhanced debugging - BEFORE list table creation
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM render_filtered_table BEFORE LIST TABLE - Query found ' . $wp_query->found_posts . ' posts for ' . $this->post_type);
+            //error_log('HAM render_filtered_table BEFORE LIST TABLE - Query found ' . $wp_query->found_posts . ' posts for ' . $this->post_type);
             // Print first post ID and title if available
             if ($wp_query->have_posts()) {
                 $first_post = $wp_query->posts[0];
-                error_log('HAM render_filtered_table FIRST POST - ID: ' . $first_post->ID . ', Title: ' . $first_post->post_title);
+                //error_log('HAM render_filtered_table FIRST POST - ID: ' . $first_post->ID . ', Title: ' . $first_post->post_title);
             }
         }
         
@@ -307,7 +307,7 @@ abstract class HAM_Base_Admin_List_Table {
             $is_ajax = defined('DOING_AJAX') && DOING_AJAX;
             
             if (defined('WP_DEBUG') && WP_DEBUG && $is_ajax) {
-                error_log('HAM: Current columns structure before cleanup: ' . print_r($columns, true));
+                //error_log('HAM: Current columns structure before cleanup: ' . print_r($columns, true));
             }
             
             // First run the column customization through the child class's method
@@ -348,11 +348,11 @@ abstract class HAM_Base_Admin_List_Table {
                         $seen_labels[] = $label;
                         
                         if (defined('WP_DEBUG') && WP_DEBUG && $is_ajax) {
-                            error_log("HAM: Keeping column {$key} as {$normalized_key}");
+                            //error_log("HAM: Keeping column {$key} as {$normalized_key}");
                         }
                     } else {
                         if (defined('WP_DEBUG') && WP_DEBUG && $is_ajax) {
-                            error_log("HAM: Skipping duplicate column {$key} with label {$label}");
+                            //error_log("HAM: Skipping duplicate column {$key} with label {$label}");
                         }
                     }
                 }
@@ -381,7 +381,7 @@ abstract class HAM_Base_Admin_List_Table {
             }
             
             if (defined('WP_DEBUG') && WP_DEBUG && $is_ajax) {
-                error_log('HAM: Final columns structure after cleanup: ' . print_r($columns, true));
+                //error_log('HAM: Final columns structure after cleanup: ' . print_r($columns, true));
             }
             
             return $columns;
@@ -389,8 +389,8 @@ abstract class HAM_Base_Admin_List_Table {
         
         // Debug list table object
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM render_filtered_table LIST TABLE - Class: ' . get_class($wp_list_table));
-            error_log('HAM render_filtered_table LIST TABLE - Methods: ' . implode(', ', get_class_methods($wp_list_table)));
+            //error_log('HAM render_filtered_table LIST TABLE - Class: ' . get_class($wp_list_table));
+            //error_log('HAM render_filtered_table LIST TABLE - Methods: ' . implode(', ', get_class_methods($wp_list_table)));
         }
         
         // Prepare the list table items - this will run WP_Query with filters
@@ -409,7 +409,7 @@ abstract class HAM_Base_Admin_List_Table {
         
         // Debug output
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM AJAX Filter results HTML length: ' . strlen($table_html));
+            //error_log('HAM AJAX Filter results HTML length: ' . strlen($table_html));
         }
         
         return $table_html;
@@ -420,7 +420,7 @@ abstract class HAM_Base_Admin_List_Table {
      * 
      * @param array $columns Existing columns.
     
-    error_log('HAM registered filter fields for ' . $this->post_type . ': ' . print_r(is_array($this->filter_fields) ? array_keys($this->filter_fields) : [], true));
+    //error_log('HAM registered filter fields for ' . $this->post_type . ': ' . print_r(is_array($this->filter_fields) ? array_keys($this->filter_fields) : [], true));
 }
 
 // CRITICAL FIX: Store original _GET values
@@ -452,8 +452,8 @@ if (!empty($filters['orderby'])) {
 
 // DEBUG: Log original filters before processing
 if (defined('WP_DEBUG') && WP_DEBUG) {
-    error_log('HAM DEBUG - AJAX FILTERS BEFORE PROCESSING: ' . print_r($filters, true));
-    error_log('HAM DEBUG - QUERY ARGS BEFORE FILTERS: ' . print_r($args, true));
+    //error_log('HAM DEBUG - AJAX FILTERS BEFORE PROCESSING: ' . print_r($filters, true));
+    //error_log('HAM DEBUG - QUERY ARGS BEFORE FILTERS: ' . print_r($args, true));
 }
 
 // Apply filters to query args using the generic filter system
@@ -461,7 +461,7 @@ $this->apply_filters_to_query_args($args, $filters);
 
 // DEBUG: Log final query args after processing
 if (defined('WP_DEBUG') && WP_DEBUG) {
-    error_log('HAM DEBUG - QUERY ARGS AFTER FILTERS: ' . print_r($args, true));
+    //error_log('HAM DEBUG - QUERY ARGS AFTER FILTERS: ' . print_r($args, true));
 }
 
 // Run the query
@@ -470,7 +470,7 @@ $post_type = $this->post_type;
 
 // Enhanced debugging - BEFORE list table creation
 if (defined('WP_DEBUG') && WP_DEBUG) {
-    error_log('HAM render_filtered_table BEFORE LIST TABLE - Query found ' . $wp_query->found_posts . ' posts for ' . $this->post_type);
+    //error_log('HAM render_filtered_table BEFORE LIST TABLE - Query found ' . $wp_query->found_posts . ' posts for ' . $this->post_type);
     // Print first post ID and title if available
     if ($wp_query->have_posts()) {
         $first_post = $wp_query->posts[0];
@@ -492,7 +492,7 @@ add_filter("manage_{$this->post_type}_posts_columns", function($columns) {
     $is_ajax = defined('DOING_AJAX') && DOING_AJAX;
     
     if (defined('WP_DEBUG') && WP_DEBUG && $is_ajax) {
-        error_log('HAM: Current columns structure before cleanup: ' . print_r($columns, true));
+        //error_log('HAM: Current columns structure before cleanup: ' . print_r($columns, true));
     }
     
     // First run the column customization through the child class's method
@@ -533,11 +533,11 @@ add_filter("manage_{$this->post_type}_posts_columns", function($columns) {
                 $seen_labels[] = $label;
                 
                 if (defined('WP_DEBUG') && WP_DEBUG && $is_ajax) {
-                    error_log("HAM: Keeping column {$key} as {$normalized_key}");
+                    //error_log("HAM: Keeping column {$key} as {$normalized_key}");
                 }
             } else {
                 if (defined('WP_DEBUG') && WP_DEBUG && $is_ajax) {
-                    error_log("HAM: Skipping duplicate column {$key} with label {$label}");
+                    //error_log("HAM: Skipping duplicate column {$key} with label {$label}");
                 }
             }
         }
@@ -679,8 +679,8 @@ add_filter("manage_{$this->post_type}_posts_columns", function($columns) {
         
         // Debug
         if (!empty($filters) && defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM filter_query for ' . $this->post_type . ' - GET params: ' . print_r($_GET, true));
-            error_log('HAM filter_query for ' . $this->post_type . ' - Filters: ' . print_r($filters, true));
+            //error_log('HAM filter_query for ' . $this->post_type . ' - GET params: ' . print_r($_GET, true));
+            //error_log('HAM filter_query for ' . $this->post_type . ' - Filters: ' . print_r($filters, true));
         }
         
         // Apply filters to the query
@@ -809,9 +809,9 @@ add_filter("manage_{$this->post_type}_posts_columns", function($columns) {
         
         // Enhanced debugging - Before filtering
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM apply_filters_to_query_args BEFORE for ' . $this->post_type . ' - Args: ' . print_r($args, true));
-            error_log('HAM apply_filters_to_query_args INPUT filters for ' . $this->post_type . ': ' . print_r($filters, true));
-            error_log('HAM filter fields registered for ' . $this->post_type . ': ' . print_r($this->filter_fields, true));
+            //error_log('HAM apply_filters_to_query_args BEFORE for ' . $this->post_type . ' - Args: ' . print_r($args, true));
+            //error_log('HAM apply_filters_to_query_args INPUT filters for ' . $this->post_type . ': ' . print_r($filters, true));
+            //error_log('HAM filter fields registered for ' . $this->post_type . ': ' . print_r($this->filter_fields, true));
             
             // Log filter fields and associated callbacks
             $registered_callbacks = [];
@@ -835,17 +835,17 @@ add_filter("manage_{$this->post_type}_posts_columns", function($columns) {
                 
                 $registered_callbacks[] = $callback_info;
             }
-            error_log('HAM filter callbacks for ' . $this->post_type . ': ' . print_r($registered_callbacks, true));
+            //error_log('HAM filter callbacks for ' . $this->post_type . ': ' . print_r($registered_callbacks, true));
         }
         
         // Enhanced debug - trace all registered filter names vs. incoming filter parameters
         if (defined('WP_DEBUG') && WP_DEBUG) {
             // Ensure filter_fields is an array
             $this->filter_fields = is_array($this->filter_fields) ? $this->filter_fields : [];
-            error_log('HAM DEBUG - REGISTERED FILTER NAMES for ' . $this->post_type . ': ' . print_r(array_keys($this->filter_fields), true));
+            //error_log('HAM DEBUG - REGISTERED FILTER NAMES for ' . $this->post_type . ': ' . print_r(array_keys($this->filter_fields), true));
             // Ensure filters is an array
             $filters = is_array($filters) ? $filters : [];
-            error_log('HAM DEBUG - INCOMING FILTER PARAMETERS for ' . $this->post_type . ': ' . print_r(array_keys($filters), true));
+            //error_log('HAM DEBUG - INCOMING FILTER PARAMETERS for ' . $this->post_type . ': ' . print_r(array_keys($filters), true));
             
             // Check for filter name mismatches
             foreach ($filters as $filter_key => $filter_value) {
@@ -859,20 +859,20 @@ add_filter("manage_{$this->post_type}_posts_columns", function($columns) {
             // Skip if filter value is empty or default (-1)
             if (empty($filters[$name]) || $filters[$name] === '-1') {
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('HAM DEBUG - Skipping filter "' . $name . '" because value is empty or -1: ' . (isset($filters[$name]) ? $filters[$name] : 'NOT SET'));
+                    //error_log('HAM DEBUG - Skipping filter "' . $name . '" because value is empty or -1: ' . (isset($filters[$name]) ? $filters[$name] : 'NOT SET'));
                 }
                 continue;
             }
             
             // CRITICAL ENHANCED DEBUGGING
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('HAM DEBUG - CONFIRMED PROCESSING filter "' . $name . '" with value: ' . $filters[$name]);
-                error_log('HAM DEBUG - Filter config: ' . print_r($config, true));
+                //error_log('HAM DEBUG - CONFIRMED PROCESSING filter "' . $name . '" with value: ' . $filters[$name]);
+                //error_log('HAM DEBUG - Filter config: ' . print_r($config, true));
             }
             
             // Log that we're processing this filter
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('HAM DEBUG - Processing filter "' . $name . '" with value: ' . $filters[$name]);
+                //error_log('HAM DEBUG - Processing filter "' . $name . '" with value: ' . $filters[$name]);
             }
             
             $value = sanitize_text_field($filters[$name]);
@@ -880,23 +880,23 @@ add_filter("manage_{$this->post_type}_posts_columns", function($columns) {
             switch ($config['type']) {
                 case 'meta':
                     if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log('HAM DEBUG - Processing meta filter: ' . $name . ' with meta_key: ' . ($config['meta_key'] ?? 'NOT SET'));
+                        //error_log('HAM DEBUG - Processing meta filter: ' . $name . ' with meta_key: ' . ($config['meta_key'] ?? 'NOT SET'));
                     }
                     
                     if (!empty($config['meta_query_callback']) && is_callable($config['meta_query_callback'])) {
                         // For complex meta queries, use the callback
                         if (defined('WP_DEBUG') && WP_DEBUG) {
-                            error_log('HAM DEBUG - Using meta_query_callback for: ' . $name);
+                            //error_log('HAM DEBUG - Using meta_query_callback for: ' . $name);
                         }
                         $meta_query = call_user_func($config['meta_query_callback'], $name, $value, $filters);
                         if (!empty($meta_query)) {
                             $meta_queries[] = $meta_query;
                             if (defined('WP_DEBUG') && WP_DEBUG) {
-                                error_log('HAM DEBUG - Added meta query from callback: ' . print_r($meta_query, true));
+                                //error_log('HAM DEBUG - Added meta query from callback: ' . print_r($meta_query, true));
                             }
                         } else {
                             if (defined('WP_DEBUG') && WP_DEBUG) {
-                                error_log('HAM DEBUG - Empty meta query returned from callback');
+                                //error_log('HAM DEBUG - Empty meta query returned from callback');
                             }
                         }
                     } else {
@@ -909,7 +909,7 @@ add_filter("manage_{$this->post_type}_posts_columns", function($columns) {
                         ];
                         $meta_queries[] = $meta_query;
                         if (defined('WP_DEBUG') && WP_DEBUG) {
-                            error_log('HAM DEBUG - Added simple meta query: ' . print_r($meta_query, true));
+                            //error_log('HAM DEBUG - Added simple meta query: ' . print_r($meta_query, true));
                         }
                     }
                     break;
@@ -935,7 +935,7 @@ add_filter("manage_{$this->post_type}_posts_columns", function($columns) {
                     
                     if ($callback) {
                         if (defined('WP_DEBUG') && WP_DEBUG) {
-                            error_log('HAM custom filter executing callback for: ' . $name);
+                            //error_log('HAM custom filter executing callback for: ' . $name);
                         }
                         call_user_func_array($callback, [&$args, $name, $value, $filters]);
                     } else {
@@ -968,7 +968,7 @@ add_filter("manage_{$this->post_type}_posts_columns", function($columns) {
             
             // Debug the final meta query structure
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('HAM DEBUG - Final meta_query structure: ' . print_r($args['meta_query'], true));
+                //error_log('HAM DEBUG - Final meta_query structure: ' . print_r($args['meta_query'], true));
             }
         }
         
@@ -995,14 +995,14 @@ add_filter("manage_{$this->post_type}_posts_columns", function($columns) {
             
             // Debug the final taxonomy query structure
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('HAM DEBUG - Final tax_query structure: ' . print_r($args['tax_query'], true));
+                //error_log('HAM DEBUG - Final tax_query structure: ' . print_r($args['tax_query'], true));
             }
         }
         
         // Enhanced debugging - log the final query args and applied filters
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM filter debug - FINAL ARGS for post type: ' . $this->post_type);
-            error_log('Final query args: ' . print_r($args, true));
+            //error_log('HAM filter debug - FINAL ARGS for post type: ' . $this->post_type);
+            //error_log('Final query args: ' . print_r($args, true));
             
             // Log which filters were applied
             $applied_filters = [];
@@ -1040,7 +1040,7 @@ add_filter("manage_{$this->post_type}_posts_columns", function($columns) {
                     $('.wp-list-table').wrap('<div class="wp-list-table-container" data-post-type="<?php echo esc_attr($this->post_type); ?>"></div>');
                     
                     if (window.console && console.log) {
-                        console.log('HAM: Wrapped list table in container div for post type: <?php echo esc_attr($this->post_type); ?>');
+                        //console.log('HAM: Wrapped list table in container div for post type: <?php echo esc_attr($this->post_type); ?>');
                     }
                 }
             });

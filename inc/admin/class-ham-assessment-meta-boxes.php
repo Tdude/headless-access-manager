@@ -59,15 +59,15 @@ class HAM_Assessment_Meta_Boxes
      */
     public function render_questions_meta_box($post)
     {
-        error_log('HAM Debug - Rendering meta box for post ' . $post->ID);
+        //error_log('HAM Debug - Rendering meta box for post ' . $post->ID);
         
         // Get current data
         $assessment_data = get_post_meta($post->ID, '_ham_assessment_data', true);
-        error_log('HAM Debug - Current data: ' . print_r($assessment_data, true));
+        //error_log('HAM Debug - Current data: ' . print_r($assessment_data, true));
         
         // Default empty structure
         if (empty($assessment_data)) {
-            error_log('HAM Debug - Using default structure');
+            //error_log('HAM Debug - Using default structure');
             require_once dirname(__FILE__, 2) . '/assessment-constants.php';
             $assessment_data = HAM_ASSESSMENT_DEFAULT_STRUCTURE;
         }
@@ -205,7 +205,7 @@ class HAM_Assessment_Meta_Boxes
      */
     public function ajax_save_assessment_data()
     {
-        error_log('HAM Debug - AJAX save called');
+        //error_log('HAM Debug - AJAX save called');
         
         // Verify nonce
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'ham_save_assessment')) {
@@ -225,15 +225,15 @@ class HAM_Assessment_Meta_Boxes
         // Get and validate data
         $assessment_data = isset($_POST['assessment_data']) ? $_POST['assessment_data'] : '';
         if (empty($assessment_data)) {
-            error_log('HAM Debug - No assessment data');
+            //error_log('HAM Debug - No assessment data');
             wp_send_json_error('No assessment data');
             return;
         }
 
-        error_log('HAM Debug - Raw assessment data: ' . $assessment_data);
+        //error_log('HAM Debug - Raw assessment data: ' . $assessment_data);
         
         $data = json_decode(wp_unslash($assessment_data), true);
-        error_log('HAM Debug - Decoded data: ' . print_r($data, true));
+        //error_log('HAM Debug - Decoded data: ' . print_r($data, true));
         
         if (json_last_error() !== JSON_ERROR_NONE) {
             error_log('HAM Debug - JSON decode error: ' . json_last_error_msg());
@@ -251,7 +251,7 @@ class HAM_Assessment_Meta_Boxes
 
         // Save the data
         update_post_meta($post_id, '_ham_assessment_data', $data);
-        error_log('HAM Debug - Data saved successfully');
+        //error_log('HAM Debug - Data saved successfully');
         
         wp_send_json_success(array(
             'message' => 'Assessment data saved successfully'

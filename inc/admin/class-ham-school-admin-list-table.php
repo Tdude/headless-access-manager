@@ -89,16 +89,16 @@ class HAM_School_Admin_List_Table extends HAM_Base_Admin_List_Table {
     public function build_principal_meta_query($filter_name, $value, $filters) {
         // Enhanced debugging
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM Schools - Building principal meta query');
-            error_log('HAM Schools - Filter name: ' . $filter_name);
-            error_log('HAM Schools - Filter value: ' . $value);
-            error_log('HAM Schools - All filters: ' . print_r($filters, true));
+            //error_log('HAM Schools - Building principal meta query');
+            //error_log('HAM Schools - Filter name: ' . $filter_name);
+            //error_log('HAM Schools - Filter value: ' . $value);
+            //error_log('HAM Schools - All filters: ' . print_r($filters, true));
         }
         
         // Validate the value to prevent errors
         if (empty($value) || $value === '-1') {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('HAM Schools - Empty or default principal filter value, not applying filter');
+                //error_log('HAM Schools - Empty or default principal filter value, not applying filter');
             }
             return [];
         }
@@ -107,13 +107,13 @@ class HAM_School_Admin_List_Table extends HAM_Base_Admin_List_Table {
         $value = intval($value);
         if (!$value) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('HAM Schools - Invalid principal ID (not an integer): ' . $value);
+                //error_log('HAM Schools - Invalid principal ID (not an integer): ' . $value);
             }
             return [];
         }
         
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM Schools - Building principal meta query with validated value: ' . $value);
+            //error_log('HAM Schools - Building principal meta query with validated value: ' . $value);
         }
         
         // The meta data is stored as a PHP serialized array, so we need to construct
@@ -167,28 +167,28 @@ class HAM_School_Admin_List_Table extends HAM_Base_Admin_List_Table {
         }
         
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('================= HAM SCHOOLS PRINCIPAL FILTER =================');
-            error_log('HAM Schools - build_principal_meta_query_args running for principal ID: ' . $value);
-            error_log('HAM Schools - Filter name: ' . $filter_name);
-            error_log('HAM Schools - Original args: ' . print_r($args, true));
+            //error_log('================= HAM SCHOOLS PRINCIPAL FILTER =================');
+            //error_log('HAM Schools - build_principal_meta_query_args running for principal ID: ' . $value);
+            //error_log('HAM Schools - Filter name: ' . $filter_name);
+            //error_log('HAM Schools - Original args: ' . print_r($args, true));
             
             // Get some actual schools and dump their principal IDs to understand the format
             $sample_schools = get_posts(["post_type" => HAM_CPT_SCHOOL, "numberposts" => 3]);
-            error_log('HAM Schools - Found ' . count($sample_schools) . ' sample schools');
+            //error_log('HAM Schools - Found ' . count($sample_schools) . ' sample schools');
             
             foreach ($sample_schools as $school) {
                 $principal_ids = get_post_meta($school->ID, '_ham_principal_ids', true);
-                error_log('HAM Schools - School ID ' . $school->ID . ' (' . $school->post_title . ') has principal_ids: ' . print_r($principal_ids, true));
-                error_log('HAM Schools - principal_ids TYPE: ' . gettype($principal_ids));
+                //error_log('HAM Schools - School ID ' . $school->ID . ' (' . $school->post_title . ') has principal_ids: ' . print_r($principal_ids, true));
+                //error_log('HAM Schools - principal_ids TYPE: ' . gettype($principal_ids));
                 
                 if (is_array($principal_ids)) {
-                    error_log('HAM Schools - principal_ids serialized: ' . serialize($principal_ids));
+                    //error_log('HAM Schools - principal_ids serialized: ' . serialize($principal_ids));
                     // Check if our target value is in this array
                     if (in_array($value, $principal_ids)) {
-                        error_log('HAM Schools - MATCH FOUND! Principal ID ' . $value . ' is assigned to school ' . $school->ID);
+                        //error_log('HAM Schools - MATCH FOUND! Principal ID ' . $value . ' is assigned to school ' . $school->ID);
                     }
                 } else if ($principal_ids == $value) {
-                    error_log('HAM Schools - MATCH FOUND! Principal ID ' . $value . ' is directly assigned to school ' . $school->ID);
+                    //error_log('HAM Schools - MATCH FOUND! Principal ID ' . $value . ' is directly assigned to school ' . $school->ID);
                 }
             }
             
@@ -202,11 +202,11 @@ class HAM_School_Admin_List_Table extends HAM_Base_Admin_List_Table {
                 '%"' . $value . '"%',   // Pattern for serialized array with string
                 $value                   // Direct match
             );
-            error_log('HAM Schools - Direct SQL query: ' . $sql);
+            //error_log('HAM Schools - Direct SQL query: ' . $sql);
             $results = $wpdb->get_results($sql);
-            error_log('HAM Schools - SQL query found ' . count($results) . ' matches');
+            //error_log('HAM Schools - SQL query found ' . count($results) . ' matches');
             foreach ($results as $result) {
-                error_log('HAM Schools - Match in post_id ' . $result->post_id . ' with value: ' . $result->meta_value);
+                //error_log('HAM Schools - Match in post_id ' . $result->post_id . ' with value: ' . $result->meta_value);
             }
         }
         
@@ -263,13 +263,13 @@ class HAM_School_Admin_List_Table extends HAM_Base_Admin_List_Table {
         $args['meta_query'][] = $principal_query;
         
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('HAM Schools - Final meta query: ' . print_r($args['meta_query'], true));
+            //error_log('HAM Schools - Final meta query: ' . print_r($args['meta_query'], true));
             
             // Create a test WP_Query to see the SQL it generates
             $test_query = new \WP_Query();
             add_filter('posts_request', function($sql) {
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('HAM Schools - SQL query generated: ' . $sql);
+                    //error_log('HAM Schools - SQL query generated: ' . $sql);
                 }
                 return $sql;
             });
@@ -282,8 +282,8 @@ class HAM_School_Admin_List_Table extends HAM_Base_Admin_List_Table {
             
             // Run the query - this will trigger our posts_request filter above
             $test_posts = $test_query->query($test_args);
-            error_log('HAM Schools - Test query found ' . count($test_posts) . ' posts');
-            error_log('HAM Schools - Found post IDs: ' . implode(', ', $test_posts));
+            //error_log('HAM Schools - Test query found ' . count($test_posts) . ' posts');
+            //error_log('HAM Schools - Found post IDs: ' . implode(', ', $test_posts));
             
             // Remove our filter
             remove_all_filters('posts_request');
@@ -317,7 +317,7 @@ class HAM_School_Admin_List_Table extends HAM_Base_Admin_List_Table {
         // Skip if we've already rendered this cell (happens during AJAX filtering)
         if (defined('DOING_AJAX') && DOING_AJAX && isset($rendered_cells[$cell_key])) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("HAM SCHOOL TABLE: Skipping duplicate render for {$column_name} cell on post {$post_id}");
+                //error_log("HAM SCHOOL TABLE: Skipping duplicate render for {$column_name} cell on post {$post_id}");
             }
             return;
         }
@@ -526,8 +526,8 @@ class HAM_School_Admin_List_Table extends HAM_Base_Admin_List_Table {
             // Filter by principal
             if (isset($_GET['ham_principal_filter']) && $_GET['ham_principal_filter'] !== '-1') {
                 // Debug
-                error_log('GET filter: principal_id = ' . sanitize_text_field($_GET['ham_principal_filter']));
-                error_log('$_GET params: ' . print_r($_GET, true));
+                //error_log('GET filter: principal_id = ' . sanitize_text_field($_GET['ham_principal_filter']));
+                //error_log('$_GET params: ' . print_r($_GET, true));
                 
                 $filtered_principal_id = sanitize_text_field($_GET['ham_principal_filter']);
                 $meta_query = $query->get('meta_query') ?: [];
@@ -569,7 +569,7 @@ class HAM_School_Admin_List_Table extends HAM_Base_Admin_List_Table {
                 // Add our principal filter query to the existing meta query
                 $meta_query[] = $principal_meta_query;
                 
-                error_log('Setting meta query: ' . print_r($meta_query, true));
+                //error_log('Setting meta query: ' . print_r($meta_query, true));
                 $query->set('meta_query', $meta_query);
             }
         }
