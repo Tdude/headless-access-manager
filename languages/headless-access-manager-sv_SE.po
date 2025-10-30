@@ -1097,8 +1097,8 @@ msgid "No principals assigned"
 msgstr "Inga rektorer tilldelade"
 
 # Principal List Table
-msgid "Linked User"
-msgstr "Länkad användare"
+msgid "Linked User Account"
+msgstr "Länkat användarkonto"
 
 msgid "Not linked"
 msgstr "Ej länkad"

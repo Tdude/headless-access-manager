@@ -67,7 +67,7 @@ class HAM_Principal_Admin_List_Table extends HAM_Base_Admin_List_Table {
     public function add_admin_columns($columns) {
         // Use standardized column helper for consistent naming without prefixes
         return $this->standardize_columns($columns, [
-            'linked_user' => __('Linked User', 'headless-access-manager'),
+            'linked_user' => __('Linked User Account', 'headless-access-manager'),
             'schools' => __('Assigned Schools', 'headless-access-manager')
         ]);
     }
