@@ -472,6 +472,15 @@ class HAM_Data_Controller extends HAM_Base_Controller
             'school_name' => $school ? $school->post_title : '',
         );
 
+        // Add student_count using the same logic as the admin list table "students" column
+        $student_ids = get_post_meta($class->ID, '_ham_student_ids', true);
+        if (! empty($student_ids) && is_array($student_ids)) {
+            $unique_students        = array_unique($student_ids);
+            $data['student_count']  = count($unique_students);
+        } else {
+            $data['student_count'] = 0;
+        }
+
         return $data;
     }
 }
