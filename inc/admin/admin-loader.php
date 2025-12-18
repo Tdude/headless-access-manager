@@ -165,6 +165,9 @@ class HAM_Admin_Loader
         // Set primary column for CPTs to ensure row actions are present
         add_filter('list_table_primary_column', array(__CLASS__, 'set_primary_column'), 10, 2);
 
+        // Ensure admin search works reliably for the Student CPT by forcing a title search
+        add_filter('posts_search', array(__CLASS__, 'force_student_admin_title_search'), 10, 2);
+
 
     }
 
@@ -673,6 +676,50 @@ class HAM_Admin_Loader
             wp_redirect(home_url());
             exit;
         }
+    }
+
+    /**
+     * Ensure that searching in the Student CPT admin list always matches post titles.
+     * This is a safety net in case other filters modify or clear the default search SQL.
+     *
+     * @param string    $search Existing search SQL fragment.
+     * @param WP_Query  $query  Current query.
+     * @return string           Modified search SQL.
+     */
+    public static function force_student_admin_title_search($search, $query) {
+        global $pagenow, $wpdb;
+
+        // Only affect admin main query on the ham_student list screen
+        if (!is_admin() || !$query->is_main_query()) {
+            return $search;
+        }
+
+        if ($pagenow !== 'edit.php') {
+            return $search;
+        }
+
+        $post_type = $query->get('post_type');
+        if ($post_type !== HAM_CPT_STUDENT) {
+            return $search;
+        }
+
+        $term = $query->get('s');
+        if (!is_string($term) || $term === '') {
+            return $search;
+        }
+
+        // Clear core's handling so we control the WHERE fragment
+        $query->set('s', '');
+
+        $like = '%' . $wpdb->esc_like($term) . '%';
+
+        // Simple, explicit title search for student posts
+        $search = $wpdb->prepare(
+            " AND {$wpdb->posts}.post_title LIKE %s",
+            $like
+        );
+
+        return $search;
     }
 
 } // End of HAM_Admin_Loader class
