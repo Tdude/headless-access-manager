@@ -165,10 +165,6 @@ class HAM_Admin_Loader
         // Set primary column for CPTs to ensure row actions are present
         add_filter('list_table_primary_column', array(__CLASS__, 'set_primary_column'), 10, 2);
 
-        // Safety net: ensure admin search works reliably for HAM CPTs by guaranteeing
-        // there is at least a basic title search fragment when a search term is present.
-        add_filter('posts_search', array(__CLASS__, 'ensure_ham_admin_title_search'), 10, 2);
-
 
     }
 
@@ -679,75 +675,5 @@ class HAM_Admin_Loader
         }
     }
 
-    /**
-     * Safety net for admin search on HAM CPTs.
-     *
-     * WordPress core already builds a search WHERE fragment based on 's'. However,
-     * custom filters in complex setups can sometimes clear or replace that fragment.
-     * This hook ensures that when we are on a HAM CPT admin list screen and a search
-     * term exists, there is at least a basic title LIKE condition.
-     *
-     * Importantly, this does NOT clear the 's' query var and only injects a condition
-     * when core has not already produced a search fragment.
-     *
-     * @param string   $search Existing search SQL fragment.
-     * @param WP_Query $query  Current query.
-     * @return string          Modified search SQL.
-     */
-    public static function ensure_ham_admin_title_search($search, $query) {
-        global $pagenow, $wpdb;
-
-        // Only affect admin main queries on list screens
-        if (!is_admin() || !$query->is_main_query()) {
-            return $search;
-        }
-
-        if ($pagenow !== 'edit.php') {
-            return $search;
-        }
-
-        $post_type = $query->get('post_type');
-        $ham_cpts = array(
-            HAM_CPT_STUDENT,
-            HAM_CPT_TEACHER,
-            HAM_CPT_CLASS,
-            HAM_CPT_SCHOOL,
-            HAM_CPT_PRINCIPAL,
-            HAM_CPT_SCHOOL_HEAD,
-            HAM_CPT_ASSESSMENT,
-        );
-
-        // Support both string and array post_type values
-        if (is_array($post_type)) {
-            $matches = array_intersect($ham_cpts, $post_type);
-            if (empty($matches)) {
-                return $search;
-            }
-        } else {
-            if (!in_array($post_type, $ham_cpts, true)) {
-                return $search;
-            }
-        }
-
-        $term = $query->get('s');
-        if (!is_string($term) || $term === '') {
-            return $search;
-        }
-
-        $like = '%' . $wpdb->esc_like($term) . '%';
-
-        // For HAM CPTs we take full control of the search WHERE fragment and
-        // force a simple, robust title search. This avoids issues where other
-        // code (or complex query building) clears or overrides core's search.
-        //
-        // Note: we do NOT touch the 's' query var itself; we only override the
-        // SQL fragment generated for it.
-        $search = $wpdb->prepare(
-            " AND {$wpdb->posts}.post_title LIKE %s",
-            $like
-        );
-
-        return $search;
-    }
-
 } // End of HAM_Admin_Loader class
+
