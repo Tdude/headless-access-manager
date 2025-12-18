@@ -193,7 +193,9 @@ class HAM_Student_Admin_List_Table extends HAM_Base_Admin_List_Table {
         global $pagenow;
         // Ensure it's the main query, in the admin, for the Student CPT, and our filter is set.
         if ($query->is_main_query() && is_admin() && 'edit.php' === $pagenow && isset($_GET['post_type']) && HAM_CPT_STUDENT === $_GET['post_type'] && isset($_GET['ham_filter_school_id'])) {
-            $school_id_filter = absint($_GET['ham_filter_school_id']);
+            // Use the raw value to avoid treating -1 ("All schools") as 1 via absint
+            $raw_school_id = $_GET['ham_filter_school_id'];
+            $school_id_filter = intval($raw_school_id);
             if ($school_id_filter > 0) {
                 $meta_query = $query->get('meta_query') ?: [];
                 $meta_query[] = [

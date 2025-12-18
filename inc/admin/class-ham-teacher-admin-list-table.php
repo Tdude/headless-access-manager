@@ -174,8 +174,11 @@ class HAM_Teacher_Admin_List_Table extends HAM_Base_Admin_List_Table {
 
         if (is_admin() && $pagenow == 'edit.php' && HAM_CPT_TEACHER === $post_type && $query->is_main_query()) {
             // Filter by school
-            if (isset($_GET['ham_filter_school_id']) && absint($_GET['ham_filter_school_id']) > 0) {
-                $school_id = absint($_GET['ham_filter_school_id']);
+            if (isset($_GET['ham_filter_school_id'])) {
+                // Use the raw value to avoid treating -1 ("All schools") as 1 via absint
+                $raw_school_id = $_GET['ham_filter_school_id'];
+                $school_id = intval($raw_school_id);
+                if ($school_id > 0) {
                 $meta_query = $query->get('meta_query') ?: [];
                 $meta_query[] = [
                     'key' => '_ham_school_id',
@@ -183,6 +186,7 @@ class HAM_Teacher_Admin_List_Table extends HAM_Base_Admin_List_Table {
                     'compare' => '='
                 ];
                 $query->set('meta_query', $meta_query);
+                }
             }
         }
     }
