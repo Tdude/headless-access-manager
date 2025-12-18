@@ -6,6 +6,19 @@
 // Load WordPress
 require_once dirname(__FILE__, 5) . '/wp-load.php';
 
+// Environment + security check: only allow in development and for admins
+if (function_exists('wp_get_environment_type')) {
+    $ham_env = wp_get_environment_type();
+} elseif (defined('WP_ENVIRONMENT_TYPE')) {
+    $ham_env = WP_ENVIRONMENT_TYPE;
+} else {
+    $ham_env = (defined('WP_DEBUG') && WP_DEBUG) ? 'development' : 'production';
+}
+
+if ($ham_env !== 'development') {
+    wp_die('This debug tool is only available in the development environment.');
+}
+
 // Security check
 if (!current_user_can('manage_options')) {
     wp_die('Unauthorized access');
