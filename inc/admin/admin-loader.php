@@ -697,6 +697,7 @@ class HAM_Admin_Loader
     public static function ensure_ham_admin_title_search($search, $query) {
         global $pagenow, $wpdb;
 
+        // Only affect admin main queries on list screens
         if (!is_admin() || !$query->is_main_query()) {
             return $search;
         }
@@ -716,8 +717,16 @@ class HAM_Admin_Loader
             HAM_CPT_ASSESSMENT,
         );
 
-        if (!in_array($post_type, $ham_cpts, true)) {
-            return $search;
+        // Support both string and array post_type values
+        if (is_array($post_type)) {
+            $matches = array_intersect($ham_cpts, $post_type);
+            if (empty($matches)) {
+                return $search;
+            }
+        } else {
+            if (!in_array($post_type, $ham_cpts, true)) {
+                return $search;
+            }
         }
 
         $term = $query->get('s');
@@ -725,17 +734,14 @@ class HAM_Admin_Loader
             return $search;
         }
 
-        // If core (or another plugin) has already generated a search WHERE clause,
-        // respect it and do nothing. This keeps behavior as close to core as possible.
-        if (!empty($search)) {
-            return $search;
-        }
-
         $like = '%' . $wpdb->esc_like($term) . '%';
 
-        // Minimal, explicit title search for the current HAM CPT.
-        // Prefixed with AND because WordPress expects posts_search to return a
-        // fragment that is concatenated into the main WHERE clause.
+        // For HAM CPTs we take full control of the search WHERE fragment and
+        // force a simple, robust title search. This avoids issues where other
+        // code (or complex query building) clears or overrides core's search.
+        //
+        // Note: we do NOT touch the 's' query var itself; we only override the
+        // SQL fragment generated for it.
         $search = $wpdb->prepare(
             " AND {$wpdb->posts}.post_title LIKE %s",
             $like
