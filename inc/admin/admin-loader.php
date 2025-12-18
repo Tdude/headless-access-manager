@@ -165,8 +165,9 @@ class HAM_Admin_Loader
         // Set primary column for CPTs to ensure row actions are present
         add_filter('list_table_primary_column', array(__CLASS__, 'set_primary_column'), 10, 2);
 
-        // Ensure admin search works reliably for the Student CPT by forcing a title search
-        add_filter('posts_search', array(__CLASS__, 'force_student_admin_title_search'), 10, 2);
+        // Safety net: ensure admin search works reliably for HAM CPTs by guaranteeing
+        // there is at least a basic title search fragment when a search term is present.
+        add_filter('posts_search', array(__CLASS__, 'ensure_ham_admin_title_search'), 10, 2);
 
 
     }
@@ -679,17 +680,23 @@ class HAM_Admin_Loader
     }
 
     /**
-     * Ensure that searching in the Student CPT admin list always matches post titles.
-     * This is a safety net in case other filters modify or clear the default search SQL.
+     * Safety net for admin search on HAM CPTs.
      *
-     * @param string    $search Existing search SQL fragment.
-     * @param WP_Query  $query  Current query.
-     * @return string           Modified search SQL.
+     * WordPress core already builds a search WHERE fragment based on 's'. However,
+     * custom filters in complex setups can sometimes clear or replace that fragment.
+     * This hook ensures that when we are on a HAM CPT admin list screen and a search
+     * term exists, there is at least a basic title LIKE condition.
+     *
+     * Importantly, this does NOT clear the 's' query var and only injects a condition
+     * when core has not already produced a search fragment.
+     *
+     * @param string   $search Existing search SQL fragment.
+     * @param WP_Query $query  Current query.
+     * @return string          Modified search SQL.
      */
-    public static function force_student_admin_title_search($search, $query) {
+    public static function ensure_ham_admin_title_search($search, $query) {
         global $pagenow, $wpdb;
 
-        // Only affect admin main query on the ham_student list screen
         if (!is_admin() || !$query->is_main_query()) {
             return $search;
         }
@@ -699,7 +706,17 @@ class HAM_Admin_Loader
         }
 
         $post_type = $query->get('post_type');
-        if ($post_type !== HAM_CPT_STUDENT) {
+        $ham_cpts = array(
+            HAM_CPT_STUDENT,
+            HAM_CPT_TEACHER,
+            HAM_CPT_CLASS,
+            HAM_CPT_SCHOOL,
+            HAM_CPT_PRINCIPAL,
+            HAM_CPT_SCHOOL_HEAD,
+            HAM_CPT_ASSESSMENT,
+        );
+
+        if (!in_array($post_type, $ham_cpts, true)) {
             return $search;
         }
 
@@ -708,12 +725,17 @@ class HAM_Admin_Loader
             return $search;
         }
 
-        // Clear core's handling so we control the WHERE fragment
-        $query->set('s', '');
+        // If core (or another plugin) has already generated a search WHERE clause,
+        // respect it and do nothing. This keeps behavior as close to core as possible.
+        if (!empty($search)) {
+            return $search;
+        }
 
         $like = '%' . $wpdb->esc_like($term) . '%';
 
-        // Simple, explicit title search for student posts
+        // Minimal, explicit title search for the current HAM CPT.
+        // Prefixed with AND because WordPress expects posts_search to return a
+        // fragment that is concatenated into the main WHERE clause.
         $search = $wpdb->prepare(
             " AND {$wpdb->posts}.post_title LIKE %s",
             $like
