@@ -1608,61 +1608,26 @@ public function ajax_get_assessment_details()
         }
         */
 
-        // Get the questions structure - create a proper structure with question text and options
-        // Do not rely on get_questions_structure() as it doesn't contain the proper structure
+        // Get the questions structure - prefer the canonical default structure so the modal can show
+        // full question text and full option labels.
         $questions_structure = array();
 
-        // Define the default options
-        $default_options = array(
-            array('value' => '1', 'label' => 'Inte alls', 'stage' => 'ej'),
-            array('value' => '2', 'label' => 'Sällan', 'stage' => 'ej'),
-            array('value' => '3', 'label' => 'Ibland', 'stage' => 'trans'),
-            array('value' => '4', 'label' => 'Ofta', 'stage' => 'trans'),
-            array('value' => '5', 'label' => 'Alltid', 'stage' => 'full')
-        );
+        if (defined('HAM_ASSESSMENT_DEFAULT_STRUCTURE') && is_array(HAM_ASSESSMENT_DEFAULT_STRUCTURE)) {
+            foreach (array('anknytning', 'ansvar') as $section) {
+                if (!isset(HAM_ASSESSMENT_DEFAULT_STRUCTURE[$section]) || !is_array(HAM_ASSESSMENT_DEFAULT_STRUCTURE[$section])) {
+                    continue;
+                }
 
-        // Define default question texts - these should match the frontend
-        $question_texts = array(
-            'anknytning' => array(
-                'a1' => 'Närvaro',
-                'a2' => 'Dialog 1',
-                'a3' => 'Dialog 2',
-                'a4' => 'Kontakt',
-                'a5' => 'Samarbete',
-                'a6' => 'Vid konflikt',
-                'a7' => 'Engagemang'
-            ),
-            'ansvar' => array(
-                'b1' => 'Uppgift',
-                'b2' => 'Initiativ',
-                'b3' => 'Material',
-                'b4' => 'Tid',
-                'b5' => 'Regler',
-                'b6' => 'Vid konflikt',
-                'b7' => 'Ansvar'
-            )
-        );
-
-        // Build a proper structure for each section, ensuring correct order from the predefined list
-        foreach ($question_texts as $section => $section_questions) {
-            $questions = array();
-
-            // Iterate over the DEFINED questions in order to maintain the correct sequence
-            foreach ($section_questions as $qkey => $qtext) {
-                // Normalize key just in case, though it should be consistent
-                $qkey = strtolower($qkey);
-
-                // Add question with proper text and options
-                $questions[$qkey] = array(
-                    'text'    => $qtext,
-                    'options' => $default_options,
+                $questions_structure[$section] = array(
+                    'title'     => isset(HAM_ASSESSMENT_DEFAULT_STRUCTURE[$section]['title']) ? HAM_ASSESSMENT_DEFAULT_STRUCTURE[$section]['title'] : ucfirst($section),
+                    'questions' => isset(HAM_ASSESSMENT_DEFAULT_STRUCTURE[$section]['questions']) ? HAM_ASSESSMENT_DEFAULT_STRUCTURE[$section]['questions'] : array(),
                 );
             }
+        }
 
-            $questions_structure[$section] = array(
-                'title'     => $section == 'anknytning' ? 'Anknytningstecken' : 'Ansvarstecken',
-                'questions' => $questions,
-            );
+        // Fallback: if the canonical structure isn't available for some reason.
+        if (empty($questions_structure)) {
+            $questions_structure = self::get_questions_structure();
         }
 
         // Dump processed data for debugging

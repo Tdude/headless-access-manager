@@ -198,6 +198,12 @@
                 .replace(/'/g, '&#039;');
         }
 
+        function decodeHtml(value) {
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = String(value);
+            return textarea.value;
+        }
+
         function hideTooltip() {
             if (tooltipState.timer) {
                 clearTimeout(tooltipState.timer);
@@ -237,17 +243,19 @@
         }
 
         function showTooltipFromTarget($target) {
-            const text = $target.data('fullText');
-            if (!text) {
+            const attrText = $target.attr('data-full-text');
+            if (!attrText) {
                 return;
             }
+
+            const text = decodeHtml(attrText);
 
             if (!tooltipState.$tooltip) {
                 tooltipState.$tooltip = $('<div class="ham-tooltip" role="tooltip"></div>');
                 $('body').append(tooltipState.$tooltip);
             }
 
-            tooltipState.$tooltip.html(escapeHtml(text));
+            tooltipState.$tooltip.text(text);
             positionTooltip();
         }
 
@@ -492,6 +500,24 @@
                         }
                     }
 
+                    let questionTooltipText = questionText;
+                    if (questionStructure.options && Array.isArray(questionStructure.options) && questionStructure.options.length) {
+                        const optionLines = questionStructure.options
+                            .map(opt => {
+                                const optValue = opt && opt.value !== undefined ? String(opt.value) : '';
+                                const optLabel = opt && opt.label ? String(opt.label) : '';
+                                if (!optLabel) {
+                                    return '';
+                                }
+                                return optValue ? `${optValue}. ${optLabel}` : optLabel;
+                            })
+                            .filter(Boolean);
+
+                        if (optionLines.length) {
+                            questionTooltipText = `${questionText}\n\n${optionLines.join('\n')}`;
+                        }
+                    }
+
                     // Set stage badge
                     let stageClass = '';
                     let stageText = '';
@@ -515,11 +541,12 @@
 
                     const safeQuestionText = escapeHtml(questionText);
                     const safeAnswerLabel = escapeHtml(answerLabel);
+                    const safeQuestionTooltipText = escapeHtml(questionTooltipText);
 
                     // Create table row
                     const tableRow = `
                         <tr>
-                            <td><span class="ham-tooltip-target" data-full-text="${safeQuestionText}">${safeQuestionText}</span></td>
+                            <td><span class="ham-tooltip-target" data-full-text="${safeQuestionTooltipText}">${safeQuestionText}</span></td>
                             <td><span class="ham-tooltip-target" data-full-text="${safeAnswerLabel}">${safeAnswerLabel}</span></td>
                             <td>${stageBadge}</td>
                         </tr>
