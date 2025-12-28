@@ -318,6 +318,26 @@ class HAM_Assessment_Manager
         return $map;
     }
 
+    private static function get_question_order()
+    {
+        $structure = self::get_questions_structure();
+        if (empty($structure) || !is_array($structure)) {
+            return array();
+        }
+
+        $order = array();
+        foreach (array('anknytning', 'ansvar') as $section_key) {
+            if (!isset($structure[$section_key]['questions']) || !is_array($structure[$section_key]['questions'])) {
+                continue;
+            }
+            foreach ($structure[$section_key]['questions'] as $question_id => $question) {
+                $order[] = $section_key . '_' . $question_id;
+            }
+        }
+
+        return $order;
+    }
+
     private static function fetch_evaluation_posts($student_ids = array())
     {
         $meta_query = array(
@@ -706,26 +726,29 @@ class HAM_Assessment_Manager
             $posts = self::fetch_evaluation_posts(array($student_id));
             $view['series'] = self::aggregate_evaluations_by_semester($posts);
 
-            $question_totals = array();
+            $question_order = self::get_question_order();
+            $seen_questions = array();
             foreach ($view['series'] as $bucket) {
                 foreach ($bucket['question_avgs'] as $qk => $avg) {
-                    if (!isset($question_totals[$qk])) {
-                        $question_totals[$qk] = array('sum' => 0.0, 'count' => 0);
-                    }
-                    $question_totals[$qk]['sum'] += (float) $avg;
-                    $question_totals[$qk]['count']++;
+                    $seen_questions[$qk] = true;
                 }
             }
 
-            $question_rank = array();
-            foreach ($question_totals as $qk => $agg) {
-                if ($agg['count'] <= 0) {
-                    continue;
+            $ordered_questions = array();
+            foreach ($question_order as $qk) {
+                if (isset($seen_questions[$qk])) {
+                    $ordered_questions[] = $qk;
+                    unset($seen_questions[$qk]);
                 }
-                $question_rank[$qk] = $agg['sum'] / $agg['count'];
             }
-            arsort($question_rank);
-            $view['top_questions'] = array_slice(array_keys($question_rank), 0, 8);
+
+            if (!empty($seen_questions)) {
+                $extra = array_keys($seen_questions);
+                sort($extra);
+                $ordered_questions = array_merge($ordered_questions, $extra);
+            }
+
+            $view['top_questions'] = $ordered_questions;
 
             return $view;
         }

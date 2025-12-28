@@ -14,6 +14,7 @@ if (! defined('ABSPATH')) {
     <h1><?php echo esc_html__('Evaluations by Tryggve', 'headless-access-manager'); ?></h1>
 
     <?php if (isset($drilldown) && is_array($drilldown)) : ?>
+
         <div class="ham-stats-panel" style="margin-top: 20px;">
             <h2><?php echo esc_html__('Evaluation Drilldown', 'headless-access-manager'); ?></h2>
 
@@ -22,9 +23,9 @@ if (! defined('ABSPATH')) {
                     <?php
                     $crumbs = array();
                     foreach ($drilldown['breadcrumb'] as $crumb) {
-                        $crumbs[] = '<a href="' . esc_url($crumb['url']) . '">' . esc_html($crumb['label']) . '</a>';
+                        $crumbs[] = '<a class="ham-pill-link" href="' . esc_url($crumb['url']) . '">' . esc_html($crumb['label']) . '</a>';
                     }
-                    echo wp_kses_post(implode(' &raquo; ', $crumbs));
+                    echo '<div class="ham-pill-group">' . wp_kses_post(implode('<span class="ham-pill-separator">&raquo;</span>', $crumbs)) . '</div>';
                     ?>
                 </div>
             <?php endif; ?>
@@ -83,7 +84,9 @@ if (! defined('ABSPATH')) {
                         <?php if (!empty($drilldown['schools'])) : ?>
                             <?php foreach ($drilldown['schools'] as $school) : ?>
                                 <tr>
-                                    <td><a href="<?php echo esc_url($school['url']); ?>"><?php echo esc_html($school['name']); ?></a></td>
+                                    <td>
+                                        <a class="ham-pill-link" href="<?php echo esc_url($school['url']); ?>"><?php echo esc_html($school['name']); ?></a>
+                                    </td>
                                     <td><?php echo esc_html((int) $school['class_count']); ?></td>
                                     <td><?php echo esc_html((int) $school['student_count']); ?></td>
                                     <td><?php echo esc_html((int) $school['evaluation_count']); ?></td>
@@ -123,7 +126,9 @@ if (! defined('ABSPATH')) {
                         <?php if (!empty($drilldown['classes'])) : ?>
                             <?php foreach ($drilldown['classes'] as $class) : ?>
                                 <tr>
-                                    <td><a href="<?php echo esc_url($class['url']); ?>"><?php echo esc_html($class['name']); ?></a></td>
+                                    <td>
+                                        <a class="ham-pill-link" href="<?php echo esc_url($class['url']); ?>"><?php echo esc_html($class['name']); ?></a>
+                                    </td>
                                     <td><?php echo esc_html((int) $class['student_count']); ?></td>
                                     <td><?php echo esc_html((int) $class['evaluation_count']); ?></td>
                                     <td><?php echo $class['overall_avg'] === null ? '—' : esc_html(number_format((float) $class['overall_avg'], 2)); ?></td>
@@ -161,7 +166,9 @@ if (! defined('ABSPATH')) {
                         <?php if (!empty($drilldown['students'])) : ?>
                             <?php foreach ($drilldown['students'] as $student) : ?>
                                 <tr>
-                                    <td><a href="<?php echo esc_url($student['url']); ?>"><?php echo esc_html($student['name']); ?></a></td>
+                                    <td>
+                                        <a class="ham-pill-link" href="<?php echo esc_url($student['url']); ?>"><?php echo esc_html($student['name']); ?></a>
+                                    </td>
                                     <td><?php echo esc_html((int) $student['evaluation_count']); ?></td>
                                     <td><?php echo $student['overall_avg'] === null ? '—' : esc_html(number_format((float) $student['overall_avg'], 2)); ?></td>
                                     <td style="min-width: 320px;">
@@ -191,9 +198,9 @@ if (! defined('ABSPATH')) {
 
                 <?php if (!empty($drilldown['series'])) : ?>
                     <?php
-                    $top_questions = isset($drilldown['top_questions']) && is_array($drilldown['top_questions']) ? $drilldown['top_questions'] : array();
-                    if (empty($top_questions)) {
-                        $top_questions = array();
+                    $questions = isset($drilldown['top_questions']) && is_array($drilldown['top_questions']) ? $drilldown['top_questions'] : array();
+                    if (empty($questions)) {
+                        $questions = array();
                     }
                     ?>
                     <table class="wp-list-table widefat fixed striped">
@@ -206,8 +213,8 @@ if (! defined('ABSPATH')) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (!empty($top_questions)) : ?>
-                                <?php foreach ($top_questions as $qk) : ?>
+                            <?php if (!empty($questions)) : ?>
+                                <?php foreach ($questions as $qk) : ?>
                                     <?php
                                     $label = $qk;
                                     if (isset($drilldown['question_labels'][$qk])) {

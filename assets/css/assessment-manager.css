@@ -339,6 +339,36 @@
     }
 }
 
+.ham-pill-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #f0f0f1;
+    border: 1px solid #dcdcde;
+    color: #1d2327;
+    text-decoration: none;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: nowrap;
+}
+.ham-pill-link:hover {
+    background: #fff;
+    border-color: #2271b1;
+    color: #2271b1;
+}
+.ham-pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.ham-pill-separator {
+    display: inline-flex;
+    align-items: center;
+    color: #646970;
+    padding: 0 2px;
+}
+
 /* HAM assessments list */
 
 /* Assessment List Styles */
