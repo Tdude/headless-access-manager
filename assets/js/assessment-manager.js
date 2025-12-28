@@ -182,6 +182,105 @@
         const $modalClose = $('.ham-modal-close');
         const $viewButtons = $('.ham-view-assessment');
 
+        const tooltipState = {
+            timer: null,
+            $tooltip: null,
+            $target: null,
+            lastEvent: null,
+        };
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function hideTooltip() {
+            if (tooltipState.timer) {
+                clearTimeout(tooltipState.timer);
+                tooltipState.timer = null;
+            }
+            tooltipState.$target = null;
+            tooltipState.lastEvent = null;
+            if (tooltipState.$tooltip) {
+                tooltipState.$tooltip.remove();
+                tooltipState.$tooltip = null;
+            }
+        }
+
+        function positionTooltip() {
+            if (!tooltipState.$tooltip || !tooltipState.lastEvent) {
+                return;
+            }
+
+            const padding = 12;
+            let left = tooltipState.lastEvent.pageX + 12;
+            let top = tooltipState.lastEvent.pageY + 12;
+
+            tooltipState.$tooltip.css({ left: left + 'px', top: top + 'px' });
+
+            const $w = $(window);
+            const maxLeft = $w.scrollLeft() + $w.width() - tooltipState.$tooltip.outerWidth() - padding;
+            const maxTop = $w.scrollTop() + $w.height() - tooltipState.$tooltip.outerHeight() - padding;
+
+            if (left > maxLeft) {
+                left = maxLeft;
+            }
+            if (top > maxTop) {
+                top = maxTop;
+            }
+
+            tooltipState.$tooltip.css({ left: left + 'px', top: top + 'px' });
+        }
+
+        function showTooltipFromTarget($target) {
+            const text = $target.data('fullText');
+            if (!text) {
+                return;
+            }
+
+            if (!tooltipState.$tooltip) {
+                tooltipState.$tooltip = $('<div class="ham-tooltip" role="tooltip"></div>');
+                $('body').append(tooltipState.$tooltip);
+            }
+
+            tooltipState.$tooltip.html(escapeHtml(text));
+            positionTooltip();
+        }
+
+        $modal.on('mouseenter', '.ham-tooltip-target', function(e) {
+            hideTooltip();
+            tooltipState.$target = $(this);
+            tooltipState.lastEvent = e;
+            tooltipState.timer = setTimeout(function() {
+                if (tooltipState.$target) {
+                    showTooltipFromTarget(tooltipState.$target);
+                }
+            }, 1000);
+        });
+
+        $modal.on('mousemove', '.ham-tooltip-target', function(e) {
+            tooltipState.lastEvent = e;
+            positionTooltip();
+        });
+
+        $modal.on('mouseleave', '.ham-tooltip-target', function() {
+            hideTooltip();
+        });
+
+        $modal.on('scroll', function() {
+            hideTooltip();
+        });
+
+        $(document).on('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideTooltip();
+            }
+        });
+
         // Open modal when view button is clicked
         $viewButtons.on('click', function(e) {
             e.preventDefault();
@@ -414,11 +513,14 @@
 
                     const stageBadge = stage ? `<span class="ham-stage-badge ${stageClass}">${stageText}</span>` : '';
 
+                    const safeQuestionText = escapeHtml(questionText);
+                    const safeAnswerLabel = escapeHtml(answerLabel);
+
                     // Create table row
                     const tableRow = `
                         <tr>
-                            <td>${questionText}</td>
-                            <td>${answerLabel}</td>
+                            <td><span class="ham-tooltip-target" data-full-text="${safeQuestionText}">${safeQuestionText}</span></td>
+                            <td><span class="ham-tooltip-target" data-full-text="${safeAnswerLabel}">${safeAnswerLabel}</span></td>
                             <td>${stageBadge}</td>
                         </tr>
                     `;

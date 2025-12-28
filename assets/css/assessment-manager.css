@@ -187,6 +187,29 @@
     margin-top: 0;
 }
 
+.ham-tooltip {
+    position: absolute;
+    z-index: 100001;
+    max-width: 360px;
+    padding: 8px 10px;
+    background: rgba(17, 17, 17, 0.95);
+    color: #fff;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.35;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.ham-tooltip-target {
+    cursor: help;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
+}
+
 .ham-comment-item {
     margin-bottom: 15px;
     padding: 10px;
