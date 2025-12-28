@@ -203,6 +203,29 @@
     word-break: break-word;
 }
 
+ .ham-tooltip .ham-tooltip-label {
+     font-weight: 600;
+     margin-bottom: 6px;
+     opacity: 0.95;
+ }
+
+ .ham-tooltip .ham-tooltip-list {
+     margin: 0;
+     padding-left: 18px;
+ }
+
+ .ham-tooltip .ham-tooltip-list li {
+     margin: 4px 0;
+ }
+
+ .ham-tooltip .ham-tooltip-option-value {
+     display: inline-block;
+     min-width: 18px;
+     margin-right: 6px;
+     font-weight: 700;
+     opacity: 0.95;
+ }
+
 .ham-tooltip-target {
     cursor: help;
     text-decoration: underline;

@@ -248,19 +248,26 @@
         }
 
         function showTooltipFromTarget($target) {
+            const attrHtml = $target.attr('data-full-html');
             const attrText = $target.attr('data-full-text');
-            if (!attrText) {
+
+            if (!attrHtml && !attrText) {
                 return;
             }
 
-            const text = decodeHtml(attrText);
+            const html = attrHtml ? decodeHtml(attrHtml) : '';
+            const text = attrText ? decodeHtml(attrText) : '';
 
             if (!tooltipState.$tooltip) {
                 tooltipState.$tooltip = $('<div class="ham-tooltip" role="tooltip"></div>');
                 $('body').append(tooltipState.$tooltip);
             }
 
-            tooltipState.$tooltip.text(text);
+            if (attrHtml) {
+                tooltipState.$tooltip.html(html);
+            } else {
+                tooltipState.$tooltip.text(text);
+            }
             positionTooltip();
         }
 
@@ -302,7 +309,7 @@
             if (assessmentId === undefined) {
                 assessmentId = $(this).data('id');
             }
-            console.log('Opening modal for assessment ID:', assessmentId);
+            //console.log('Opening modal for assessment ID:', assessmentId);
             fetchAssessmentDetails(assessmentId);
         });
 
@@ -333,14 +340,14 @@
                 assessment_id: assessmentId
             };
 
-            console.log('Fetching assessment details with data:', data);
+            //console.log('Fetching assessment details with data:', data);
 
             $.post(hamAssessment.ajaxUrl, data, function(response) {
                 $('#ham-assessment-loading').hide();
 
                 if (response.success && response.data) {
                     // Log the full response for debugging
-                    console.log('Assessment details response (FULL):', response.data);
+                    //console.log('Assessment details response (FULL):', response.data);
 
                     // Display the assessment details
                     displayAssessmentDetails(response.data);
@@ -349,12 +356,12 @@
                     $('#ham-assessment-details').show();
                 } else {
                     $('#ham-assessment-error').show();
-                    console.error('Error fetching assessment details:', response);
+                    //console.error('Error fetching assessment details:', response);
                 }
             }).fail(function(xhr, status, error) {
                 $('#ham-assessment-loading').hide();
                 $('#ham-assessment-error').show();
-                console.error('AJAX error:', status, error);
+                //console.error('AJAX error:', status, error);
             });
         }
 
@@ -396,10 +403,10 @@
             // =============================
 
             // Set student name and date
-            console.log('SETTING STUDENT NAME:', data.student_name);
-            console.log('CURRENT STUDENT ELEMENT:', $('#ham-assessment-student').length, $('#ham-assessment-student').text());
+            //console.log('SETTING STUDENT NAME:', data.student_name);
+            //console.log('CURRENT STUDENT ELEMENT:', $('#ham-assessment-student').length, $('#ham-assessment-student').text());
             $('#ham-assessment-student').text(data.student_name);
-            console.log('AFTER SETTING:', $('#ham-assessment-student').text());
+            //console.log('AFTER SETTING:', $('#ham-assessment-student').text());
             $('#ham-assessment-date').text(data.date);
             $('#ham-assessment-author').text(data.author_name);
 
@@ -448,7 +455,7 @@
 
                 // Skip if no structure is available
                 if (!sectionStructure || !sectionStructure.questions) {
-                    console.log(`Missing structure for section: ${sectionName}`);
+                    //console.log(`Missing structure for section: ${sectionName}`);
                     $container.html(`<tr><td colspan="3">${hamAssessment.texts.noQuestions || 'No questions configured.'}</td></tr>`);
                     return;
                 }
@@ -458,7 +465,7 @@
                 
                 // FIX: Iterate over the keys from the STRUCTURE to maintain the correct order
                 const questionKeysInOrder = Object.keys(structureQuestions);
-                console.log(`Processing ${sectionName} questions in order from structure:`, questionKeysInOrder);
+                //console.log(`Processing ${sectionName} questions in order from structure:`, questionKeysInOrder);
 
                 if (questionKeysInOrder.length === 0) {
                     $container.html(`<tr><td colspan="3">${hamAssessment.texts.noQuestions || 'No questions configured.'}</td></tr>`);
@@ -485,7 +492,7 @@
 
                     if (!debugTooltipCandidates[sectionName]) {
                         debugTooltipCandidates[sectionName] = true;
-                        console.log('[HAM MODAL TOOLTIP DEBUG]', {
+                        //console.log('[HAM MODAL TOOLTIP DEBUG]', {
                             section: sectionName,
                             qKey,
                             questionStructure,
@@ -533,8 +540,6 @@
                         }
                     }
 
-                    const questionTooltipText = questionText;
-
                     let answerTooltipText = '';
                     if (questionStructure.options && Array.isArray(questionStructure.options) && questionStructure.options.length) {
                         const optionLines = questionStructure.options
@@ -555,6 +560,29 @@
 
                     if (!answerTooltipText) {
                         answerTooltipText = answerLabel;
+                    }
+
+                    let answerTooltipHtml = '';
+                    if (questionStructure.options && Array.isArray(questionStructure.options) && questionStructure.options.length) {
+                        const optionItemsHtml = questionStructure.options
+                            .map(opt => {
+                                const optValue = opt && opt.value !== undefined ? String(opt.value) : '';
+                                const optLabel = opt && opt.label ? String(opt.label) : '';
+                                if (!optLabel) {
+                                    return '';
+                                }
+
+                                const safeOptValue = escapeHtml(optValue);
+                                const safeOptLabel = escapeHtml(optLabel);
+                                const valuePrefix = optValue ? `<span class="ham-tooltip-option-value">${safeOptValue}</span>` : '';
+                                return `<li>${valuePrefix}${safeOptLabel}</li>`;
+                            })
+                            .filter(Boolean)
+                            .join('');
+
+                        if (optionItemsHtml) {
+                            answerTooltipHtml = `<div class="ham-tooltip-label">${escapeHtml(hamAssessment.texts.answerAlternatives || 'Svarsalternativ')}</div><ul class="ham-tooltip-list">${optionItemsHtml}</ul>`;
+                        }
                     }
 
                     // Set stage badge
@@ -580,14 +608,14 @@
 
                     const safeQuestionText = escapeHtml(questionText);
                     const safeAnswerLabel = escapeHtml(answerLabel);
-                    const safeQuestionTooltipText = escapeHtml(questionTooltipText);
                     const safeAnswerTooltipText = escapeHtml(answerTooltipText);
+                    const safeAnswerTooltipHtml = answerTooltipHtml ? escapeHtml(answerTooltipHtml) : '';
 
                     // Create table row
                     const tableRow = `
                         <tr>
-                            <td><span class="ham-tooltip-target" data-full-text="${safeQuestionTooltipText}">${safeQuestionText}</span></td>
-                            <td><span class="ham-tooltip-target" data-full-text="${safeAnswerTooltipText}">${safeAnswerLabel}</span></td>
+                            <td>${safeQuestionText}</td>
+                            <td><span class="ham-tooltip-target" ${safeAnswerTooltipHtml ? `data-full-html="${safeAnswerTooltipHtml}"` : `data-full-text="${safeAnswerTooltipText}"`}>${safeAnswerLabel}</span></td>
                             <td>${stageBadge}</td>
                         </tr>
                     `;
