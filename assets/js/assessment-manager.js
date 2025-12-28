@@ -500,10 +500,9 @@
                         }
                     }
 
-                    const sectionTitle = (sectionStructure && sectionStructure.title) ? sectionStructure.title : sectionName;
-                    const questionTooltipText = `${sectionTitle}: ${questionText}`;
+                    const questionTooltipText = questionText;
 
-                    let answerTooltipText = answerLabel;
+                    let answerTooltipText = '';
                     if (questionStructure.options && Array.isArray(questionStructure.options) && questionStructure.options.length) {
                         const optionLines = questionStructure.options
                             .map(opt => {
@@ -517,7 +516,7 @@
                             .filter(Boolean);
 
                         if (optionLines.length) {
-                            answerTooltipText = `${answerLabel}\n\n${optionLines.join('\n')}`;
+                            answerTooltipText = optionLines.join('\n');
                         }
                     }
 
