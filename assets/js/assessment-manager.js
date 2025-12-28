@@ -469,7 +469,14 @@
                     const answerData = answeredKey ? answeredQuestions[answeredKey] : undefined;
                     
                     const questionStructure = structureQuestions[qKey];
-                    const questionText = questionStructure.text || qKey;
+                    const questionTextFromStructure = questionStructure && typeof questionStructure.text === 'string' ? questionStructure.text.trim() : '';
+
+                    let questionTextFromAnswer = '';
+                    if (answerData && typeof answerData === 'object' && answerData !== null && typeof answerData.text === 'string') {
+                        questionTextFromAnswer = answerData.text.trim();
+                    }
+
+                    const questionText = (questionTextFromAnswer || questionTextFromStructure || String(qKey)).trim();
 
                     let answerValue;
                     let stage;
@@ -518,6 +525,10 @@
                         if (optionLines.length) {
                             answerTooltipText = optionLines.join('\n');
                         }
+                    }
+
+                    if (!answerTooltipText) {
+                        answerTooltipText = answerLabel;
                     }
 
                     // Set stage badge
