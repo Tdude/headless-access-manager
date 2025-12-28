@@ -500,7 +500,10 @@
                         }
                     }
 
-                    let questionTooltipText = questionText;
+                    const sectionTitle = (sectionStructure && sectionStructure.title) ? sectionStructure.title : sectionName;
+                    const questionTooltipText = `${sectionTitle}: ${questionText}`;
+
+                    let answerTooltipText = answerLabel;
                     if (questionStructure.options && Array.isArray(questionStructure.options) && questionStructure.options.length) {
                         const optionLines = questionStructure.options
                             .map(opt => {
@@ -514,7 +517,7 @@
                             .filter(Boolean);
 
                         if (optionLines.length) {
-                            questionTooltipText = `${questionText}\n\n${optionLines.join('\n')}`;
+                            answerTooltipText = `${answerLabel}\n\n${optionLines.join('\n')}`;
                         }
                     }
 
@@ -542,12 +545,13 @@
                     const safeQuestionText = escapeHtml(questionText);
                     const safeAnswerLabel = escapeHtml(answerLabel);
                     const safeQuestionTooltipText = escapeHtml(questionTooltipText);
+                    const safeAnswerTooltipText = escapeHtml(answerTooltipText);
 
                     // Create table row
                     const tableRow = `
                         <tr>
                             <td><span class="ham-tooltip-target" data-full-text="${safeQuestionTooltipText}">${safeQuestionText}</span></td>
-                            <td><span class="ham-tooltip-target" data-full-text="${safeAnswerLabel}">${safeAnswerLabel}</span></td>
+                            <td><span class="ham-tooltip-target" data-full-text="${safeAnswerTooltipText}">${safeAnswerLabel}</span></td>
                             <td>${stageBadge}</td>
                         </tr>
                     `;
