@@ -407,7 +407,7 @@ msgid "Full"
 msgstr "Fullt etablerat"
 
 msgid "Not Established"
-msgstr "Ännu ej elev"
+msgstr "Ej etablerad"
 
 msgid "In Transition"
 msgstr "Utvecklas"
