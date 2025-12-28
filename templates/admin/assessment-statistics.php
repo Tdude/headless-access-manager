@@ -80,11 +80,23 @@ if (! defined('ABSPATH')) {
                     if (empty($monthlyData)) {
                         echo '<p>' . esc_html__('No data to display', 'headless-access-manager') . '</p>';
                     } else {
-                        echo '<div class="ham-simple-chart">';
+                        $maxCount = 0;
                         foreach ($monthlyData as $item) {
-                            $height = $item['count'] * 20; // 20px per unit
-                            echo '<div class="ham-bar-wrapper" style="display: inline-block; margin: 0 10px; text-align: center;">';
-                            echo '<div class="ham-bar" style="height: ' . esc_attr($height) . 'px; width: 30px; background-color: #0073aa; display: inline-block;"></div>';
+                            $count = isset($item['count']) ? (int) $item['count'] : 0;
+                            if ($count > $maxCount) {
+                                $maxCount = $count;
+                            }
+                        }
+                        if ($maxCount < 1) {
+                            $maxCount = 1;
+                        }
+
+                        echo '<div class="ham-simple-chart" style="height: 220px; display: flex; align-items: flex-end; justify-content: center; gap: 20px;">';
+                        foreach ($monthlyData as $item) {
+                            $count = isset($item['count']) ? (int) $item['count'] : 0;
+                            $heightPct = ($count / $maxCount) * 100;
+                            echo '<div class="ham-bar-wrapper" style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center;">';
+                            echo '<div class="ham-bar" style="display: block; height: ' . esc_attr($heightPct) . '%; width: 30px; background-color: #0073aa;"></div>';
                             echo '<div class="ham-bar-label" style="margin-top: 5px;">' . esc_html($item['month']) . '</div>';
                             echo '<div class="ham-bar-value" style="font-weight: bold;">' . esc_html($item['count']) . '</div>';
                             echo '</div>';
