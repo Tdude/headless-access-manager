@@ -198,6 +198,97 @@ msgid "Assessment removed from trash"
 msgstr "Bedömning borttagen från papperskorgen"
 
 # Short Status Messages
+
+#: templates/admin/assessment-statistics.php:18
+msgid "Evaluation Drilldown"
+msgstr "Fördelning av bedömningar"
+
+#: templates/admin/assessment-statistics.php:35
+msgid "No evaluation data available."
+msgstr "Ingen bedömningsdata tillgänglig."
+
+#: templates/admin/assessment-statistics.php:59
+msgid "Avg"
+msgstr "Snitt"
+
+#: templates/admin/assessment-statistics.php:68
+msgid "Select a school to drill down into classes, students, and per-question evaluation progress by semester."
+msgstr "Välj en skola för att fördjupa dig i klasser, elever och utveckling per fråga per termin."
+
+#: templates/admin/assessment-statistics.php:75
+msgid "# Classes"
+msgstr "Antal klasser"
+
+#: templates/admin/assessment-statistics.php:76
+msgid "# Students evaluated"
+msgstr "Antal bedömda elever"
+
+#: templates/admin/assessment-statistics.php:77
+#: templates/admin/assessment-statistics.php:117
+#: templates/admin/assessment-statistics.php:155
+msgid "# Evaluations"
+msgstr "Antal bedömningar"
+
+#: templates/admin/assessment-statistics.php:78
+#: templates/admin/assessment-statistics.php:118
+#: templates/admin/assessment-statistics.php:156
+msgid "Overall Avg"
+msgstr "Snitt totalt"
+
+#: templates/admin/assessment-statistics.php:79
+#: templates/admin/assessment-statistics.php:119
+#: templates/admin/assessment-statistics.php:157
+msgid "Progress (by semester)"
+msgstr "Utveckling (per termin)"
+
+
+#: templates/admin/assessment-statistics.php:105
+msgid "School Progress (by semester)"
+msgstr "Skolans utveckling (per termin)"
+
+
+#: templates/admin/assessment-statistics.php:116
+msgid "# Students"
+msgstr "Antal elever"
+
+#: templates/admin/assessment-statistics.php:136
+msgid "No classes found for this school."
+msgstr "Inga klasser hittades för denna skola."
+
+#: templates/admin/assessment-statistics.php:144
+msgid "Class Progress (by semester)"
+msgstr "Klassens utveckling (per termin)"
+
+
+#: templates/admin/assessment-statistics.php:173
+msgid "No students found for this class."
+msgstr "Inga elever hittades för denna klass."
+
+#: templates/admin/assessment-statistics.php:181
+msgid "Student Progress (by semester)"
+msgstr "Elevens utveckling (per termin)"
+
+#: templates/admin/assessment-statistics.php:189
+msgid "Per-question averages (by semester)"
+msgstr "Snitt per fråga (per termin)"
+
+
+#: templates/admin/assessment-statistics.php:231
+msgid "No per-question data available."
+msgstr "Ingen data per fråga tillgänglig."
+
+#: templates/admin/assessment-statistics.php:236
+msgid "No evaluation data available for this student."
+msgstr "Ingen bedömningsdata tillgänglig för denna elev."
+
+# Semester labels
+#: inc/admin/class-ham-assessment-manager.php:228
+msgid "Spring"
+msgstr "Vår"
+
+#: inc/admin/class-ham-assessment-manager.php:228
+msgid "Fall"
+msgstr "Höst"
 msgid "Assessment updated."
 msgstr "Bedömning uppdaterad."
 
@@ -316,7 +407,7 @@ msgid "Full"
 msgstr "Fullt etablerat"
 
 msgid "Not Established"
-msgstr "Ej etablerad"
+msgstr "Ännu ej elev"
 
 msgid "In Transition"
 msgstr "Utvecklas"
@@ -429,7 +520,7 @@ msgstr "Genomsnitt per bedömningsavsnitt"
 
 #: templates/admin/assessment-statistics.php
 msgid "Top-Rated Assessment Questions"
-msgstr "Högst rankade bedömningsfrågor"
+msgstr "Högst utfall per fråga"
 
 msgid "Actions"
 msgstr "Åtgärder"

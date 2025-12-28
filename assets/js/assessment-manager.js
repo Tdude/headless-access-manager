@@ -400,7 +400,7 @@
                     switch(stage) {
                         case 'ej':
                             stageClass = 'ham-stage-not';
-                            stageText = 'Ej etablerad';
+                            stageText = 'Ännu ej elev';
                             break;
                         case 'trans':
                             stageClass = 'ham-stage-trans';
