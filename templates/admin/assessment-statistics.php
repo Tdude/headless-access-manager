@@ -285,15 +285,15 @@ if (! defined('ABSPATH')) {
             <div class="ham-stats-data">
                 <div class="ham-stats-value">
                     <?php 
-                    if (!empty($stats['monthly_submissions'])) {
-                        $latest_month = end($stats['monthly_submissions']);
-                        echo esc_html($latest_month['count']);
+                    if (!empty($stats['term_submissions'])) {
+                        $latest_term = end($stats['term_submissions']);
+                        echo esc_html($latest_term['count']);
                     } else {
                         echo '0';
                     }
                     ?>
                 </div>
-                <div class="ham-stats-label"><?php echo esc_html__('Evaluations This Month', 'headless-access-manager'); ?></div>
+                <div class="ham-stats-label"><?php echo esc_html__('Evaluations This Term', 'headless-access-manager'); ?></div>
             </div>
         </div>
     </div>
@@ -301,21 +301,21 @@ if (! defined('ABSPATH')) {
     <div class="ham-stats-row">
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Monthly Evaluations', 'headless-access-manager'); ?></h2>
+                <h2><?php echo esc_html__('Term Evaluations', 'headless-access-manager'); ?></h2>
                 <div id="monthlyChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
                     <?php
-                    $monthlyData = array_map(function($item) {
+                    $termData = array_map(function($item) {
                         return array(
-                            'month' => date_i18n('M Y', strtotime($item['month'] . '-01')),
+                            'label' => isset($item['label']) ? $item['label'] : '',
                             'count' => $item['count']
                         );
-                    }, $stats['monthly_submissions']);
+                    }, $stats['term_submissions']);
                     
-                    if (empty($monthlyData)) {
+                    if (empty($termData)) {
                         echo '<p>' . esc_html__('No data to display', 'headless-access-manager') . '</p>';
                     } else {
                         $maxCount = 0;
-                        foreach ($monthlyData as $item) {
+                        foreach ($termData as $item) {
                             $count = isset($item['count']) ? (int) $item['count'] : 0;
                             if ($count > $maxCount) {
                                 $maxCount = $count;
@@ -326,12 +326,12 @@ if (! defined('ABSPATH')) {
                         }
 
                         echo '<div class="ham-simple-chart" style="height: 220px; display: flex; align-items: flex-end; justify-content: center; gap: 20px;">';
-                        foreach ($monthlyData as $item) {
+                        foreach ($termData as $item) {
                             $count = isset($item['count']) ? (int) $item['count'] : 0;
                             $heightPct = ($count / $maxCount) * 100;
                             echo '<div class="ham-bar-wrapper" style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center;">';
                             echo '<div class="ham-bar" style="display: block; height: ' . esc_attr($heightPct) . '%; width: 30px; background-color: #0073aa;"></div>';
-                            echo '<div class="ham-bar-label" style="margin-top: 5px;">' . esc_html($item['month']) . '</div>';
+                            echo '<div class="ham-bar-label" style="margin-top: 5px;">' . esc_html($item['label']) . '</div>';
                             echo '<div class="ham-bar-value" style="font-weight: bold;">' . esc_html($item['count']) . '</div>';
                             echo '</div>';
                         }

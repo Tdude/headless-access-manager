@@ -507,8 +507,20 @@ msgid "Average Completion Rate"
 msgstr "Genomsnittlig slutförandegrad"
 
 #: templates/admin/assessment-statistics.php
-msgid "Monthly Evaluations"
-msgstr "Månatliga utvärderingar"
+msgid "Evaluations This Term"
+msgstr "Utvärderingar denna termin"
+
+#: templates/admin/assessment-statistics.php
+msgid "Term Evaluations"
+msgstr "Utvärderingar per termin"
+
+#: inc/admin/class-ham-assessment-manager.php
+msgid "Spring term"
+msgstr "Vårtermin"
+
+#: inc/admin/class-ham-assessment-manager.php
+msgid "Autumn term"
+msgstr "Hösttermin"
 
 #: templates/admin/assessment-statistics.php:104
 msgid "Status Distribution"

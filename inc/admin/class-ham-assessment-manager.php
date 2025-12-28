@@ -1140,7 +1140,7 @@ class HAM_Assessment_Manager
                 'trans' => 0,
                 'full' => 0
             ),
-            'monthly_submissions' => array()
+            'term_submissions' => array()
         );
 
         if (empty($assessments)) {
@@ -1155,7 +1155,7 @@ class HAM_Assessment_Manager
         $question_sums = array();
         $question_counts = array();
         $stage_counts = array('ej' => 0, 'trans' => 0, 'full' => 0);
-        $monthly_data = array();
+        $term_data = array();
 
         foreach ($assessments as $assessment) {
             // Track unique students
@@ -1199,12 +1199,29 @@ class HAM_Assessment_Manager
                 }
             }
 
-            // Track monthly submissions
-            $month = date('Y-m', strtotime($assessment['date']));
-            if (!isset($monthly_data[$month])) {
-                $monthly_data[$month] = 0;
+            // Track term submissions (school year Aug-Jun)
+            $timestamp = strtotime($assessment['date']);
+            $month_num = (int) date('n', $timestamp);
+            $year_num = (int) date('Y', $timestamp);
+
+            // School year starts in August.
+            if ($month_num >= 8) {
+                $school_year_start = $year_num;
+                $term_code = 'HT';
+            } elseif ($month_num <= 6) {
+                $school_year_start = $year_num - 1;
+                $term_code = 'VT';
+            } else {
+                // July: treat as upcoming autumn term.
+                $school_year_start = $year_num;
+                $term_code = 'HT';
             }
-            $monthly_data[$month]++;
+
+            $term_key = sprintf('%04d-%s', $school_year_start, $term_code);
+            if (!isset($term_data[$term_key])) {
+                $term_data[$term_key] = 0;
+            }
+            $term_data[$term_key]++;
         }
 
         // Calculate final statistics
@@ -1229,12 +1246,18 @@ class HAM_Assessment_Manager
             }
         }
 
-        // Sort and format monthly data
-        ksort($monthly_data);
-        foreach ($monthly_data as $month => $count) {
-            $stats['monthly_submissions'][] = array(
-                'month' => $month,
-                'count' => $count
+        // Sort and format term data
+        ksort($term_data);
+        foreach ($term_data as $term_key => $count) {
+            $school_year_start = (int) substr($term_key, 0, 4);
+            $term_code = substr($term_key, 5);
+            $school_year_label = sprintf('%d/%02d', $school_year_start, ($school_year_start + 1) % 100);
+            $term_label = $term_code === 'VT' ? __('Spring term', 'headless-access-manager') : __('Autumn term', 'headless-access-manager');
+
+            $stats['term_submissions'][] = array(
+                'term' => $term_key,
+                'label' => sprintf('%s %s', $term_label, $school_year_label),
+                'count' => $count,
             );
         }
 
