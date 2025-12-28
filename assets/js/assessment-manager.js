@@ -182,6 +182,11 @@
         const $modalClose = $('.ham-modal-close');
         const $viewButtons = $('.ham-view-assessment');
 
+        const debugTooltipCandidates = {
+            anknytning: false,
+            ansvar: false,
+        };
+
         const tooltipState = {
             timer: null,
             $tooltip: null,
@@ -477,6 +482,27 @@
                     }
 
                     const questionText = (questionTextFromAnswer || questionTextFromStructure || String(qKey)).trim();
+
+                    if (!debugTooltipCandidates[sectionName]) {
+                        debugTooltipCandidates[sectionName] = true;
+                        console.log('[HAM MODAL TOOLTIP DEBUG]', {
+                            section: sectionName,
+                            qKey,
+                            questionStructure,
+                            answerData,
+                            candidates: {
+                                questionTextFromAnswer,
+                                questionTextFromStructure,
+                                qKey,
+                                resolvedQuestionText: questionText,
+                            },
+                            options: Array.isArray(questionStructure && questionStructure.options) ? (questionStructure.options || []).map(opt => ({
+                                value: opt && opt.value !== undefined ? opt.value : null,
+                                label: opt && opt.label ? opt.label : null,
+                                stage: opt && opt.stage ? opt.stage : null,
+                            })) : null,
+                        });
+                    }
 
                     let answerValue;
                     let stage;
