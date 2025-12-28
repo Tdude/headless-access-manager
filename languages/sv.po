@@ -12,3 +12,19 @@ msgstr ""
 "X-Generator: Poedit 3.6\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-SearchPath-0: .\n"
+
+#: templates/admin/assessment-statistics.php
+msgid "Evaluations This Term"
+msgstr "Utvärderingar denna termin"
+
+#: templates/admin/assessment-statistics.php
+msgid "Term Evaluations"
+msgstr "Utvärderingar per termin"
+
+#: inc/admin/class-ham-assessment-manager.php
+msgid "Spring term"
+msgstr "Vårtermin"
+
+#: inc/admin/class-ham-assessment-manager.php
+msgid "Autumn term"
+msgstr "Hösttermin"
