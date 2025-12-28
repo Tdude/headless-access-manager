@@ -187,8 +187,550 @@ class HAM_Assessment_Manager
         // Get statistics data (pass the source filter)
         $stats = self::get_assessment_statistics($source);
 
+        $school_id  = isset($_GET['school_id']) ? absint($_GET['school_id']) : 0;
+        $class_id   = isset($_GET['class_id']) ? absint($_GET['class_id']) : 0;
+        $student_id = isset($_GET['student_id']) ? absint($_GET['student_id']) : 0;
+
+        $drilldown = self::get_assessment_drilldown_stats($school_id, $class_id, $student_id);
+
         // Include the template
         include HAM_PLUGIN_DIR . 'templates/admin/assessment-statistics.php';
+    }
+
+    private static function get_assessment_effective_date(WP_Post $post)
+    {
+        $meta_date = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATE, true);
+        if (!empty($meta_date)) {
+            $ts = strtotime($meta_date);
+            if ($ts !== false) {
+                return $ts;
+            }
+        }
+
+        $ts = strtotime($post->post_date);
+        return $ts !== false ? $ts : time();
+    }
+
+    private static function get_semester_key_from_timestamp($ts)
+    {
+        $year = (int) gmdate('Y', $ts);
+        $month = (int) gmdate('n', $ts);
+        $semester = ($month <= 6) ? 'spring' : 'fall';
+        return $year . '-' . $semester;
+    }
+
+    private static function format_semester_label($semester_key)
+    {
+        if (!is_string($semester_key) || strpos($semester_key, '-') === false) {
+            return $semester_key;
+        }
+        list($year, $semester) = explode('-', $semester_key, 2);
+        $semester_label = ($semester === 'spring') ? __('Spring', 'headless-access-manager') : __('Fall', 'headless-access-manager');
+        return $year . ' ' . $semester_label;
+    }
+
+    private static function sort_semester_keys_asc($a, $b)
+    {
+        $a_parts = explode('-', (string) $a, 2);
+        $b_parts = explode('-', (string) $b, 2);
+        $a_year = isset($a_parts[0]) ? (int) $a_parts[0] : 0;
+        $b_year = isset($b_parts[0]) ? (int) $b_parts[0] : 0;
+        if ($a_year !== $b_year) {
+            return $a_year <=> $b_year;
+        }
+
+        $a_sem = isset($a_parts[1]) ? $a_parts[1] : '';
+        $b_sem = isset($b_parts[1]) ? $b_parts[1] : '';
+        $a_rank = ($a_sem === 'spring') ? 1 : 2;
+        $b_rank = ($b_sem === 'spring') ? 1 : 2;
+        return $a_rank <=> $b_rank;
+    }
+
+    private static function extract_scores_from_assessment_data($assessment_data)
+    {
+        $overall_values = array();
+        $question_values = array();
+
+        if (!is_array($assessment_data)) {
+            return array(
+                'overall_avg' => null,
+                'question_values' => array(),
+            );
+        }
+
+        foreach (array('anknytning', 'ansvar') as $section_key) {
+            if (!isset($assessment_data[$section_key]['questions']) || !is_array($assessment_data[$section_key]['questions'])) {
+                continue;
+            }
+
+            foreach ($assessment_data[$section_key]['questions'] as $question_id => $answer) {
+                if ($answer === '' || $answer === null) {
+                    continue;
+                }
+
+                if (!is_numeric($answer)) {
+                    continue;
+                }
+
+                $value = (float) $answer;
+                $overall_values[] = $value;
+
+                $question_key = $section_key . '_' . $question_id;
+                if (!isset($question_values[$question_key])) {
+                    $question_values[$question_key] = array();
+                }
+                $question_values[$question_key][] = $value;
+            }
+        }
+
+        $overall_avg = null;
+        if (!empty($overall_values)) {
+            $overall_avg = array_sum($overall_values) / count($overall_values);
+        }
+
+        return array(
+            'overall_avg' => $overall_avg,
+            'question_values' => $question_values,
+        );
+    }
+
+    private static function get_question_labels_map()
+    {
+        $structure = self::get_questions_structure();
+        if (empty($structure) || !is_array($structure)) {
+            return array();
+        }
+
+        $map = array();
+        foreach (array('anknytning', 'ansvar') as $section_key) {
+            if (!isset($structure[$section_key]['questions']) || !is_array($structure[$section_key]['questions'])) {
+                continue;
+            }
+            foreach ($structure[$section_key]['questions'] as $question_id => $question) {
+                $key = $section_key . '_' . $question_id;
+                $map[$key] = array(
+                    'section' => isset($structure[$section_key]['title']) ? $structure[$section_key]['title'] : ucfirst($section_key),
+                    'text' => isset($question['text']) ? $question['text'] : $question_id,
+                );
+            }
+        }
+
+        return $map;
+    }
+
+    private static function fetch_evaluation_posts($student_ids = array())
+    {
+        $meta_query = array(
+            array(
+                'key'     => HAM_ASSESSMENT_META_STUDENT_ID,
+                'value'   => '',
+                'compare' => '!=',
+            ),
+        );
+
+        if (!empty($student_ids)) {
+            $meta_query[] = array(
+                'key'     => HAM_ASSESSMENT_META_STUDENT_ID,
+                'value'   => array_values(array_unique(array_map('absint', $student_ids))),
+                'compare' => 'IN',
+            );
+        }
+
+        $args = array(
+            'post_type'      => HAM_CPT_ASSESSMENT,
+            'posts_per_page' => -1,
+            'post_status'    => 'publish',
+            'orderby'        => 'date',
+            'order'          => 'ASC',
+            'meta_query'     => $meta_query,
+        );
+
+        return get_posts($args);
+    }
+
+    private static function aggregate_evaluations_by_semester($posts)
+    {
+        $buckets = array();
+
+        foreach ($posts as $post) {
+            $student_id = (int) get_post_meta($post->ID, HAM_ASSESSMENT_META_STUDENT_ID, true);
+            if ($student_id <= 0) {
+                continue;
+            }
+
+            $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
+            $scores = self::extract_scores_from_assessment_data($assessment_data);
+
+            $ts = self::get_assessment_effective_date($post);
+            $semester_key = self::get_semester_key_from_timestamp($ts);
+
+            if (!isset($buckets[$semester_key])) {
+                $buckets[$semester_key] = array(
+                    'semester_key' => $semester_key,
+                    'semester_label' => self::format_semester_label($semester_key),
+                    'count' => 0,
+                    'students' => array(),
+                    'overall_sum' => 0.0,
+                    'overall_count' => 0,
+                    'questions' => array(),
+                );
+            }
+
+            $buckets[$semester_key]['count']++;
+            $buckets[$semester_key]['students'][$student_id] = true;
+
+            if ($scores['overall_avg'] !== null) {
+                $buckets[$semester_key]['overall_sum'] += (float) $scores['overall_avg'];
+                $buckets[$semester_key]['overall_count']++;
+            }
+
+            foreach ($scores['question_values'] as $question_key => $values) {
+                if (!isset($buckets[$semester_key]['questions'][$question_key])) {
+                    $buckets[$semester_key]['questions'][$question_key] = array(
+                        'sum' => 0.0,
+                        'count' => 0,
+                    );
+                }
+                $buckets[$semester_key]['questions'][$question_key]['sum'] += array_sum($values);
+                $buckets[$semester_key]['questions'][$question_key]['count'] += count($values);
+            }
+        }
+
+        uksort($buckets, array(__CLASS__, 'sort_semester_keys_asc'));
+
+        $out = array();
+        foreach ($buckets as $bucket) {
+            $avg = null;
+            if ($bucket['overall_count'] > 0) {
+                $avg = $bucket['overall_sum'] / $bucket['overall_count'];
+            }
+
+            $questions = array();
+            foreach ($bucket['questions'] as $question_key => $agg) {
+                if ($agg['count'] <= 0) {
+                    continue;
+                }
+                $questions[$question_key] = $agg['sum'] / $agg['count'];
+            }
+
+            $out[] = array(
+                'semester_key' => $bucket['semester_key'],
+                'semester_label' => $bucket['semester_label'],
+                'count' => $bucket['count'],
+                'student_count' => count($bucket['students']),
+                'overall_avg' => $avg,
+                'question_avgs' => $questions,
+            );
+        }
+
+        return $out;
+    }
+
+    public static function get_assessment_drilldown_stats($school_id = 0, $class_id = 0, $student_id = 0)
+    {
+        $question_labels = self::get_question_labels_map();
+
+        $view = array(
+            'level' => 'schools',
+            'breadcrumb' => array(),
+            'question_labels' => $question_labels,
+            'schools' => array(),
+            'classes' => array(),
+            'students' => array(),
+            'student' => null,
+            'series' => array(),
+            'top_questions' => array(),
+        );
+
+        if ($student_id > 0) {
+            $view['level'] = 'student';
+        } elseif ($class_id > 0) {
+            $view['level'] = 'class';
+        } elseif ($school_id > 0) {
+            $view['level'] = 'school';
+        }
+
+        if ($school_id > 0) {
+            $school_post = get_post($school_id);
+            if ($school_post && $school_post->post_type === HAM_CPT_SCHOOL) {
+                $view['breadcrumb'][] = array(
+                    'label' => $school_post->post_title,
+                    'url' => admin_url('admin.php?page=ham-assessment-stats&school_id=' . $school_id),
+                );
+            } else {
+                $school_id = 0;
+                $view['level'] = 'schools';
+            }
+        }
+
+        if ($class_id > 0) {
+            $class_post = get_post($class_id);
+            if ($class_post && $class_post->post_type === HAM_CPT_CLASS) {
+                if ($school_id > 0) {
+                    $class_school = (int) get_post_meta($class_id, '_ham_school_id', true);
+                    if ($class_school !== $school_id) {
+                        $class_id = 0;
+                    }
+                }
+
+                if ($class_id > 0) {
+                    $view['breadcrumb'][] = array(
+                        'label' => $class_post->post_title,
+                        'url' => admin_url('admin.php?page=ham-assessment-stats&school_id=' . $school_id . '&class_id=' . $class_id),
+                    );
+                }
+            } else {
+                $class_id = 0;
+            }
+        }
+
+        if ($student_id > 0) {
+            $student_post = get_post($student_id);
+            if ($student_post && $student_post->post_type === HAM_CPT_STUDENT) {
+                if ($school_id > 0) {
+                    $student_school = (int) get_post_meta($student_id, '_ham_school_id', true);
+                    if ($student_school !== $school_id) {
+                        $student_id = 0;
+                    }
+                }
+
+                if ($class_id > 0) {
+                    $student_ids_in_class = get_post_meta($class_id, '_ham_student_ids', true);
+                    $student_ids_in_class = is_array($student_ids_in_class) ? $student_ids_in_class : array();
+                    if (!in_array($student_id, $student_ids_in_class, true)) {
+                        $student_id = 0;
+                    }
+                }
+
+                if ($student_id > 0) {
+                    $view['breadcrumb'][] = array(
+                        'label' => $student_post->post_title,
+                        'url' => admin_url('admin.php?page=ham-assessment-stats&school_id=' . $school_id . '&class_id=' . $class_id . '&student_id=' . $student_id),
+                    );
+                }
+            } else {
+                $student_id = 0;
+            }
+        }
+
+        if ($view['level'] === 'schools') {
+            $schools = get_posts(array(
+                'post_type'      => HAM_CPT_SCHOOL,
+                'posts_per_page' => -1,
+                'post_status'    => 'publish',
+                'orderby'        => 'title',
+                'order'          => 'ASC',
+            ));
+
+            $all_evals = self::fetch_evaluation_posts();
+            $school_to_students = array();
+
+            foreach ($all_evals as $eval_post) {
+                $sid = (int) get_post_meta($eval_post->ID, HAM_ASSESSMENT_META_STUDENT_ID, true);
+                if ($sid <= 0) {
+                    continue;
+                }
+                $student_school = (int) get_post_meta($sid, '_ham_school_id', true);
+                if ($student_school <= 0) {
+                    continue;
+                }
+                if (!isset($school_to_students[$student_school])) {
+                    $school_to_students[$student_school] = array();
+                }
+                $school_to_students[$student_school][$sid] = true;
+            }
+
+            foreach ($schools as $school) {
+                $students_map = isset($school_to_students[$school->ID]) ? $school_to_students[$school->ID] : array();
+                $student_ids = array_keys($students_map);
+
+                $class_count = 0;
+                $classes = get_posts(array(
+                    'post_type'      => HAM_CPT_CLASS,
+                    'posts_per_page' => -1,
+                    'post_status'    => 'publish',
+                    'fields'         => 'ids',
+                    'meta_query'     => array(
+                        array(
+                            'key'     => '_ham_school_id',
+                            'value'   => $school->ID,
+                            'compare' => '=',
+                        ),
+                    ),
+                ));
+                $class_count = is_array($classes) ? count($classes) : 0;
+
+                $series = empty($student_ids) ? array() : self::aggregate_evaluations_by_semester(self::fetch_evaluation_posts($student_ids));
+                $total_evals = 0;
+                $overall_sum = 0.0;
+                $overall_count = 0;
+                foreach ($series as $bucket) {
+                    $total_evals += (int) $bucket['count'];
+                    if ($bucket['overall_avg'] !== null) {
+                        $overall_sum += (float) $bucket['overall_avg'];
+                        $overall_count++;
+                    }
+                }
+                $overall_avg = $overall_count > 0 ? ($overall_sum / $overall_count) : null;
+
+                $view['schools'][] = array(
+                    'id' => $school->ID,
+                    'name' => $school->post_title,
+                    'class_count' => $class_count,
+                    'student_count' => count($student_ids),
+                    'evaluation_count' => $total_evals,
+                    'overall_avg' => $overall_avg,
+                    'series' => $series,
+                    'url' => admin_url('admin.php?page=ham-assessment-stats&school_id=' . $school->ID),
+                );
+            }
+
+            return $view;
+        }
+
+        if ($view['level'] === 'school') {
+            $classes = get_posts(array(
+                'post_type'      => HAM_CPT_CLASS,
+                'posts_per_page' => -1,
+                'post_status'    => 'publish',
+                'orderby'        => 'title',
+                'order'          => 'ASC',
+                'meta_query'     => array(
+                    array(
+                        'key'     => '_ham_school_id',
+                        'value'   => $school_id,
+                        'compare' => '=',
+                    ),
+                ),
+            ));
+
+            $school_student_posts = get_posts(array(
+                'post_type'      => HAM_CPT_STUDENT,
+                'posts_per_page' => -1,
+                'post_status'    => 'publish',
+                'fields'         => 'ids',
+                'meta_query'     => array(
+                    array(
+                        'key'     => '_ham_school_id',
+                        'value'   => $school_id,
+                        'compare' => '=',
+                    ),
+                ),
+            ));
+            $school_student_ids = is_array($school_student_posts) ? array_map('absint', $school_student_posts) : array();
+
+            $view['series'] = empty($school_student_ids) ? array() : self::aggregate_evaluations_by_semester(self::fetch_evaluation_posts($school_student_ids));
+
+            foreach ($classes as $class_post) {
+                $class_student_ids = get_post_meta($class_post->ID, '_ham_student_ids', true);
+                $class_student_ids = is_array($class_student_ids) ? array_map('absint', $class_student_ids) : array();
+                $series = empty($class_student_ids) ? array() : self::aggregate_evaluations_by_semester(self::fetch_evaluation_posts($class_student_ids));
+
+                $total_evals = 0;
+                $overall_sum = 0.0;
+                $overall_count = 0;
+                foreach ($series as $bucket) {
+                    $total_evals += (int) $bucket['count'];
+                    if ($bucket['overall_avg'] !== null) {
+                        $overall_sum += (float) $bucket['overall_avg'];
+                        $overall_count++;
+                    }
+                }
+                $overall_avg = $overall_count > 0 ? ($overall_sum / $overall_count) : null;
+
+                $view['classes'][] = array(
+                    'id' => $class_post->ID,
+                    'name' => $class_post->post_title,
+                    'student_count' => count($class_student_ids),
+                    'evaluation_count' => $total_evals,
+                    'overall_avg' => $overall_avg,
+                    'series' => $series,
+                    'url' => admin_url('admin.php?page=ham-assessment-stats&school_id=' . $school_id . '&class_id=' . $class_post->ID),
+                );
+            }
+
+            return $view;
+        }
+
+        if ($view['level'] === 'class') {
+            $student_ids = get_post_meta($class_id, '_ham_student_ids', true);
+            $student_ids = is_array($student_ids) ? array_map('absint', $student_ids) : array();
+
+            $view['series'] = empty($student_ids) ? array() : self::aggregate_evaluations_by_semester(self::fetch_evaluation_posts($student_ids));
+
+            $students = empty($student_ids) ? array() : get_posts(array(
+                'post_type'      => HAM_CPT_STUDENT,
+                'posts_per_page' => -1,
+                'post_status'    => 'publish',
+                'post__in'       => $student_ids,
+                'orderby'        => 'title',
+                'order'          => 'ASC',
+            ));
+
+            foreach ($students as $student_post) {
+                $series = self::aggregate_evaluations_by_semester(self::fetch_evaluation_posts(array($student_post->ID)));
+                $total_evals = 0;
+                $overall_sum = 0.0;
+                $overall_count = 0;
+                foreach ($series as $bucket) {
+                    $total_evals += (int) $bucket['count'];
+                    if ($bucket['overall_avg'] !== null) {
+                        $overall_sum += (float) $bucket['overall_avg'];
+                        $overall_count++;
+                    }
+                }
+                $overall_avg = $overall_count > 0 ? ($overall_sum / $overall_count) : null;
+
+                $view['students'][] = array(
+                    'id' => $student_post->ID,
+                    'name' => $student_post->post_title,
+                    'evaluation_count' => $total_evals,
+                    'overall_avg' => $overall_avg,
+                    'series' => $series,
+                    'url' => admin_url('admin.php?page=ham-assessment-stats&school_id=' . $school_id . '&class_id=' . $class_id . '&student_id=' . $student_post->ID),
+                );
+            }
+
+            return $view;
+        }
+
+        if ($view['level'] === 'student') {
+            $student_post = get_post($student_id);
+            if ($student_post && $student_post->post_type === HAM_CPT_STUDENT) {
+                $view['student'] = array(
+                    'id' => $student_post->ID,
+                    'name' => $student_post->post_title,
+                );
+            }
+
+            $posts = self::fetch_evaluation_posts(array($student_id));
+            $view['series'] = self::aggregate_evaluations_by_semester($posts);
+
+            $question_totals = array();
+            foreach ($view['series'] as $bucket) {
+                foreach ($bucket['question_avgs'] as $qk => $avg) {
+                    if (!isset($question_totals[$qk])) {
+                        $question_totals[$qk] = array('sum' => 0.0, 'count' => 0);
+                    }
+                    $question_totals[$qk]['sum'] += (float) $avg;
+                    $question_totals[$qk]['count']++;
+                }
+            }
+
+            $question_rank = array();
+            foreach ($question_totals as $qk => $agg) {
+                if ($agg['count'] <= 0) {
+                    continue;
+                }
+                $question_rank[$qk] = $agg['sum'] / $agg['count'];
+            }
+            arsort($question_rank);
+            $view['top_questions'] = array_slice(array_keys($question_rank), 0, 8);
+
+            return $view;
+        }
+
+        return $view;
     }
 
     /**

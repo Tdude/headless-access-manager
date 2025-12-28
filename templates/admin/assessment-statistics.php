@@ -12,6 +12,233 @@ if (! defined('ABSPATH')) {
 ?>
 <div class="wrap">
     <h1><?php echo esc_html__('Evaluations by Tryggve', 'headless-access-manager'); ?></h1>
+
+    <?php if (isset($drilldown) && is_array($drilldown)) : ?>
+        <div class="ham-stats-panel" style="margin-top: 20px;">
+            <h2><?php echo esc_html__('Evaluation Drilldown', 'headless-access-manager'); ?></h2>
+
+            <?php if (!empty($drilldown['breadcrumb'])) : ?>
+                <div style="margin-bottom: 10px;">
+                    <?php
+                    $crumbs = array();
+                    foreach ($drilldown['breadcrumb'] as $crumb) {
+                        $crumbs[] = '<a href="' . esc_url($crumb['url']) . '">' . esc_html($crumb['label']) . '</a>';
+                    }
+                    echo wp_kses_post(implode(' &raquo; ', $crumbs));
+                    ?>
+                </div>
+            <?php endif; ?>
+
+            <?php
+            $render_semester_bars = function ($series, $max_height_pct = 100) {
+                if (empty($series) || !is_array($series)) {
+                    echo '<p>' . esc_html__('No evaluation data available.', 'headless-access-manager') . '</p>';
+                    return;
+                }
+
+                $max_count = 1;
+                foreach ($series as $bucket) {
+                    $count = isset($bucket['count']) ? (int) $bucket['count'] : 0;
+                    if ($count > $max_count) {
+                        $max_count = $count;
+                    }
+                }
+
+                echo '<div class="ham-simple-chart" style="height: 220px; display: flex; align-items: flex-end; justify-content: center; gap: 20px;">';
+                foreach ($series as $bucket) {
+                    $count = isset($bucket['count']) ? (int) $bucket['count'] : 0;
+                    $avg = isset($bucket['overall_avg']) ? $bucket['overall_avg'] : null;
+                    $heightPct = ($count / $max_count) * $max_height_pct;
+                    $label = isset($bucket['semester_label']) ? $bucket['semester_label'] : (isset($bucket['semester_key']) ? $bucket['semester_key'] : '');
+                    $avg_label = ($avg === null) ? '—' : number_format((float) $avg, 2);
+
+                    echo '<div class="ham-bar-wrapper" style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center;">';
+                    echo '<div class="ham-bar" style="display: block; height: ' . esc_attr($heightPct) . '%; width: 34px; background-color: #0073aa;"></div>';
+                    echo '<div class="ham-bar-label" style="margin-top: 5px;">' . esc_html($label) . '</div>';
+                    echo '<div class="ham-bar-value" style="font-weight: bold;">' . esc_html($count) . '</div>';
+                    echo '<div class="ham-bar-value" style="font-size: 12px; color: #646970;">' . esc_html__('Avg', 'headless-access-manager') . ': ' . esc_html($avg_label) . '</div>';
+                    echo '</div>';
+                }
+                echo '</div>';
+            };
+            ?>
+
+            <?php if ($drilldown['level'] === 'schools') : ?>
+                <p style="margin-top: 0; color: #646970;">
+                    <?php echo esc_html__('Select a school to drill down into classes, students, and per-question evaluation progress by semester.', 'headless-access-manager'); ?>
+                </p>
+
+                <table class="wp-list-table widefat fixed striped">
+                    <thead>
+                        <tr>
+                            <th><?php echo esc_html__('School', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('# Classes', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('# Students evaluated', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('# Evaluations', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('Overall Avg', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('Progress (by semester)', 'headless-access-manager'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($drilldown['schools'])) : ?>
+                            <?php foreach ($drilldown['schools'] as $school) : ?>
+                                <tr>
+                                    <td><a href="<?php echo esc_url($school['url']); ?>"><?php echo esc_html($school['name']); ?></a></td>
+                                    <td><?php echo esc_html((int) $school['class_count']); ?></td>
+                                    <td><?php echo esc_html((int) $school['student_count']); ?></td>
+                                    <td><?php echo esc_html((int) $school['evaluation_count']); ?></td>
+                                    <td><?php echo $school['overall_avg'] === null ? '—' : esc_html(number_format((float) $school['overall_avg'], 2)); ?></td>
+                                    <td style="min-width: 320px;">
+                                        <?php $render_semester_bars($school['series'], 100); ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else : ?>
+                            <tr><td colspan="6"><?php echo esc_html__('No schools found.', 'headless-access-manager'); ?></td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+
+            <?php elseif ($drilldown['level'] === 'school') : ?>
+
+                <h3 style="margin-top: 10px;">
+                    <?php echo esc_html__('School Progress (by semester)', 'headless-access-manager'); ?>
+                </h3>
+                <?php $render_semester_bars($drilldown['series'], 100); ?>
+
+                <h3 style="margin-top: 20px;">
+                    <?php echo esc_html__('Classes', 'headless-access-manager'); ?>
+                </h3>
+                <table class="wp-list-table widefat fixed striped">
+                    <thead>
+                        <tr>
+                            <th><?php echo esc_html__('Class', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('# Evaluations', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('Overall Avg', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('Progress (by semester)', 'headless-access-manager'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($drilldown['classes'])) : ?>
+                            <?php foreach ($drilldown['classes'] as $class) : ?>
+                                <tr>
+                                    <td><a href="<?php echo esc_url($class['url']); ?>"><?php echo esc_html($class['name']); ?></a></td>
+                                    <td><?php echo esc_html((int) $class['student_count']); ?></td>
+                                    <td><?php echo esc_html((int) $class['evaluation_count']); ?></td>
+                                    <td><?php echo $class['overall_avg'] === null ? '—' : esc_html(number_format((float) $class['overall_avg'], 2)); ?></td>
+                                    <td style="min-width: 320px;">
+                                        <?php $render_semester_bars($class['series'], 100); ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else : ?>
+                            <tr><td colspan="5"><?php echo esc_html__('No classes found for this school.', 'headless-access-manager'); ?></td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+
+            <?php elseif ($drilldown['level'] === 'class') : ?>
+
+                <h3 style="margin-top: 10px;">
+                    <?php echo esc_html__('Class Progress (by semester)', 'headless-access-manager'); ?>
+                </h3>
+                <?php $render_semester_bars($drilldown['series'], 100); ?>
+
+                <h3 style="margin-top: 20px;">
+                    <?php echo esc_html__('Students', 'headless-access-manager'); ?>
+                </h3>
+                <table class="wp-list-table widefat fixed striped">
+                    <thead>
+                        <tr>
+                            <th><?php echo esc_html__('Student', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('# Evaluations', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('Overall Avg', 'headless-access-manager'); ?></th>
+                            <th><?php echo esc_html__('Progress (by semester)', 'headless-access-manager'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($drilldown['students'])) : ?>
+                            <?php foreach ($drilldown['students'] as $student) : ?>
+                                <tr>
+                                    <td><a href="<?php echo esc_url($student['url']); ?>"><?php echo esc_html($student['name']); ?></a></td>
+                                    <td><?php echo esc_html((int) $student['evaluation_count']); ?></td>
+                                    <td><?php echo $student['overall_avg'] === null ? '—' : esc_html(number_format((float) $student['overall_avg'], 2)); ?></td>
+                                    <td style="min-width: 320px;">
+                                        <?php $render_semester_bars($student['series'], 100); ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else : ?>
+                            <tr><td colspan="4"><?php echo esc_html__('No students found for this class.', 'headless-access-manager'); ?></td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+
+            <?php elseif ($drilldown['level'] === 'student') : ?>
+
+                <h3 style="margin-top: 10px;">
+                    <?php echo esc_html__('Student Progress (by semester)', 'headless-access-manager'); ?>
+                    <?php if (!empty($drilldown['student']['name'])) : ?>
+                        <span style="color: #646970; font-weight: normal;">— <?php echo esc_html($drilldown['student']['name']); ?></span>
+                    <?php endif; ?>
+                </h3>
+                <?php $render_semester_bars($drilldown['series'], 100); ?>
+
+                <h3 style="margin-top: 20px;">
+                    <?php echo esc_html__('Per-question averages (by semester)', 'headless-access-manager'); ?>
+                </h3>
+
+                <?php if (!empty($drilldown['series'])) : ?>
+                    <?php
+                    $top_questions = isset($drilldown['top_questions']) && is_array($drilldown['top_questions']) ? $drilldown['top_questions'] : array();
+                    if (empty($top_questions)) {
+                        $top_questions = array();
+                    }
+                    ?>
+                    <table class="wp-list-table widefat fixed striped">
+                        <thead>
+                            <tr>
+                                <th><?php echo esc_html__('Question', 'headless-access-manager'); ?></th>
+                                <?php foreach ($drilldown['series'] as $bucket) : ?>
+                                    <th><?php echo esc_html($bucket['semester_label']); ?></th>
+                                <?php endforeach; ?>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($top_questions)) : ?>
+                                <?php foreach ($top_questions as $qk) : ?>
+                                    <?php
+                                    $label = $qk;
+                                    if (isset($drilldown['question_labels'][$qk])) {
+                                        $label = $drilldown['question_labels'][$qk]['section'] . ': ' . $drilldown['question_labels'][$qk]['text'];
+                                    }
+                                    ?>
+                                    <tr>
+                                        <td><?php echo esc_html($label); ?></td>
+                                        <?php foreach ($drilldown['series'] as $bucket) : ?>
+                                            <?php
+                                            $val = null;
+                                            if (isset($bucket['question_avgs'][$qk])) {
+                                                $val = $bucket['question_avgs'][$qk];
+                                            }
+                                            ?>
+                                            <td><?php echo $val === null ? '—' : esc_html(number_format((float) $val, 2)); ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <tr><td colspan="<?php echo esc_attr(1 + count($drilldown['series'])); ?>"><?php echo esc_html__('No per-question data available.', 'headless-access-manager'); ?></td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                <?php else : ?>
+                    <p><?php echo esc_html__('No evaluation data available for this student.', 'headless-access-manager'); ?></p>
+                <?php endif; ?>
+
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
     
     <div class="ham-stats-overview">
         <div class="ham-stats-card">
