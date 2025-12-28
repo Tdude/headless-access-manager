@@ -511,8 +511,36 @@ msgid "Evaluations This Term"
 msgstr "Utvärderingar denna termin"
 
 #: templates/admin/assessment-statistics.php
+msgid "Evaluations This Month"
+msgstr "Utvärderingar denna månad"
+
+#: templates/admin/assessment-statistics.php
+msgid "Evaluations This School Year"
+msgstr "Utvärderingar detta skolår"
+
+#: templates/admin/assessment-statistics.php
 msgid "Term Evaluations"
 msgstr "Utvärderingar per termin"
+
+#: templates/admin/assessment-statistics.php
+msgid "Monthly Evaluations"
+msgstr "Månatliga utvärderingar"
+
+#: templates/admin/assessment-statistics.php
+msgid "School Year Evaluations"
+msgstr "Utvärderingar per skolår"
+
+#: templates/admin/assessment-statistics.php
+msgid "Month"
+msgstr "Månad"
+
+#: templates/admin/assessment-statistics.php
+msgid "Term"
+msgstr "Termin"
+
+#: templates/admin/assessment-statistics.php
+msgid "School year"
+msgstr "Skolår"
 
 #: inc/admin/class-ham-assessment-manager.php
 msgid "Spring term"

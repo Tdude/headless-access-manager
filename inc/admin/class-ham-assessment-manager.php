@@ -1140,7 +1140,9 @@ class HAM_Assessment_Manager
                 'trans' => 0,
                 'full' => 0
             ),
-            'term_submissions' => array()
+            'monthly_submissions' => array(),
+            'term_submissions' => array(),
+            'school_year_submissions' => array()
         );
 
         if (empty($assessments)) {
@@ -1155,7 +1157,9 @@ class HAM_Assessment_Manager
         $question_sums = array();
         $question_counts = array();
         $stage_counts = array('ej' => 0, 'trans' => 0, 'full' => 0);
+        $monthly_data = array();
         $term_data = array();
+        $school_year_data = array();
 
         foreach ($assessments as $assessment) {
             // Track unique students
@@ -1199,6 +1203,13 @@ class HAM_Assessment_Manager
                 }
             }
 
+            // Track monthly submissions
+            $month = date('Y-m', strtotime($assessment['date']));
+            if (!isset($monthly_data[$month])) {
+                $monthly_data[$month] = 0;
+            }
+            $monthly_data[$month]++;
+
             // Track term submissions (school year Aug-Jun)
             $timestamp = strtotime($assessment['date']);
             $month_num = (int) date('n', $timestamp);
@@ -1222,6 +1233,11 @@ class HAM_Assessment_Manager
                 $term_data[$term_key] = 0;
             }
             $term_data[$term_key]++;
+
+            if (!isset($school_year_data[$school_year_start])) {
+                $school_year_data[$school_year_start] = 0;
+            }
+            $school_year_data[$school_year_start]++;
         }
 
         // Calculate final statistics
@@ -1246,6 +1262,15 @@ class HAM_Assessment_Manager
             }
         }
 
+        // Sort and format monthly data
+        ksort($monthly_data);
+        foreach ($monthly_data as $month => $count) {
+            $stats['monthly_submissions'][] = array(
+                'month' => $month,
+                'count' => $count,
+            );
+        }
+
         // Sort and format term data
         ksort($term_data);
         foreach ($term_data as $term_key => $count) {
@@ -1257,6 +1282,17 @@ class HAM_Assessment_Manager
             $stats['term_submissions'][] = array(
                 'term' => $term_key,
                 'label' => sprintf('%s %s', $term_label, $school_year_label),
+                'count' => $count,
+            );
+        }
+
+        // Sort and format school-year data
+        ksort($school_year_data);
+        foreach ($school_year_data as $school_year_start => $count) {
+            $school_year_label = sprintf('%d/%02d', (int) $school_year_start, (((int) $school_year_start) + 1) % 100);
+            $stats['school_year_submissions'][] = array(
+                'school_year_start' => (int) $school_year_start,
+                'label' => $school_year_label,
                 'count' => $count,
             );
         }

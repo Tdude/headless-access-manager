@@ -285,15 +285,39 @@ if (! defined('ABSPATH')) {
             <div class="ham-stats-data">
                 <div class="ham-stats-value">
                     <?php 
-                    if (!empty($stats['term_submissions'])) {
-                        $latest_term = end($stats['term_submissions']);
-                        echo esc_html($latest_term['count']);
+                    $time_bucket = isset($_GET['time_bucket']) ? sanitize_key(wp_unslash($_GET['time_bucket'])) : 'term';
+                    if (!in_array($time_bucket, array('month', 'term', 'school_year'), true)) {
+                        $time_bucket = 'term';
+                    }
+
+                    $bucket_series = array();
+                    if ($time_bucket === 'month') {
+                        $bucket_series = isset($stats['monthly_submissions']) ? $stats['monthly_submissions'] : array();
+                    } elseif ($time_bucket === 'school_year') {
+                        $bucket_series = isset($stats['school_year_submissions']) ? $stats['school_year_submissions'] : array();
+                    } else {
+                        $bucket_series = isset($stats['term_submissions']) ? $stats['term_submissions'] : array();
+                    }
+
+                    if (!empty($bucket_series)) {
+                        $latest_bucket = end($bucket_series);
+                        echo esc_html(isset($latest_bucket['count']) ? $latest_bucket['count'] : 0);
                     } else {
                         echo '0';
                     }
                     ?>
                 </div>
-                <div class="ham-stats-label"><?php echo esc_html__('Evaluations This Term', 'headless-access-manager'); ?></div>
+                <div class="ham-stats-label">
+                    <?php
+                    if ($time_bucket === 'month') {
+                        echo esc_html__('Evaluations This Month', 'headless-access-manager');
+                    } elseif ($time_bucket === 'school_year') {
+                        echo esc_html__('Evaluations This School Year', 'headless-access-manager');
+                    } else {
+                        echo esc_html__('Evaluations This Term', 'headless-access-manager');
+                    }
+                    ?>
+                </div>
             </div>
         </div>
     </div>
@@ -301,21 +325,77 @@ if (! defined('ABSPATH')) {
     <div class="ham-stats-row">
         <div class="ham-stats-column">
             <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Term Evaluations', 'headless-access-manager'); ?></h2>
+                <h2>
+                    <?php
+                    if ($time_bucket === 'month') {
+                        echo esc_html__('Monthly Evaluations', 'headless-access-manager');
+                    } elseif ($time_bucket === 'school_year') {
+                        echo esc_html__('School Year Evaluations', 'headless-access-manager');
+                    } else {
+                        echo esc_html__('Term Evaluations', 'headless-access-manager');
+                    }
+                    ?>
+                </h2>
+
+                <div style="margin-bottom: 12px;">
+                    <?php
+                    $base_args = $_GET;
+                    $base_args = is_array($base_args) ? $base_args : array();
+                    $base_args['page'] = 'ham-assessment-stats';
+
+                    $make_link = function($bucket, $label) use ($base_args, $time_bucket) {
+                        $args = $base_args;
+                        $args['time_bucket'] = $bucket;
+                        $url = add_query_arg(array_map('sanitize_text_field', $args), admin_url('admin.php'));
+                        $is_active = $time_bucket === $bucket;
+
+                        $style = 'display:inline-block; padding: 4px 10px; border-radius: 999px; text-decoration:none; margin-right: 6px; border: 1px solid #c3c4c7;';
+                        if ($is_active) {
+                            $style .= ' background:#2271b1; color:#fff; border-color:#2271b1;';
+                        } else {
+                            $style .= ' background:#fff; color:#1d2327;';
+                        }
+
+                        return '<a href="' . esc_url($url) . '" style="' . esc_attr($style) . '">' . esc_html($label) . '</a>';
+                    };
+
+                    echo $make_link('month', __('Month', 'headless-access-manager'));
+                    echo $make_link('term', __('Term', 'headless-access-manager'));
+                    echo $make_link('school_year', __('School year', 'headless-access-manager'));
+                    ?>
+                </div>
+
                 <div id="monthlyChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
                     <?php
-                    $termData = array_map(function($item) {
-                        return array(
-                            'label' => isset($item['label']) ? $item['label'] : '',
-                            'count' => $item['count']
-                        );
-                    }, $stats['term_submissions']);
+                    $chartData = array();
+                    if ($time_bucket === 'month') {
+                        $chartData = array_map(function($item) {
+                            return array(
+                                'label' => date_i18n('M Y', strtotime($item['month'] . '-01')),
+                                'count' => $item['count']
+                            );
+                        }, isset($stats['monthly_submissions']) ? $stats['monthly_submissions'] : array());
+                    } elseif ($time_bucket === 'school_year') {
+                        $chartData = array_map(function($item) {
+                            return array(
+                                'label' => isset($item['label']) ? $item['label'] : '',
+                                'count' => $item['count']
+                            );
+                        }, isset($stats['school_year_submissions']) ? $stats['school_year_submissions'] : array());
+                    } else {
+                        $chartData = array_map(function($item) {
+                            return array(
+                                'label' => isset($item['label']) ? $item['label'] : '',
+                                'count' => $item['count']
+                            );
+                        }, isset($stats['term_submissions']) ? $stats['term_submissions'] : array());
+                    }
                     
-                    if (empty($termData)) {
+                    if (empty($chartData)) {
                         echo '<p>' . esc_html__('No data to display', 'headless-access-manager') . '</p>';
                     } else {
                         $maxCount = 0;
-                        foreach ($termData as $item) {
+                        foreach ($chartData as $item) {
                             $count = isset($item['count']) ? (int) $item['count'] : 0;
                             if ($count > $maxCount) {
                                 $maxCount = $count;
@@ -326,7 +406,7 @@ if (! defined('ABSPATH')) {
                         }
 
                         echo '<div class="ham-simple-chart" style="height: 220px; display: flex; align-items: flex-end; justify-content: center; gap: 20px;">';
-                        foreach ($termData as $item) {
+                        foreach ($chartData as $item) {
                             $count = isset($item['count']) ? (int) $item['count'] : 0;
                             $heightPct = ($count / $maxCount) * 100;
                             echo '<div class="ham-bar-wrapper" style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center;">';
