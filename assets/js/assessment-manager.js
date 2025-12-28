@@ -492,7 +492,7 @@
 
                     if (!debugTooltipCandidates[sectionName]) {
                         debugTooltipCandidates[sectionName] = true;
-                        //console.log('[HAM MODAL TOOLTIP DEBUG]', {
+                        /* console.log('[HAM MODAL TOOLTIP DEBUG]', {
                             section: sectionName,
                             qKey,
                             questionStructure,
@@ -508,7 +508,7 @@
                                 label: opt && opt.label ? opt.label : null,
                                 stage: opt && opt.stage ? opt.stage : null,
                             })) : null,
-                        });
+                        }); */
                     }
 
                     let answerValue;
