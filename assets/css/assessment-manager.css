@@ -439,6 +439,28 @@
     position: relative;
 }
 
+.ham-answer-alternatives-table {
+    border: 0;
+    box-shadow: none;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.ham-answer-alternatives-table thead th,
+.ham-answer-alternatives-table tbody td {
+    border: 0 !important;
+}
+
+.ham-answer-alternatives-table tbody tr,
+.ham-answer-alternatives-table tbody tr:nth-child(odd),
+.ham-answer-alternatives-table tbody tr:nth-child(even) {
+    background: transparent !important;
+}
+
+.ham-answer-alternatives-table thead th {
+    background: transparent !important;
+}
+
 .ham-answer-alternatives-table td {
     vertical-align: top;
 }
@@ -448,7 +470,8 @@
 }
 
 .ham-answer-alternatives-table td.ham-answer-choice--selected {
-    background: rgba(0, 0, 0, 0.02);
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 4px;
 }
 
 .ham-answer-row--anknytning td:nth-child(4) {
