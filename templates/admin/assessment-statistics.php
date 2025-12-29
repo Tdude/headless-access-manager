@@ -288,46 +288,25 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <span style="color: #646970; font-weight: normal;">— <?php echo esc_html($drilldown['student']['name']); ?></span>
                     <?php endif; ?>
                 </h3>
-                <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
-                    <div>
-                        <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-month"></canvas></div>
-                    </div>
-                    <div>
-                        <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-term"></canvas></div>
-                    </div>
-                    <div>
-                        <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-school-year"></canvas></div>
-                    </div>
-                    <div>
-                        <strong><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
-                    </div>
+                <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
+                    <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
                 </div>
+                <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-student"></canvas></div>
 
                 <h3 style="margin-top: 20px;">
                     <?php echo esc_html__('Radar (per evaluation within bucket)', 'headless-access-manager'); ?>
                 </h3>
-                <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
-                    <div>
-                        <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--md"><canvas id="ham-student-radar-month"></canvas></div>
-                    </div>
-                    <div>
-                        <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--md"><canvas id="ham-student-radar-term"></canvas></div>
-                    </div>
-                    <div>
-                        <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--md"><canvas id="ham-student-radar-school-year"></canvas></div>
-                    </div>
-                    <div>
-                        <strong><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--md"><canvas id="ham-student-radar-hogstadium"></canvas></div>
-                    </div>
+                <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
+                    <button type="button" class="button ham-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
                 </div>
+                <div class="ham-chart-wrapper ham-chart-wrapper--md"><canvas id="ham-student-radar"></canvas></div>
+                <div id="ham-student-radar-table" class="ham-radar-values"></div>
 
                 <h3 style="margin-top: 20px;">
                     <?php echo esc_html__('Questions and answer alternatives', 'headless-access-manager'); ?>
@@ -655,59 +634,6 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
             <div class="ham-stats-panel">
                 <h2><?php echo esc_html__('Overall radar (question averages)', 'headless-access-manager'); ?></h2>
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-overview-radar"></canvas></div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="ham-stats-row">
-        <div class="ham-stats-column">
-            <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Top-Rated Assessment Questions', 'headless-access-manager'); ?></h2>
-                <table class="wp-list-table widefat fixed striped">
-                    <thead>
-                        <tr>
-                            <th><?php echo esc_html__('Question', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('Section', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('Average Score', 'headless-access-manager'); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        // Sort questions by average score
-                        $question_averages = $stats['question_averages'];
-                        arsort($question_averages);
-                        
-                        // Get questions structure
-                        $questions_structure = (new HAM_Assessment_Manager())->get_questions_structure();
-                        
-                        // Display all questions
-                        $count = 0;
-                        foreach ($question_averages as $question_key => $average) {
-                            list($section, $question_id) = explode('_', $question_key, 2);
-                            
-                            $section_title = isset($questions_structure[$section]['title']) 
-                                ? $questions_structure[$section]['title'] 
-                                : ucfirst($section);
-                                
-                            $question_text = isset($questions_structure[$section]['questions'][$question_id]['text']) 
-                                ? $questions_structure[$section]['questions'][$question_id]['text'] 
-                                : $question_id;
-                            
-                            echo '<tr>';
-                            echo '<td>' . esc_html($question_text) . '</td>';
-                            echo '<td>' . esc_html($section_title) . '</td>';
-                            echo '<td>' . esc_html($average) . '</td>';
-                            echo '</tr>';
-                            
-                            $count++;
-                        }
-                        
-                        if ($count === 0) {
-                            echo '<tr><td colspan="3">' . esc_html__('No question data available.', 'headless-access-manager') . '</td></tr>';
-                        }
-                        ?>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>

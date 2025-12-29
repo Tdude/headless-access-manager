@@ -34,6 +34,19 @@
         const overview = window.hamAssessmentOverview || null;
         const stats = window.hamAssessmentStats || null;
 
+        const CHART_ANIMATION_DURATION_MS = 300;
+        const CHART_ANIMATION_EASING = 'easeInOutQuad';
+        const CHART_BASE_HUE = 205;
+        const CHART_HUE_STEP = 28;
+        const CHART_BORDER_WIDTH = 2;
+        const CHART_POINT_RADIUS = 2;
+        const CHART_LINE_TENSION = 0.25;
+        const CHART_LINE_POINT_RADIUS = 3;
+        const CHART_FILL_ALPHA = 0.80;
+        const CHART_OVERLAY_DASH = [6, 4];
+        const CHART_TABLE_INSET_BORDER_PX = 4;
+        const CHART_RADAR_ANGLE_LINE_COLOR = 'rgba(0,0,0,0.08)';
+
         const t = (window.hamAssessment && window.hamAssessment.texts) ? window.hamAssessment.texts : {};
         const labelMonth = t.month || 'Month';
         const labelTerm = t.term || 'Term';
@@ -61,11 +74,10 @@
         }
 
         function datasetColor(idx) {
-            const baseHue = 205;
-            const hue = (baseHue + (idx * 28)) % 360;
+            const hue = (CHART_BASE_HUE + (idx * CHART_HUE_STEP)) % 360;
             return {
                 border: hslColor(hue, 70, 45),
-                fill: hslColor(hue, 70, 55, 0.20),
+                fill: hslColor(hue, 70, 55, CHART_FILL_ALPHA),
             };
         }
 
@@ -94,13 +106,17 @@
                         borderColor: c.border,
                         backgroundColor: c.fill,
                         fill: true,
-                        tension: 0.25,
+                        tension: CHART_LINE_TENSION,
                         pointRadius: 3,
                     }],
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: CHART_ANIMATION_DURATION_MS,
+                        easing: CHART_ANIMATION_EASING,
+                    },
                     plugins: {
                         legend: { display: false },
                         tooltip: { enabled: true },
@@ -116,11 +132,200 @@
             });
         }
 
+        function initBucketToggle(options) {
+            const {
+                buttons,
+                defaultKey,
+                isKeyAvailable,
+                onChange,
+            } = options || {};
+
+            const btns = Array.isArray(buttons) ? buttons : [];
+            if (btns.length === 0 || typeof onChange !== 'function') {
+                return null;
+            }
+
+            function setActive(key) {
+                btns.forEach((b) => {
+                    const isActive = b.getAttribute('data-bucket') === key;
+                    b.classList.toggle('button-primary', isActive);
+                    b.classList.toggle('button-secondary', !isActive);
+                    b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+            }
+
+            let activeKey = defaultKey;
+            if (typeof isKeyAvailable === 'function' && !isKeyAvailable(activeKey)) {
+                activeKey = btns[0].getAttribute('data-bucket') || defaultKey;
+            }
+
+            function setBucket(bucketKey) {
+                if (!bucketKey) {
+                    return;
+                }
+                activeKey = bucketKey;
+                setActive(bucketKey);
+                onChange(bucketKey);
+            }
+
+            btns.forEach((b) => {
+                b.addEventListener('click', () => {
+                    setBucket(b.getAttribute('data-bucket'));
+                });
+            });
+
+            setBucket(activeKey);
+
+            return {
+                getActiveKey: () => activeKey,
+                setBucket,
+            };
+        }
+
+        function buildStudentAvgProgressToggle() {
+            const canvas = document.getElementById('ham-avg-progress-student');
+            const btns = Array.from(document.querySelectorAll('.ham-progress-toggle-btn'));
+
+            if (!canvas || btns.length === 0 || !stats || stats.level !== 'student' || !stats.avg_progress) {
+                return;
+            }
+
+            const seriesByKey = stats.avg_progress;
+
+            const titleByKey = {
+                month: labelMonth,
+                term: labelTerm,
+                school_year: labelSchoolYear,
+                hogstadium: labelHogstadium,
+            };
+
+            function buildDataForBucket(bucketKey) {
+                const series = seriesByKey && Array.isArray(seriesByKey[bucketKey]) ? seriesByKey[bucketKey] : [];
+                const labels = series.map((p) => p.label);
+                const data = series.map((p) => clampNumber(p.overall_avg, 1, 5));
+                return { labels, data, title: titleByKey[bucketKey] || labelRadar };
+            }
+
+            const existing = Chart.getChart(canvas);
+            if (existing) {
+                existing.destroy();
+            }
+
+            const initial = buildDataForBucket('term');
+            const c = datasetColor(0);
+            const chart = new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: initial.labels,
+                    datasets: [{
+                        label: initial.title,
+                        data: initial.data,
+                        borderColor: c.border,
+                        backgroundColor: c.fill,
+                        fill: true,
+                        tension: CHART_LINE_TENSION,
+                        pointRadius: CHART_LINE_POINT_RADIUS,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: CHART_ANIMATION_DURATION_MS,
+                        easing: CHART_ANIMATION_EASING,
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: initial.title,
+                        },
+                        tooltip: { enabled: true },
+                    },
+                    scales: {
+                        y: {
+                            min: 1,
+                            max: 5,
+                            ticks: { stepSize: 1 },
+                        },
+                    },
+                },
+            });
+
+            function updateChart(bucketKey) {
+                const next = buildDataForBucket(bucketKey);
+                chart.data.labels = next.labels;
+                chart.data.datasets[0].data = next.data;
+                chart.data.datasets[0].label = next.title;
+                chart.options.plugins.title.text = next.title;
+                chart.update();
+            }
+
+            initBucketToggle({
+                buttons: btns,
+                defaultKey: 'term',
+                isKeyAvailable: (key) => Array.isArray(seriesByKey[key]) && seriesByKey[key].length > 0,
+                onChange: updateChart,
+            });
+        }
+
         function pickLatestBucket(buckets) {
             if (!Array.isArray(buckets) || buckets.length === 0) {
                 return null;
             }
             return buckets[buckets.length - 1];
+        }
+
+        function renderRadarValuesTable(containerId, bucketGroup) {
+            const el = document.getElementById(containerId);
+            if (!el) {
+                return;
+            }
+
+            if (!bucketGroup || !Array.isArray(bucketGroup.labels) || !Array.isArray(bucketGroup.buckets)) {
+                el.innerHTML = '';
+                return;
+            }
+
+            const bucket = pickLatestBucket(bucketGroup.buckets);
+            if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+
+            const qLabels = bucketGroup.labels;
+            const datasets = bucket.datasets;
+
+            let html = '';
+            html += `<div class="ham-radar-values-header">${bucket.label ? String(bucket.label) : ''}</div>`;
+            html += '<div class="ham-radar-values-scroll">';
+            html += '<table class="widefat fixed striped ham-radar-values-table">';
+            html += '<thead><tr>';
+            html += `<th class="ham-radar-values-th-question">${escapeHtml(t.question || 'Question')}</th>`;
+
+            datasets.forEach((ds, idx) => {
+                const c = datasetColor(idx);
+                const safeLabel = escapeHtml(ds.label || `${labelRadar} ${idx + 1}`);
+                html += `<th class="ham-radar-values-th-eval" style="box-shadow: inset ${CHART_TABLE_INSET_BORDER_PX}px 0 0 ${c.border};">${safeLabel}</th>`;
+            });
+
+            html += '</tr></thead>';
+            html += '<tbody>';
+
+            for (let qi = 0; qi < qLabels.length; qi++) {
+                html += '<tr>';
+                html += `<td class="ham-radar-values-td-question">${escapeHtml(qLabels[qi] || '')}</td>`;
+                datasets.forEach((ds, idx) => {
+                    const c = datasetColor(idx);
+                    const v = Array.isArray(ds.values) ? ds.values[qi] : null;
+                    const vv = clampNumber(v, 1, 5);
+                    html += `<td class="ham-radar-values-td-eval" style="box-shadow: inset ${CHART_TABLE_INSET_BORDER_PX}px 0 0 ${c.border};">${vv == null ? '—' : vv.toFixed(1)}</td>`;
+                });
+                html += '</tr>';
+            }
+
+            html += '</tbody></table></div>';
+            el.innerHTML = html;
         }
 
         function buildRadarChart(canvasId, bucketGroup, title) {
@@ -148,10 +353,10 @@
                     data: Array.isArray(ds.values) ? ds.values.map((v) => clampNumber(v, 1, 5)) : [],
                     borderColor: c.border,
                     backgroundColor: c.fill,
-                    borderWidth: 2,
-                    pointRadius: 2,
+                    borderWidth: CHART_BORDER_WIDTH,
+                    pointRadius: CHART_POINT_RADIUS,
                     fill: true,
-                    borderDash: idx === 0 ? [] : [6, 4],
+                    borderDash: idx === 0 ? [] : CHART_OVERLAY_DASH,
                 };
             });
 
@@ -164,6 +369,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: CHART_ANIMATION_DURATION_MS,
+                        easing: CHART_ANIMATION_EASING,
+                    },
                     plugins: {
                         legend: { position: 'bottom' },
                         title: {
@@ -183,11 +392,121 @@
                                 circular: false,
                             },
                             angleLines: {
-                                color: 'rgba(0,0,0,0.08)',
+                                color: CHART_RADAR_ANGLE_LINE_COLOR,
                             },
                         },
                     },
                 },
+            });
+        }
+
+        function buildStudentRadarToggle() {
+            const canvas = document.getElementById('ham-student-radar');
+            const btns = Array.from(document.querySelectorAll('.ham-radar-toggle-btn'));
+
+            if (!canvas || btns.length === 0 || !stats || stats.level !== 'student' || !stats.student_radar || !stats.student_radar.buckets) {
+                return;
+            }
+
+            const labels = Array.isArray(stats.student_radar.labels) ? stats.student_radar.labels : [];
+            const bucketsByKey = stats.student_radar.buckets;
+
+            const titleByKey = {
+                month: labelMonth,
+                term: labelTerm,
+                school_year: labelSchoolYear,
+                hogstadium: labelHogstadium,
+            };
+
+            function buildDatasetsForBucket(bucketKey) {
+                const buckets = bucketsByKey && bucketsByKey[bucketKey] ? bucketsByKey[bucketKey] : [];
+                const bucket = pickLatestBucket(buckets);
+                if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
+                    return { title: titleByKey[bucketKey] || labelRadar, datasets: [] };
+                }
+
+                const datasets = bucket.datasets.map((ds, idx) => {
+                    const c = datasetColor(idx);
+                    return {
+                        label: ds.label,
+                        data: Array.isArray(ds.values) ? ds.values.map((v) => clampNumber(v, 1, 5)) : [],
+                        borderColor: c.border,
+                        backgroundColor: c.fill,
+                        borderWidth: CHART_BORDER_WIDTH,
+                        pointRadius: CHART_POINT_RADIUS,
+                        fill: true,
+                        borderDash: idx === 0 ? [] : CHART_OVERLAY_DASH,
+                    };
+                });
+
+                return { title: bucket.label || (titleByKey[bucketKey] || labelRadar), datasets };
+            }
+
+            function renderTableForBucket(bucketKey) {
+                renderRadarValuesTable('ham-student-radar-table', {
+                    labels,
+                    buckets: bucketsByKey[bucketKey] || [],
+                });
+            }
+
+            const existing = Chart.getChart(canvas);
+            if (existing) {
+                existing.destroy();
+            }
+
+            const initial = buildDatasetsForBucket('term');
+            const chart = new Chart(canvas.getContext('2d'), {
+                type: 'radar',
+                data: {
+                    labels,
+                    datasets: initial.datasets,
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: CHART_ANIMATION_DURATION_MS,
+                        easing: CHART_ANIMATION_EASING,
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: {
+                            display: true,
+                            text: initial.title,
+                        },
+                    },
+                    scales: {
+                        r: {
+                            min: 1,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                showLabelBackdrop: false,
+                            },
+                            grid: {
+                                circular: false,
+                            },
+                            angleLines: {
+                                color: CHART_RADAR_ANGLE_LINE_COLOR,
+                            },
+                        },
+                    },
+                },
+            });
+
+            function updateChart(bucketKey) {
+                const next = buildDatasetsForBucket(bucketKey);
+                chart.data.datasets = next.datasets;
+                chart.options.plugins.title.text = next.title;
+                chart.update();
+                renderTableForBucket(bucketKey);
+            }
+
+            initBucketToggle({
+                buttons: btns,
+                defaultKey: 'term',
+                isKeyAvailable: (key) => Array.isArray(bucketsByKey[key]) && bucketsByKey[key].length > 0,
+                onChange: updateChart,
             });
         }
 
@@ -212,14 +531,18 @@
                         data: radar.values.map((v) => clampNumber(v, 1, 5)),
                         borderColor: c.border,
                         backgroundColor: c.fill,
-                        borderWidth: 2,
-                        pointRadius: 2,
+                        borderWidth: CHART_BORDER_WIDTH,
+                        pointRadius: CHART_POINT_RADIUS,
                         fill: true,
                     }],
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: CHART_ANIMATION_DURATION_MS,
+                        easing: CHART_ANIMATION_EASING,
+                    },
                     plugins: {
                         legend: { display: false },
                         title: {
@@ -247,32 +570,22 @@
             });
         }
 
-        // Avg progress charts (school/class/student levels)
-        if (stats && stats.avg_progress) {
+        // Avg progress charts (school/class levels)
+        if (stats && stats.avg_progress && stats.level !== 'student') {
             buildLineChart('ham-avg-progress-month', stats.avg_progress.month, labelMonth);
             buildLineChart('ham-avg-progress-term', stats.avg_progress.term, labelTerm);
             buildLineChart('ham-avg-progress-school-year', stats.avg_progress.school_year, labelSchoolYear);
             buildLineChart('ham-avg-progress-hogstadium', stats.avg_progress.hogstadium, labelHogstadium);
         }
 
-        // Student radar charts
+        // Student avg progress toggle
+        if (stats && stats.level === 'student' && stats.avg_progress) {
+            buildStudentAvgProgressToggle();
+        }
+
+        // Student radar chart + bucket toggle
         if (stats && stats.level === 'student' && stats.student_radar && stats.student_radar.buckets) {
-            buildRadarChart('ham-student-radar-month', {
-                labels: stats.student_radar.labels,
-                buckets: stats.student_radar.buckets.month,
-            }, labelMonth);
-            buildRadarChart('ham-student-radar-term', {
-                labels: stats.student_radar.labels,
-                buckets: stats.student_radar.buckets.term,
-            }, labelTerm);
-            buildRadarChart('ham-student-radar-school-year', {
-                labels: stats.student_radar.labels,
-                buckets: stats.student_radar.buckets.school_year,
-            }, labelSchoolYear);
-            buildRadarChart('ham-student-radar-hogstadium', {
-                labels: stats.student_radar.labels,
-                buckets: stats.student_radar.buckets.hogstadium,
-            }, labelHogstadium);
+            buildStudentRadarToggle();
         }
 
         // Overview radar chart

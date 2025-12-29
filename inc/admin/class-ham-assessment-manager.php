@@ -695,6 +695,25 @@ class HAM_Assessment_Manager
                     break;
                 }
 
+                $dataset_label = sprintf(__('Evaluation %d', 'headless-access-manager'), $index);
+                $post_obj = isset($item['post_id']) ? get_post((int) $item['post_id']) : null;
+                if ($post_obj instanceof WP_Post) {
+                    $author_name = '';
+                    if (!empty($post_obj->post_author)) {
+                        $author_user = get_user_by('id', (int) $post_obj->post_author);
+                        if ($author_user) {
+                            $author_name = $author_user->display_name;
+                        }
+                    }
+
+                    $date_label = date_i18n(get_option('date_format'), (int) ($item['ts'] ?? 0));
+                    if ($date_label && $author_name) {
+                        $dataset_label = $date_label . ' — ' . $author_name;
+                    } elseif ($date_label) {
+                        $dataset_label = $date_label;
+                    }
+                }
+
                 $values = array();
                 foreach ($order as $qk) {
                     $val = null;
@@ -705,7 +724,7 @@ class HAM_Assessment_Manager
                 }
 
                 $datasets[] = array(
-                    'label' => sprintf(__('Evaluation %d', 'headless-access-manager'), $index),
+                    'label' => $dataset_label,
                     'post_id' => (int) $item['post_id'],
                     'overall_avg' => $item['overall_avg'],
                     'values' => $values,

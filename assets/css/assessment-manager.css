@@ -370,7 +370,58 @@
 }
 
 .ham-chart-wrapper--lg {
-    height: 300px;
+    height: 600px;
+}
+
+.ham-overview-radar-panel-title {
+    font-size: 22px;
+    line-height: 1.25;
+    margin-bottom: 16px;
+}
+
+.ham-radar-values {
+    margin-top: 10px;
+}
+
+.ham-radar-toggle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 6px 0 10px 0;
+}
+
+.ham-radar-toggle .button {
+    border-radius: 999px;
+    padding: 0 12px;
+    line-height: 30px;
+}
+
+.ham-radar-values-header {
+    font-size: 12px;
+    color: #646970;
+    margin: 0 0 6px 0;
+}
+
+.ham-radar-values-scroll {
+    overflow-x: auto;
+}
+
+.ham-radar-values-table {
+    border-collapse: collapse;
+}
+
+.ham-radar-values-th-question,
+.ham-radar-values-td-question {
+    min-width: 240px;
+}
+
+.ham-radar-values-th-eval,
+.ham-radar-values-td-eval {
+    min-width: 140px;
+}
+
+.ham-radar-values-td-eval {
+    font-variant-numeric: tabular-nums;
 }
 
 .ham-stats-column--half {

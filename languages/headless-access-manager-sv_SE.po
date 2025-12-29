@@ -576,7 +576,7 @@ msgstr "Statusfördelning"
 
 #: templates/admin/assessment-statistics.php:132
 msgid "Average per Assessment Section"
-msgstr "Genomsnitt per bedömningsavsnitt"
+msgstr "Genomsnitt per utvärderingsdel"
 
 #: templates/admin/assessment-statistics.php
 msgid "Top-Rated Assessment Questions"
@@ -602,10 +602,10 @@ msgid "Delete"
 msgstr "Ta bort"
 
 msgid "Evaluation Details"
-msgstr "Bedömningsdetaljer"
+msgstr "Utvärderingsdetaljer"
 
 msgid "Error loading evaluation data."
-msgstr "Fel vid laddning av bedömningsdata."
+msgstr "Fel vid laddning av utvärderingsdata."
 
 msgid "Student:"
 msgstr "Elev:"
