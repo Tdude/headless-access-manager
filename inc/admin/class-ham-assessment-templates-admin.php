@@ -63,7 +63,7 @@ class HAM_Assessment_Templates_Admin
             'public'             => false,
             'publicly_queryable' => false,
             'show_ui'            => true,
-            'show_in_menu'       => 'headless-access-manager',
+            'show_in_menu'       => false,
             'query_var'          => true,
             'rewrite'            => array( 'slug' => 'assessment-template' ),
             'capability_type'    => 'post',

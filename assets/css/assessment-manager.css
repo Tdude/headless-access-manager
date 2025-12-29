@@ -441,6 +441,37 @@
     font-weight: 600;
 }
 
+ .ham-assessments-table .column-actions {
+     white-space: nowrap;
+ }
+
+ .ham-icon-button {
+     padding: 0 8px;
+     min-width: 34px;
+     height: 32px;
+     line-height: 30px;
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
+ }
+
+ .ham-icon-button .dashicons {
+     line-height: 1;
+     margin: 0;
+ }
+
+ .ham-icon-button--danger {
+     border-color: #d63638;
+     color: #d63638;
+     background: #fff;
+ }
+
+ .ham-icon-button--danger:hover,
+ .ham-icon-button--danger:focus {
+     border-color: #b32d2e;
+     color: #b32d2e;
+ }
+
 /* Modal Styles */
 .ham-modal {
     display: none;
