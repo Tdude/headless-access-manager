@@ -182,11 +182,6 @@
         const $modalClose = $('.ham-modal-close');
         const $viewButtons = $('.ham-view-assessment');
 
-        const debugTooltipCandidates = {
-            anknytning: false,
-            ansvar: false,
-        };
-
         const tooltipState = {
             timer: null,
             $tooltip: null,
@@ -248,22 +243,56 @@
         }
 
         function showTooltipFromTarget($target) {
+            const attrOptions = $target.attr('data-options');
             const attrHtml = $target.attr('data-full-html');
             const attrText = $target.attr('data-full-text');
 
-            if (!attrHtml && !attrText) {
+            if (!attrOptions && !attrHtml && !attrText) {
                 return;
+            }
+
+            let options;
+            if (attrOptions) {
+                try {
+                    options = JSON.parse(decodeHtml(attrOptions));
+                } catch (e) {
+                    options = null;
+                }
             }
 
             const html = attrHtml ? decodeHtml(attrHtml) : '';
             const text = attrText ? decodeHtml(attrText) : '';
+
+            let tooltipHtml = '';
+            if (Array.isArray(options) && options.length) {
+                const itemsHtml = options
+                    .map(opt => {
+                        if (!opt || !opt.label) {
+                            return '';
+                        }
+                        const optValue = opt.value !== undefined && opt.value !== null ? String(opt.value) : '';
+                        const optLabel = String(opt.label);
+                        const safeOptValue = escapeHtml(optValue);
+                        const safeOptLabel = escapeHtml(optLabel);
+                        const valuePrefix = optValue ? `<span class="ham-tooltip-option-value">${safeOptValue}</span>` : '';
+                        return `<li>${valuePrefix}${safeOptLabel}</li>`;
+                    })
+                    .filter(Boolean)
+                    .join('');
+
+                if (itemsHtml) {
+                    tooltipHtml = `<div class="ham-tooltip-label">${escapeHtml(hamAssessment.texts.answerAlternatives || 'Svarsalternativ')}</div><ul class="ham-tooltip-list">${itemsHtml}</ul>`;
+                }
+            }
 
             if (!tooltipState.$tooltip) {
                 tooltipState.$tooltip = $('<div class="ham-tooltip" role="tooltip"></div>');
                 $('body').append(tooltipState.$tooltip);
             }
 
-            if (attrHtml) {
+            if (tooltipHtml) {
+                tooltipState.$tooltip.html(tooltipHtml);
+            } else if (attrHtml) {
                 tooltipState.$tooltip.html(html);
             } else {
                 tooltipState.$tooltip.text(text);
@@ -490,27 +519,6 @@
 
                     const questionText = (questionTextFromAnswer || questionTextFromStructure || String(qKey)).trim();
 
-                    if (!debugTooltipCandidates[sectionName]) {
-                        debugTooltipCandidates[sectionName] = true;
-                        /* console.log('[HAM MODAL TOOLTIP DEBUG]', {
-                            section: sectionName,
-                            qKey,
-                            questionStructure,
-                            answerData,
-                            candidates: {
-                                questionTextFromAnswer,
-                                questionTextFromStructure,
-                                qKey,
-                                resolvedQuestionText: questionText,
-                            },
-                            options: Array.isArray(questionStructure && questionStructure.options) ? (questionStructure.options || []).map(opt => ({
-                                value: opt && opt.value !== undefined ? opt.value : null,
-                                label: opt && opt.label ? opt.label : null,
-                                stage: opt && opt.stage ? opt.stage : null,
-                            })) : null,
-                        }); */
-                    }
-
                     let answerValue;
                     let stage;
 
@@ -562,27 +570,14 @@
                         answerTooltipText = answerLabel;
                     }
 
-                    let answerTooltipHtml = '';
+                    let answerTooltipOptions = [];
                     if (questionStructure.options && Array.isArray(questionStructure.options) && questionStructure.options.length) {
-                        const optionItemsHtml = questionStructure.options
-                            .map(opt => {
-                                const optValue = opt && opt.value !== undefined ? String(opt.value) : '';
-                                const optLabel = opt && opt.label ? String(opt.label) : '';
-                                if (!optLabel) {
-                                    return '';
-                                }
-
-                                const safeOptValue = escapeHtml(optValue);
-                                const safeOptLabel = escapeHtml(optLabel);
-                                const valuePrefix = optValue ? `<span class="ham-tooltip-option-value">${safeOptValue}</span>` : '';
-                                return `<li>${valuePrefix}${safeOptLabel}</li>`;
-                            })
-                            .filter(Boolean)
-                            .join('');
-
-                        if (optionItemsHtml) {
-                            answerTooltipHtml = `<div class="ham-tooltip-label">${escapeHtml(hamAssessment.texts.answerAlternatives || 'Svarsalternativ')}</div><ul class="ham-tooltip-list">${optionItemsHtml}</ul>`;
-                        }
+                        answerTooltipOptions = questionStructure.options
+                            .map(opt => ({
+                                value: opt && opt.value !== undefined ? opt.value : null,
+                                label: opt && opt.label ? String(opt.label) : '',
+                            }))
+                            .filter(opt => opt && opt.label);
                     }
 
                     // Set stage badge
@@ -609,13 +604,13 @@
                     const safeQuestionText = escapeHtml(questionText);
                     const safeAnswerLabel = escapeHtml(answerLabel);
                     const safeAnswerTooltipText = escapeHtml(answerTooltipText);
-                    const safeAnswerTooltipHtml = answerTooltipHtml ? escapeHtml(answerTooltipHtml) : '';
+                    const safeAnswerTooltipOptions = answerTooltipOptions.length ? escapeHtml(JSON.stringify(answerTooltipOptions)) : '';
 
                     // Create table row
                     const tableRow = `
                         <tr>
                             <td>${safeQuestionText}</td>
-                            <td><span class="ham-tooltip-target" ${safeAnswerTooltipHtml ? `data-full-html="${safeAnswerTooltipHtml}"` : `data-full-text="${safeAnswerTooltipText}"`}>${safeAnswerLabel}</span></td>
+                            <td><span class="ham-tooltip-target" ${safeAnswerTooltipOptions ? `data-options="${safeAnswerTooltipOptions}"` : `data-full-text="${safeAnswerTooltipText}"`}>${safeAnswerLabel}</span></td>
                             <td>${stageBadge}</td>
                         </tr>
                     `;
