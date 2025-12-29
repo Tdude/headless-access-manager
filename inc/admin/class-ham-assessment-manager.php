@@ -1970,6 +1970,19 @@ public function ajax_get_assessment_details()
             return;
         }
 
+        // Enqueue Select2 only on the Student Evaluations list page where we need searchable student filtering
+        if (strpos($hook, 'ham-assessments') !== false) {
+            $select2_js_url = HAM_PLUGIN_URL . 'assets/vendor/select2/js/select2.min.js';
+            $select2_css_url = HAM_PLUGIN_URL . 'assets/vendor/select2/css/select2.min.css';
+            $select2_js_path = HAM_PLUGIN_DIR . 'assets/vendor/select2/js/select2.min.js';
+            $select2_css_path = HAM_PLUGIN_DIR . 'assets/vendor/select2/css/select2.min.css';
+
+            if (file_exists($select2_js_path) && file_exists($select2_css_path)) {
+                wp_enqueue_script('ham-select2', $select2_js_url, array('jquery'), '4.1.0', true);
+                wp_enqueue_style('ham-select2', $select2_css_url, array(), '4.1.0');
+            }
+        }
+
         // Enqueue CSS
         wp_enqueue_style(
             'ham-assessment-manager',
@@ -2004,6 +2017,7 @@ public function ajax_get_assessment_details()
         wp_localize_script('ham-assessment-manager', 'hamAssessment', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('ham_assessment_nonce'),
+            'studentSearchNonce' => wp_create_nonce('ham_ajax_nonce'),
             'texts' => array(
                 'loading' => esc_html__('Loading...', 'headless-access-manager'),
                 'error' => esc_html__('Error loading data', 'headless-access-manager'),

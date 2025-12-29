@@ -33,6 +33,30 @@
         const $filterReset = $('#ham-filter-reset');
         const $assessmentRows = $('.ham-assessments-table tbody tr');
 
+        if ($filterStudent.length && $.fn.select2 && window.hamAssessment && hamAssessment.studentSearchNonce) {
+            $filterStudent.select2({
+                ajax: {
+                    url: hamAssessment.ajaxUrl,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            action: 'ham_search_students',
+                            q: params.term,
+                            nonce: hamAssessment.studentSearchNonce,
+                        };
+                    },
+                    processResults: function(data) {
+                        return { results: data };
+                    },
+                    cache: true,
+                },
+                minimumInputLength: 2,
+                width: 'resolve',
+                allowClear: true,
+            });
+        }
+
         // Handle student filter
         $filterStudent.on('change', applyFilters);
 

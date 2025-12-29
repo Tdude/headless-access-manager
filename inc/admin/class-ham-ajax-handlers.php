@@ -30,8 +30,13 @@ class HAM_Ajax_Handlers {
      * AJAX handler for student search.
      */
     public static function search_students() {
-        check_ajax_referer('ham_ajax_nonce', 'nonce');
-        
+        $nonce = isset($_REQUEST['nonce']) ? sanitize_text_field(wp_unslash($_REQUEST['nonce'])) : '';
+        $nonce_ok = $nonce ? wp_verify_nonce($nonce, 'ham_ajax_nonce') : false;
+
+        if (!$nonce_ok) {
+            wp_send_json_error('Invalid nonce');
+        }
+
         if (!current_user_can('edit_posts')) {
             wp_send_json_error('Unauthorized');
         }
