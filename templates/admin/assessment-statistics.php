@@ -15,6 +15,18 @@ if (! defined('ABSPATH')) {
 
     <?php if (isset($drilldown) && is_array($drilldown)) : ?>
 
+        <script>
+            window.hamAssessmentStats = <?php
+                echo wp_json_encode(array(
+                    'level' => isset($drilldown['level']) ? $drilldown['level'] : null,
+                    'student' => isset($drilldown['student']) ? $drilldown['student'] : null,
+                    'avg_progress' => isset($drilldown['avg_progress']) ? $drilldown['avg_progress'] : array(),
+                    'student_radar' => isset($drilldown['student_radar']) ? $drilldown['student_radar'] : array(),
+                    'radar_questions' => isset($drilldown['radar_questions']) ? $drilldown['radar_questions'] : array(),
+                ));
+            ?>;
+        </script>
+
         <div class="ham-stats-panel" style="margin-top: 20px;">
             <h2><?php echo esc_html__('Evaluation Drilldown', 'headless-access-manager'); ?></h2>
 
@@ -105,6 +117,28 @@ if (! defined('ABSPATH')) {
             <?php elseif ($drilldown['level'] === 'school') : ?>
 
                 <h3 style="margin-top: 10px;">
+                    <?php echo esc_html__('School average progress', 'headless-access-manager'); ?>
+                </h3>
+                <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+                    <div>
+                        <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-avg-progress-month" height="140"></canvas>
+                    </div>
+                    <div>
+                        <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-avg-progress-term" height="140"></canvas>
+                    </div>
+                    <div>
+                        <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-avg-progress-school-year" height="140"></canvas>
+                    </div>
+                    <div>
+                        <strong><?php echo esc_html__('Högstadium (3 years)', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-avg-progress-hogstadium" height="140"></canvas>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 10px;">
                     <?php echo esc_html__('School Progress (by semester)', 'headless-access-manager'); ?>
                 </h3>
                 <?php $render_semester_bars($drilldown['series'], 100); ?>
@@ -146,6 +180,28 @@ if (! defined('ABSPATH')) {
             <?php elseif ($drilldown['level'] === 'class') : ?>
 
                 <h3 style="margin-top: 10px;">
+                    <?php echo esc_html__('Class average progress', 'headless-access-manager'); ?>
+                </h3>
+                <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+                    <div>
+                        <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-avg-progress-month" height="140"></canvas>
+                    </div>
+                    <div>
+                        <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-avg-progress-term" height="140"></canvas>
+                    </div>
+                    <div>
+                        <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-avg-progress-school-year" height="140"></canvas>
+                    </div>
+                    <div>
+                        <strong><?php echo esc_html__('Högstadium (3 years)', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-avg-progress-hogstadium" height="140"></canvas>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 10px;">
                     <?php echo esc_html__('Class Progress (by semester)', 'headless-access-manager'); ?>
                 </h3>
                 <?php $render_semester_bars($drilldown['series'], 100); ?>
@@ -183,6 +239,99 @@ if (! defined('ABSPATH')) {
                 </table>
 
             <?php elseif ($drilldown['level'] === 'student') : ?>
+
+                <h3 style="margin-top: 10px;">
+                    <?php echo esc_html__('Student average progress', 'headless-access-manager'); ?>
+                    <?php if (!empty($drilldown['student']['name'])) : ?>
+                        <span style="color: #646970; font-weight: normal;">— <?php echo esc_html($drilldown['student']['name']); ?></span>
+                    <?php endif; ?>
+                </h3>
+                <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+                    <div>
+                        <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-avg-progress-month" height="140"></canvas>
+                    </div>
+                    <div>
+                        <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-avg-progress-term" height="140"></canvas>
+                    </div>
+                    <div>
+                        <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-avg-progress-school-year" height="140"></canvas>
+                    </div>
+                    <div>
+                        <strong><?php echo esc_html__('Högstadium (3 years)', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-avg-progress-hogstadium" height="140"></canvas>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 20px;">
+                    <?php echo esc_html__('Radar (per evaluation within bucket)', 'headless-access-manager'); ?>
+                </h3>
+                <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+                    <div>
+                        <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-student-radar-month" height="240"></canvas>
+                    </div>
+                    <div>
+                        <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-student-radar-term" height="240"></canvas>
+                    </div>
+                    <div>
+                        <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-student-radar-school-year" height="240"></canvas>
+                    </div>
+                    <div>
+                        <strong><?php echo esc_html__('Högstadium (3 years)', 'headless-access-manager'); ?></strong>
+                        <canvas id="ham-student-radar-hogstadium" height="240"></canvas>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 20px;">
+                    <?php echo esc_html__('Questions and answer alternatives', 'headless-access-manager'); ?>
+                </h3>
+                <?php if (!empty($drilldown['radar_questions']) && is_array($drilldown['radar_questions'])) : ?>
+                    <table class="wp-list-table widefat fixed striped">
+                        <thead>
+                            <tr>
+                                <th><?php echo esc_html__('Question', 'headless-access-manager'); ?></th>
+                                <th><?php echo esc_html__('Option 1', 'headless-access-manager'); ?></th>
+                                <th><?php echo esc_html__('Option 2', 'headless-access-manager'); ?></th>
+                                <th><?php echo esc_html__('Option 3', 'headless-access-manager'); ?></th>
+                                <th><?php echo esc_html__('Option 4', 'headless-access-manager'); ?></th>
+                                <th><?php echo esc_html__('Option 5', 'headless-access-manager'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($drilldown['radar_questions'] as $q) : ?>
+                                <?php
+                                $opts = isset($q['options']) && is_array($q['options']) ? $q['options'] : array();
+                                $opt = function($i) use ($opts) {
+                                    return isset($opts[$i]) ? $opts[$i] : '';
+                                };
+                                $label = '';
+                                if (isset($q['section']) && isset($q['text'])) {
+                                    $label = $q['section'] . ': ' . $q['text'];
+                                } elseif (isset($q['text'])) {
+                                    $label = $q['text'];
+                                } elseif (isset($q['key'])) {
+                                    $label = $q['key'];
+                                }
+                                ?>
+                                <tr>
+                                    <td><?php echo esc_html($label); ?></td>
+                                    <td><?php echo esc_html($opt(0)); ?></td>
+                                    <td><?php echo esc_html($opt(1)); ?></td>
+                                    <td><?php echo esc_html($opt(2)); ?></td>
+                                    <td><?php echo esc_html($opt(3)); ?></td>
+                                    <td><?php echo esc_html($opt(4)); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else : ?>
+                    <p><?php echo esc_html__('No question data available.', 'headless-access-manager'); ?></p>
+                <?php endif; ?>
 
                 <h3 style="margin-top: 10px;">
                     <?php echo esc_html__('Student Progress (by semester)', 'headless-access-manager'); ?>

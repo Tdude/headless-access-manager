@@ -21,6 +21,181 @@
 
         // Initialize delete buttons
         initDeleteButtons();
+
+        // Initialize statistics charts (only runs on stats page)
+        initStatsCharts();
+    }
+
+    function initStatsCharts() {
+        if (!window.hamAssessmentStats || !window.Chart) {
+            return;
+        }
+
+        const stats = window.hamAssessmentStats;
+
+        function clampNumber(val, min, max) {
+            const num = typeof val === 'number' ? val : (val == null ? null : Number(val));
+            if (num == null || Number.isNaN(num)) {
+                return null;
+            }
+            return Math.max(min, Math.min(max, num));
+        }
+
+        function hslColor(h, s, l, a) {
+            if (typeof a === 'number') {
+                return `hsla(${h}, ${s}%, ${l}%, ${a})`;
+            }
+            return `hsl(${h}, ${s}%, ${l}%)`;
+        }
+
+        function datasetColor(idx) {
+            const baseHue = 205;
+            const hue = (baseHue + (idx * 28)) % 360;
+            return {
+                border: hslColor(hue, 70, 45),
+                fill: hslColor(hue, 70, 55, 0.20),
+            };
+        }
+
+        function buildLineChart(canvasId, series, label) {
+            const el = document.getElementById(canvasId);
+            if (!el || !series || !Array.isArray(series) || series.length === 0) {
+                return;
+            }
+
+            const labels = series.map((p) => p.label);
+            const data = series.map((p) => clampNumber(p.overall_avg, 1, 5));
+
+            const c = datasetColor(0);
+            new Chart(el.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label,
+                        data,
+                        borderColor: c.border,
+                        backgroundColor: c.fill,
+                        fill: true,
+                        tension: 0.25,
+                        pointRadius: 3,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true },
+                    },
+                    scales: {
+                        y: {
+                            min: 1,
+                            max: 5,
+                            ticks: { stepSize: 1 },
+                        },
+                    },
+                },
+            });
+        }
+
+        function pickLatestBucket(buckets) {
+            if (!Array.isArray(buckets) || buckets.length === 0) {
+                return null;
+            }
+            return buckets[buckets.length - 1];
+        }
+
+        function buildRadarChart(canvasId, bucketGroup, title) {
+            const el = document.getElementById(canvasId);
+            if (!el || !bucketGroup || !bucketGroup.buckets) {
+                return;
+            }
+
+            const bucket = pickLatestBucket(bucketGroup.buckets);
+            if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
+                return;
+            }
+
+            const labels = Array.isArray(bucketGroup.labels) ? bucketGroup.labels : [];
+
+            const datasets = bucket.datasets.map((ds, idx) => {
+                const c = datasetColor(idx);
+                return {
+                    label: ds.label,
+                    data: Array.isArray(ds.values) ? ds.values.map((v) => clampNumber(v, 1, 5)) : [],
+                    borderColor: c.border,
+                    backgroundColor: c.fill,
+                    borderWidth: 2,
+                    pointRadius: 2,
+                    fill: true,
+                    borderDash: idx === 0 ? [] : [6, 4],
+                };
+            });
+
+            new Chart(el.getContext('2d'), {
+                type: 'radar',
+                data: {
+                    labels,
+                    datasets,
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: {
+                            display: Boolean(bucket.label || title),
+                            text: bucket.label || title,
+                        },
+                    },
+                    scales: {
+                        r: {
+                            min: 1,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                showLabelBackdrop: false,
+                            },
+                            grid: {
+                                circular: false,
+                            },
+                            angleLines: {
+                                color: 'rgba(0,0,0,0.08)',
+                            },
+                        },
+                    },
+                },
+            });
+        }
+
+        // Avg progress charts (school/class/student levels)
+        if (stats.avg_progress) {
+            buildLineChart('ham-avg-progress-month', stats.avg_progress.month, hamAssessment?.texts?.date || 'Month');
+            buildLineChart('ham-avg-progress-term', stats.avg_progress.term, 'Term');
+            buildLineChart('ham-avg-progress-school-year', stats.avg_progress.school_year, 'School year');
+            buildLineChart('ham-avg-progress-hogstadium', stats.avg_progress.hogstadium, 'Högstadium');
+        }
+
+        // Student radar charts
+        if (stats.level === 'student' && stats.student_radar && stats.student_radar.buckets) {
+            buildRadarChart('ham-student-radar-month', {
+                labels: stats.student_radar.labels,
+                buckets: stats.student_radar.buckets.month,
+            }, 'Month');
+            buildRadarChart('ham-student-radar-term', {
+                labels: stats.student_radar.labels,
+                buckets: stats.student_radar.buckets.term,
+            }, 'Term');
+            buildRadarChart('ham-student-radar-school-year', {
+                labels: stats.student_radar.labels,
+                buckets: stats.student_radar.buckets.school_year,
+            }, 'School year');
+            buildRadarChart('ham-student-radar-hogstadium', {
+                labels: stats.student_radar.labels,
+                buckets: stats.student_radar.buckets.hogstadium,
+            }, 'Högstadium');
+        }
     }
 
     /**
