@@ -1578,6 +1578,14 @@ public function ajax_get_assessment_details()
         // Process the assessment data to ensure it's in the right format
         $processed_assessment_data = $this->process_assessment_data($assessment_data);
 
+        // Ensure canonical questions/options structure is available.
+        if (!defined('HAM_ASSESSMENT_DEFAULT_STRUCTURE')) {
+            $constants_file = dirname(__FILE__, 2) . '/assessment-constants.php';
+            if (file_exists($constants_file)) {
+                require_once $constants_file;
+            }
+        }
+
         // Log processed data in a more readable way
         //error_log('PROCESSED ASSESSMENT DATA STRUCTURE:');
         /*
