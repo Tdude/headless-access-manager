@@ -445,24 +445,22 @@
      white-space: nowrap;
  }
 
- .ham-icon-button {
+ .column-actions .ham-icon-button {
      padding: 0 8px;
      min-width: 34px;
-     height: 32px;
-     line-height: 30px;
-     display: inline-flex;
+     display: inline-flex
      align-items: center;
      justify-content: center;
  }
 
- .ham-icon-button .dashicons {
+ .column-actions .ham-icon-button .dashicons {
      line-height: 1;
      margin: 0;
  }
 
- .ham-icon-button--danger {
-     border-color: #d63638;
-     color: #d63638;
+ .column-actions .ham-icon-button--danger {
+     border-color: #d63638 !important;
+     color: #d63638 !important;
      background: #fff;
  }
 
