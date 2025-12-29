@@ -84,6 +84,16 @@
             return Math.max(min, Math.min(max, num));
         }
 
+        function escapeHtml(str) {
+            const s = str == null ? '' : String(str);
+            return s
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         function hslColor(h, s, l, a) {
             if (typeof a === 'number') {
                 return `hsla(${h}, ${s}%, ${l}%, ${a})`;
@@ -362,6 +372,14 @@
                 const label = (section && text) ? `${section}: ${text}` : (text || key);
                 const options = Array.isArray(q.options) ? q.options : [];
 
+                const sectionKey = section.trim().toLowerCase();
+                let rowClass = '';
+                if (sectionKey === 'anknytning') {
+                    rowClass = 'ham-answer-row--anknytning';
+                } else if (sectionKey === 'ansvar') {
+                    rowClass = 'ham-answer-row--ansvar';
+                }
+
                 // optionSelections[optionIndex] => [datasetIndex, datasetIndex, ...]
                 const optionSelections = [[], [], [], [], []];
                 datasets.forEach((ds, di) => {
@@ -375,7 +393,7 @@
                     optionSelections[optIdx].push(di);
                 });
 
-                html += '<tr>';
+                html += rowClass ? `<tr class="${rowClass}">` : '<tr>';
                 html += `<td>${escapeHtml(label)}</td>`;
 
                 for (let oi = 0; oi < 5; oi++) {

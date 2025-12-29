@@ -343,6 +343,9 @@
     --ham-chart-height-md: 300px;
     --ham-chart-height-lg: 600px;
     --ham-table-inset-border-px: 4px;
+    --ham-divider-anknytning-red: #d63638;
+    --ham-divider-anknytning-yellow: #dba617;
+    --ham-divider-ansvar-orange: #dba617;
 }
 
 .ham-stats-panel h2 {
@@ -446,6 +449,18 @@
 
 .ham-answer-alternatives-table td.ham-answer-choice--selected {
     background: rgba(0, 0, 0, 0.02);
+}
+
+.ham-answer-row--anknytning td:nth-child(4) {
+    border-left: 2px solid var(--ham-divider-anknytning-red);
+}
+
+.ham-answer-row--anknytning td:nth-child(6) {
+    border-left: 2px solid var(--ham-divider-anknytning-yellow);
+}
+
+.ham-answer-row--ansvar td:nth-child(4) {
+    border-left: 2px solid var(--ham-divider-ansvar-orange);
 }
 
 .ham-stats-column--half {
