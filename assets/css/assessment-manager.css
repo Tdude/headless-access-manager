@@ -345,7 +345,7 @@
     --ham-table-inset-border-px: 4px;
     --ham-divider-anknytning-red: #d63638;
     --ham-divider-anknytning-yellow: #dba617;
-    --ham-divider-ansvar-orange: #dba617;
+    --ham-divider-ansvar-orange: #d54e21;
 }
 
 .ham-stats-panel h2 {
@@ -470,20 +470,21 @@
 }
 
 .ham-answer-alternatives-table td.ham-answer-choice--selected {
-    background: rgba(0, 0, 0, 0.03);
     border-radius: 4px;
 }
 
+/* Section-specific dividers (student answer alternatives table)
+   Columns: 1=Question, 2=Opt1, 3=Opt2, 4=Opt3, 5=Opt4, 6=Opt5 */
 .ham-answer-row--anknytning td:nth-child(4) {
-    border-left: 2px solid var(--ham-divider-anknytning-red);
+    border-left: 2px solid var(--ham-divider-anknytning-red) !important;
 }
 
 .ham-answer-row--anknytning td:nth-child(6) {
-    border-left: 2px solid var(--ham-divider-anknytning-yellow);
+    border-left: 2px solid var(--ham-divider-anknytning-yellow) !important;
 }
 
 .ham-answer-row--ansvar td:nth-child(4) {
-    border-left: 2px solid var(--ham-divider-ansvar-orange);
+    border-left: 2px solid var(--ham-divider-ansvar-orange) !important;
 }
 
 .ham-stats-column--half {

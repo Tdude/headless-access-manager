@@ -317,6 +317,12 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <h3 style="margin-top: 20px;">
                     <?php echo esc_html__('Questions and answer alternatives', 'headless-access-manager'); ?>
                 </h3>
+                <div class="ham-radar-toggle ham-answer-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
+                    <button type="button" class="button ham-answer-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-answer-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-answer-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-answer-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                </div>
                 <div id="ham-answer-alternatives" class="ham-answer-alternatives"></div>
 
                 <h3 style="margin-top: 20px;">

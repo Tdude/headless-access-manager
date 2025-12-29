@@ -351,6 +351,14 @@
 
             const datasets = bucket.datasets;
 
+            function optionBgColor(optionIndex, alpha) {
+                const a = typeof alpha === 'number' ? alpha : 0.22;
+                // 1..5 => red -> orange -> yellow -> light green -> green
+                const hues = [0, 28, 50, 90, 120];
+                const hue = hues[Math.max(0, Math.min(4, optionIndex))];
+                return `hsla(${hue}, 85%, 60%, ${a})`;
+            }
+
             let html = '';
             html += '<div class="ham-radar-values-scroll">';
             html += '<table class="wp-list-table widefat fixed striped ham-answer-alternatives-table">';
@@ -405,13 +413,8 @@
 
                     if (sel.length > 0) {
                         cls += ' ham-answer-choice--selected';
-                        // stack multiple inset stripes for multiple evaluations
-                        const shadows = sel.map((datasetIndex, stripeIndex) => {
-                            const c = datasetColor(datasetIndex);
-                            const offset = (stripeIndex + 1) * CHART_TABLE_INSET_BORDER_PX;
-                            return `inset ${offset}px 0 0 ${c.border}`;
-                        });
-                        style = ` style="box-shadow: ${shadows.join(', ')};"`;
+                        const alpha = Math.min(0.45, 0.18 + (sel.length * 0.07));
+                        style = ` style="background-color: ${optionBgColor(oi, alpha)};"`;
                     }
 
                     html += `<td class="${cls}"${style}>${escapeHtml(optText)}</td>`;
@@ -561,8 +564,10 @@
         function buildStudentRadarToggle() {
             const canvas = document.getElementById('ham-student-radar');
             const btns = Array.from(document.querySelectorAll('.ham-radar-toggle-btn'));
+            const answerBtns = Array.from(document.querySelectorAll('.ham-answer-toggle-btn'));
+            const allBtns = btns.concat(answerBtns);
 
-            if (!canvas || btns.length === 0 || !stats || stats.level !== 'student' || !stats.student_radar || !stats.student_radar.buckets) {
+            if (!canvas || allBtns.length === 0 || !stats || stats.level !== 'student' || !stats.student_radar || !stats.student_radar.buckets) {
                 return;
             }
 
@@ -676,7 +681,7 @@
             }
 
             initBucketToggle({
-                buttons: btns,
+                buttons: allBtns,
                 defaultKey: 'term',
                 isKeyAvailable: (key) => Array.isArray(bucketsByKey[key]) && bucketsByKey[key].length > 0,
                 onChange: updateChart,
