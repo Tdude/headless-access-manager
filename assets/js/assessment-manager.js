@@ -34,6 +34,13 @@
         const overview = window.hamAssessmentOverview || null;
         const stats = window.hamAssessmentStats || null;
 
+        const t = (window.hamAssessment && window.hamAssessment.texts) ? window.hamAssessment.texts : {};
+        const labelMonth = t.month || 'Month';
+        const labelTerm = t.term || 'Term';
+        const labelSchoolYear = t.schoolYear || 'School year';
+        const labelHogstadium = t.hogstadium || 'Högstadium';
+        const labelRadar = t.radar || 'Radar';
+
         if (!overview && !stats) {
             return;
         }
@@ -201,7 +208,7 @@
                 data: {
                     labels: radar.labels,
                     datasets: [{
-                        label: radar.title || 'Radar',
+                        label: radar.title || labelRadar,
                         data: radar.values.map((v) => clampNumber(v, 1, 5)),
                         borderColor: c.border,
                         backgroundColor: c.fill,
@@ -242,10 +249,10 @@
 
         // Avg progress charts (school/class/student levels)
         if (stats && stats.avg_progress) {
-            buildLineChart('ham-avg-progress-month', stats.avg_progress.month, hamAssessment?.texts?.date || 'Month');
-            buildLineChart('ham-avg-progress-term', stats.avg_progress.term, 'Term');
-            buildLineChart('ham-avg-progress-school-year', stats.avg_progress.school_year, 'School year');
-            buildLineChart('ham-avg-progress-hogstadium', stats.avg_progress.hogstadium, 'Högstadium');
+            buildLineChart('ham-avg-progress-month', stats.avg_progress.month, labelMonth);
+            buildLineChart('ham-avg-progress-term', stats.avg_progress.term, labelTerm);
+            buildLineChart('ham-avg-progress-school-year', stats.avg_progress.school_year, labelSchoolYear);
+            buildLineChart('ham-avg-progress-hogstadium', stats.avg_progress.hogstadium, labelHogstadium);
         }
 
         // Student radar charts
@@ -253,19 +260,19 @@
             buildRadarChart('ham-student-radar-month', {
                 labels: stats.student_radar.labels,
                 buckets: stats.student_radar.buckets.month,
-            }, 'Month');
+            }, labelMonth);
             buildRadarChart('ham-student-radar-term', {
                 labels: stats.student_radar.labels,
                 buckets: stats.student_radar.buckets.term,
-            }, 'Term');
+            }, labelTerm);
             buildRadarChart('ham-student-radar-school-year', {
                 labels: stats.student_radar.labels,
                 buckets: stats.student_radar.buckets.school_year,
-            }, 'School year');
+            }, labelSchoolYear);
             buildRadarChart('ham-student-radar-hogstadium', {
                 labels: stats.student_radar.labels,
                 buckets: stats.student_radar.buckets.hogstadium,
-            }, 'Högstadium');
+            }, labelHogstadium);
         }
 
         // Overview radar chart
@@ -556,7 +563,7 @@
                     .join('');
 
                 if (itemsHtml) {
-                    tooltipHtml = `<div class="ham-tooltip-label">${escapeHtml(hamAssessment.texts.answerAlternatives || 'Svarsalternativ')}</div><ul class="ham-tooltip-list">${itemsHtml}</ul>`;
+                    tooltipHtml = `<div class="ham-tooltip-label">${escapeHtml(hamAssessment.texts.answerAlternatives || 'Answer alternatives')}</div><ul class="ham-tooltip-list">${itemsHtml}</ul>`;
                 }
             }
 
@@ -740,7 +747,7 @@
                     // Fallback: single string
                     $commentsContainer.append(`<div class="ham-question-comment">${section.comments}</div>`);
                 } else {
-                    $commentsContainer.append(`<div class="ham-question-comment ham-no-comment">${hamAssessment.texts.noComments || 'Inga kommentarer.'}</div>`);
+                    $commentsContainer.append(`<div class="ham-question-comment ham-no-comment">${hamAssessment.texts.noComments || 'No comments.'}</div>`);
                 }
             }
             renderSectionComments('anknytning', data);

@@ -2347,6 +2347,13 @@ public function ajax_get_assessment_details()
                 'question' => esc_html__('Question', 'headless-access-manager'),
                 'answer' => esc_html__('Answer', 'headless-access-manager'),
                 'comments' => esc_html__('Comments', 'headless-access-manager'),
+                'noComments' => esc_html__('No comments.', 'headless-access-manager'),
+                'answerAlternatives' => esc_html__('Answer alternatives', 'headless-access-manager'),
+                'month' => esc_html__('Month', 'headless-access-manager'),
+                'term' => esc_html__('Term', 'headless-access-manager'),
+                'schoolYear' => esc_html__('School year', 'headless-access-manager'),
+                'hogstadium' => esc_html__('Högstadium', 'headless-access-manager'),
+                'radar' => esc_html__('Radar', 'headless-access-manager'),
                 'confirmDelete' => esc_html__('Are you sure you want to delete this assessment?', 'headless-access-manager'),
             )
         ));

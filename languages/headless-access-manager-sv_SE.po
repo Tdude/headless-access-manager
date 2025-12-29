@@ -543,6 +543,26 @@ msgid "School year"
 msgstr "Skolår"
 
 #: inc/admin/class-ham-assessment-manager.php
+msgid "Högstadium"
+msgstr "Högstadium"
+
+#: inc/admin/class-ham-assessment-manager.php
+msgid "Radar"
+msgstr "Radar"
+
+#: inc/admin/class-ham-assessment-manager.php
+msgid "Answer alternatives"
+msgstr "Svarsalternativ"
+
+#: inc/admin/class-ham-assessment-manager.php
+msgid "No comments."
+msgstr "Inga kommentarer."
+
+#: templates/admin/assessment-statistics.php
+msgid "Overall question averages"
+msgstr "Övergripande utfall per fråga"
+
+#: inc/admin/class-ham-assessment-manager.php
 msgid "Spring term"
 msgstr "Vårtermin"
 

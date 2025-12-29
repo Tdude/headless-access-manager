@@ -175,7 +175,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-school-year"></canvas></div>
                     </div>
                     <div>
-                        <strong><?php echo esc_html__('Högstadium (3 years)', 'headless-access-manager'); ?></strong>
+                        <strong><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></strong>
                         <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
                     </div>
                 </div>
@@ -238,7 +238,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-school-year"></canvas></div>
                     </div>
                     <div>
-                        <strong><?php echo esc_html__('Högstadium (3 years)', 'headless-access-manager'); ?></strong>
+                        <strong><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></strong>
                         <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
                     </div>
                 </div>
@@ -302,7 +302,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-school-year"></canvas></div>
                     </div>
                     <div>
-                        <strong><?php echo esc_html__('Högstadium (3 years)', 'headless-access-manager'); ?></strong>
+                        <strong><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></strong>
                         <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
                     </div>
                 </div>
@@ -324,7 +324,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <div class="ham-chart-wrapper ham-chart-wrapper--md"><canvas id="ham-student-radar-school-year"></canvas></div>
                     </div>
                     <div>
-                        <strong><?php echo esc_html__('Högstadium (3 years)', 'headless-access-manager'); ?></strong>
+                        <strong><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></strong>
                         <div class="ham-chart-wrapper ham-chart-wrapper--md"><canvas id="ham-student-radar-hogstadium"></canvas></div>
                     </div>
                 </div>
@@ -494,7 +494,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         $latest_bucket = end($bucket_series);
                         echo esc_html(isset($latest_bucket['count']) ? $latest_bucket['count'] : 0);
                     } else {
-                        echo '0';
+                        echo esc_html('0');
                     }
                     ?>
                 </div>
@@ -651,44 +651,10 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
     </div>
 
     <div class="ham-stats-row">
-        <div class="ham-stats-column ham-stats-column--half">
+        <div class="ham-stats-column">
             <div class="ham-stats-panel">
                 <h2><?php echo esc_html__('Overall radar (question averages)', 'headless-access-manager'); ?></h2>
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-overview-radar"></canvas></div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="ham-stats-row">
-        <div class="ham-stats-column">
-            <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Average per Assessment Section', 'headless-access-manager'); ?></h2>
-                <div id="sectionChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
-                    <?php
-                    $sectionData = array(
-                        array(
-                            'label' => esc_html__('Connection', 'headless-access-manager'),
-                            'value' => $stats['section_averages']['anknytning'],
-                            'color' => '#0073aa'
-                        ),
-                        array(
-                            'label' => esc_html__('Responsibility', 'headless-access-manager'),
-                            'value' => $stats['section_averages']['ansvar'],
-                            'color' => '#00a0d2'
-                        )
-                    );
-                    
-                    echo '<div class="ham-simple-bars" style="display: flex; justify-content: center; align-items: flex-end; height: 200px;">';
-                    foreach ($sectionData as $item) {
-                        $height = ($item['value'] / 5) * 150; // Scale to max height of 150px (5 is max value)
-                        echo '<div style="margin: 0 20px; text-align: center;">';
-                        echo '<div style="height: ' . esc_attr($height) . 'px; width: 60px; background-color: ' . esc_attr($item['color']) . ';"></div>';
-                        echo '<div style="margin-top: 10px;"><strong>' . esc_html($item['label']) . '</strong>: ' . esc_html($item['value']) . '</div>';
-                        echo '</div>';
-                    }
-                    echo '</div>';
-                    ?>
-                </div>
             </div>
         </div>
     </div>
@@ -714,7 +680,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         // Get questions structure
                         $questions_structure = (new HAM_Assessment_Manager())->get_questions_structure();
                         
-                        // Display top 10 questions
+                        // Display all questions
                         $count = 0;
                         foreach ($question_averages as $question_key => $average) {
                             list($section, $question_id) = explode('_', $question_key, 2);
@@ -734,9 +700,6 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                             echo '</tr>';
                             
                             $count++;
-                            if ($count >= 10) {
-                                break;
-                            }
                         }
                         
                         if ($count === 0) {
