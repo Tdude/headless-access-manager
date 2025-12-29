@@ -188,10 +188,11 @@
                 onChange,
             } = options || {};
 
-            let btns = Array.isArray(buttons) ? buttons : [];
-            const btnSet = new Set(btns);
+            const initialButtons = Array.isArray(buttons) ? buttons : [];
+            let btns = [];
+            const btnSet = new Set();
 
-            if (btns.length === 0 || typeof onChange !== 'function') {
+            if (initialButtons.length === 0 || typeof onChange !== 'function') {
                 return null;
             }
 
@@ -206,7 +207,7 @@
 
             let activeKey = defaultKey;
             if (typeof isKeyAvailable === 'function' && !isKeyAvailable(activeKey)) {
-                activeKey = btns[0].getAttribute('data-bucket') || defaultKey;
+                activeKey = initialButtons[0].getAttribute('data-bucket') || defaultKey;
             }
 
             function setBucket(bucketKey) {
@@ -234,7 +235,7 @@
                 setActive(activeKey);
             }
 
-            wireButtons(btns);
+            wireButtons(initialButtons);
 
             setBucket(activeKey);
 
