@@ -445,6 +445,16 @@
      white-space: nowrap;
  }
 
+ .ham-assessments-table .column-actions .button {
+     padding: 0 8px;
+     min-height: 28px;
+     line-height: 26px;
+ }
+
+ .ham-assessments-table .column-actions .ham-view-assessment {
+     padding: 0 10px;
+ }
+
  .column-actions .ham-icon-button {
      padding: 0 8px;
      min-width: 32px;
@@ -454,6 +464,9 @@
  }
 
  .column-actions .ham-icon-button .dashicons {
+     font-size: 18px;
+     width: 18px;
+     height: 18px;
      line-height: 1;
      margin: 0;
  }
