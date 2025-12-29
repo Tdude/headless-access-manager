@@ -76,8 +76,14 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <div style="margin-bottom: 10px;">
                     <?php
                     $crumbs = array();
-                    foreach ($drilldown['breadcrumb'] as $crumb) {
-                        $crumbs[] = '<a class="ham-pill-link" href="' . esc_url($crumb['url']) . '">' . esc_html($crumb['label']) . '</a>';
+                    $breadcrumb_items = is_array($drilldown['breadcrumb']) ? array_values($drilldown['breadcrumb']) : array();
+                    $last_index = count($breadcrumb_items) - 1;
+                    foreach ($breadcrumb_items as $idx => $crumb) {
+                        if ($idx === $last_index) {
+                            $crumbs[] = '<span class="ham-pill-link" aria-current="page">' . esc_html($crumb['label']) . '</span>';
+                        } else {
+                            $crumbs[] = '<a class="ham-pill-link" href="' . esc_url($crumb['url']) . '">' . esc_html($crumb['label']) . '</a>';
+                        }
                     }
                     echo '<div class="ham-pill-group">' . wp_kses_post(implode('<span class="ham-pill-separator">&raquo;</span>', $crumbs)) . '</div>';
                     ?>
@@ -164,19 +170,19 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
                     <div>
                         <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-month"></canvas></div>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-month"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-term"></canvas></div>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-term"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-school-year"></canvas></div>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-school-year"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
                     </div>
                 </div>
 
@@ -227,19 +233,19 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
                     <div>
                         <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-month"></canvas></div>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-month"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-term"></canvas></div>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-term"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-school-year"></canvas></div>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-school-year"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
                     </div>
                 </div>
 
@@ -305,14 +311,14 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <button type="button" class="button ham-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
                 </div>
-                <div class="ham-chart-wrapper ham-chart-wrapper--md"><canvas id="ham-student-radar"></canvas></div>
+                <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-student-radar"></canvas></div>
                 <div id="ham-student-radar-table" class="ham-radar-values"></div>
 
                 <h3 style="margin-top: 20px;">
                     <?php echo esc_html__('Questions and answer alternatives', 'headless-access-manager'); ?>
                 </h3>
                 <?php if (!empty($drilldown['radar_questions']) && is_array($drilldown['radar_questions'])) : ?>
-                    <table class="wp-list-table widefat fixed striped">
+                    <table class="wp-list-table widefat fixed striped ham-answer-alternatives-table">
                         <thead>
                             <tr>
                                 <th><?php echo esc_html__('Question', 'headless-access-manager'); ?></th>
@@ -353,14 +359,6 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <?php else : ?>
                     <p><?php echo esc_html__('No question data available.', 'headless-access-manager'); ?></p>
                 <?php endif; ?>
-
-                <h3 style="margin-top: 10px;">
-                    <?php echo esc_html__('Student Progress (by semester)', 'headless-access-manager'); ?>
-                    <?php if (!empty($drilldown['student']['name'])) : ?>
-                        <span style="color: #646970; font-weight: normal;">— <?php echo esc_html($drilldown['student']['name']); ?></span>
-                    <?php endif; ?>
-                </h3>
-                <?php $render_semester_bars($drilldown['series'], 100); ?>
 
                 <h3 style="margin-top: 20px;">
                     <?php echo esc_html__('Per-question averages (by semester)', 'headless-access-manager'); ?>
@@ -625,15 +623,6 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     echo '</div>';
                     ?>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="ham-stats-row">
-        <div class="ham-stats-column">
-            <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Overall radar (question averages)', 'headless-access-manager'); ?></h2>
-                <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-overview-radar"></canvas></div>
             </div>
         </div>
     </div>

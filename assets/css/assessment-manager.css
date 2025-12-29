@@ -338,6 +338,13 @@
     padding: 20px;
 }
 
+:root {
+    --ham-chart-height-sm: 160px;
+    --ham-chart-height-md: 300px;
+    --ham-chart-height-lg: 600px;
+    --ham-table-inset-border-px: 4px;
+}
+
 .ham-stats-panel h2 {
     margin-top: 0;
     margin-bottom: 20px;
@@ -362,15 +369,15 @@
 }
 
 .ham-chart-wrapper--sm {
-    height: 160px;
+    height: var(--ham-chart-height-sm);
 }
 
 .ham-chart-wrapper--md {
-    height: 300px;
+    height: var(--ham-chart-height-md);
 }
 
 .ham-chart-wrapper--lg {
-    height: 600px;
+    height: var(--ham-chart-height-lg);
 }
 
 .ham-overview-radar-panel-title {
@@ -422,6 +429,16 @@
 
 .ham-radar-values-td-eval {
     font-variant-numeric: tabular-nums;
+}
+
+.ham-answer-alternatives-table th,
+.ham-answer-alternatives-table td {
+    position: relative;
+}
+
+.ham-answer-alternatives-table th:nth-child(n+2),
+.ham-answer-alternatives-table td:nth-child(n+2) {
+    box-shadow: inset var(--ham-table-inset-border-px) 0 0 rgba(0, 0, 0, 0.08);
 }
 
 .ham-stats-column--half {

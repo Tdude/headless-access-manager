@@ -562,6 +562,38 @@ msgstr "Inga kommentarer."
 msgid "Overall question averages"
 msgstr "Övergripande utfall per fråga"
 
+#: templates/admin/assessment-statistics.php
+msgid "Student average progress"
+msgstr "Elevens genomsnittliga utveckling"
+
+#: templates/admin/assessment-statistics.php
+msgid "Radar (per evaluation within bucket)"
+msgstr "Radar (per utvärdering inom tidsintervall)"
+
+#: templates/admin/assessment-statistics.php
+msgid "Questions and answer alternatives"
+msgstr "Frågor och svarsalternativ"
+
+#: templates/admin/assessment-statistics.php
+msgid "Option 1"
+msgstr "Alternativ 1"
+
+#: templates/admin/assessment-statistics.php
+msgid "Option 2"
+msgstr "Alternativ 2"
+
+#: templates/admin/assessment-statistics.php
+msgid "Option 3"
+msgstr "Alternativ 3"
+
+#: templates/admin/assessment-statistics.php
+msgid "Option 4"
+msgstr "Alternativ 4"
+
+#: templates/admin/assessment-statistics.php
+msgid "Option 5"
+msgstr "Alternativ 5"
+
 #: inc/admin/class-ham-assessment-manager.php
 msgid "Spring term"
 msgstr "Vårtermin"

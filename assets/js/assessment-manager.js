@@ -44,8 +44,21 @@
         const CHART_LINE_POINT_RADIUS = 3;
         const CHART_FILL_ALPHA = 0.80;
         const CHART_OVERLAY_DASH = [6, 4];
-        const CHART_TABLE_INSET_BORDER_PX = 4;
+        const CHART_TABLE_INSET_BORDER_PX = (function() {
+            try {
+                const raw = getComputedStyle(document.documentElement).getPropertyValue('--ham-table-inset-border-px');
+                const px = parseInt(String(raw).trim().replace('px', ''), 10);
+                return Number.isFinite(px) ? px : 4;
+            } catch (e) {
+                return 4;
+            }
+        })();
         const CHART_RADAR_ANGLE_LINE_COLOR = 'rgba(0,0,0,0.08)';
+
+        const CHART_FONT_SIZE_TICKS = 10;
+        const CHART_FONT_SIZE_POINT_LABELS = 11;
+        const CHART_FONT_SIZE_TITLE = 13;
+        const CHART_FONT_SIZE_LEGEND = 11;
 
         const t = (window.hamAssessment && window.hamAssessment.texts) ? window.hamAssessment.texts : {};
         const labelMonth = t.month || 'Month';
@@ -374,10 +387,16 @@
                         easing: CHART_ANIMATION_EASING,
                     },
                     plugins: {
-                        legend: { position: 'bottom' },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: CHART_FONT_SIZE_LEGEND },
+                            },
+                        },
                         title: {
                             display: Boolean(bucket.label || title),
                             text: bucket.label || title,
+                            font: { size: CHART_FONT_SIZE_TITLE },
                         },
                     },
                     scales: {
@@ -387,6 +406,10 @@
                             ticks: {
                                 stepSize: 1,
                                 showLabelBackdrop: false,
+                                font: { size: CHART_FONT_SIZE_TICKS },
+                            },
+                            pointLabels: {
+                                font: { size: CHART_FONT_SIZE_POINT_LABELS },
                             },
                             grid: {
                                 circular: false,
@@ -469,10 +492,16 @@
                         easing: CHART_ANIMATION_EASING,
                     },
                     plugins: {
-                        legend: { position: 'bottom' },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: CHART_FONT_SIZE_LEGEND },
+                            },
+                        },
                         title: {
                             display: true,
                             text: initial.title,
+                            font: { size: CHART_FONT_SIZE_TITLE },
                         },
                     },
                     scales: {
@@ -482,6 +511,10 @@
                             ticks: {
                                 stepSize: 1,
                                 showLabelBackdrop: false,
+                                font: { size: CHART_FONT_SIZE_TICKS },
+                            },
+                            pointLabels: {
+                                font: { size: CHART_FONT_SIZE_POINT_LABELS },
                             },
                             grid: {
                                 circular: false,
@@ -548,6 +581,7 @@
                         title: {
                             display: Boolean(radar.title),
                             text: radar.title,
+                            font: { size: CHART_FONT_SIZE_TITLE },
                         },
                     },
                     scales: {
@@ -557,25 +591,21 @@
                             ticks: {
                                 stepSize: 1,
                                 showLabelBackdrop: false,
+                                font: { size: CHART_FONT_SIZE_TICKS },
+                            },
+                            pointLabels: {
+                                font: { size: CHART_FONT_SIZE_POINT_LABELS },
                             },
                             grid: {
                                 circular: false,
                             },
                             angleLines: {
-                                color: 'rgba(0,0,0,0.08)',
+                                color: CHART_RADAR_ANGLE_LINE_COLOR,
                             },
                         },
                     },
                 },
             });
-        }
-
-        // Avg progress charts (school/class levels)
-        if (stats && stats.avg_progress && stats.level !== 'student') {
-            buildLineChart('ham-avg-progress-month', stats.avg_progress.month, labelMonth);
-            buildLineChart('ham-avg-progress-term', stats.avg_progress.term, labelTerm);
-            buildLineChart('ham-avg-progress-school-year', stats.avg_progress.school_year, labelSchoolYear);
-            buildLineChart('ham-avg-progress-hogstadium', stats.avg_progress.hogstadium, labelHogstadium);
         }
 
         // Student avg progress toggle
