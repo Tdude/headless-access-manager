@@ -388,13 +388,13 @@
 .ham-pill-link {
     display: inline-flex;
     align-items: center;
-    padding: 4px 10px;
+    padding: .4em 1.5em;
     border-radius: 999px;
     background: #f0f0f1;
     border: 1px solid #dcdcde;
     color: #1d2327;
     text-decoration: none;
-    font-size: 12px;
+    font-size: 1em;
     line-height: 1.6;
     white-space: nowrap;
 }
@@ -409,6 +409,7 @@
     gap: 6px;
 }
 .ham-pill-separator {
+    font-size: 1em;
     display: inline-flex;
     align-items: center;
     color: #646970;
