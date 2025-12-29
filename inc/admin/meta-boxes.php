@@ -34,6 +34,14 @@ class HAM_Meta_Boxes
             'high'
         );
         add_meta_box(
+            'ham_assessment_teacher',
+            __('Teacher', 'headless-access-manager'),
+            [__CLASS__, 'render_assessment_teacher_meta_box'],
+            HAM_CPT_ASSESSMENT,
+            'side',
+            'high'
+        );
+        add_meta_box(
             'ham_assessment_data',
             __('Assessment Data', 'headless-access-manager'),
             [__CLASS__, 'render_assessment_data_meta_box'],
@@ -78,6 +86,62 @@ class HAM_Meta_Boxes
                         data: function(params) {
                             return {
                                 action: 'ham_search_students',
+                                q: params.term,
+                                nonce: '<?php echo wp_create_nonce('ham_ajax_nonce'); ?>'
+                            };
+                        },
+                        processResults: function(data) {
+                            return { results: data };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 2,
+                    width: '100%',
+                    allowClear: true
+                });
+            });
+        </script>
+        <?php
+    }
+
+    /**
+     * Render assessment teacher meta box with a searchable dropdown.
+     *
+     * Teacher is stored as the post author for evaluations.
+     *
+     * @param WP_Post $post Current post object.
+     */
+    public static function render_assessment_teacher_meta_box($post)
+    {
+        wp_nonce_field('ham_assessment_teacher_meta_box', 'ham_assessment_teacher_meta_box_nonce');
+
+        $teacher_id = isset($post->post_author) ? absint($post->post_author) : 0;
+        $teacher_user = $teacher_id ? get_user_by('id', $teacher_id) : null;
+        $teacher_name = $teacher_user ? $teacher_user->display_name : '';
+        ?>
+        <p>
+            <label for="ham_teacher_id"><?php echo esc_html__('Select Teacher:', 'headless-access-manager'); ?></label>
+            <select name="ham_teacher_id" id="ham_teacher_id" class="widefat ham-teacher-search-select">
+                <?php if ($teacher_id && $teacher_user) : ?>
+                    <option value="<?php echo esc_attr($teacher_id); ?>" selected="selected"><?php echo esc_html($teacher_name); ?></option>
+                <?php endif; ?>
+            </select>
+            <span class="description"><?php echo esc_html__('Type to search for a teacher by name.', 'headless-access-manager'); ?></span>
+        </p>
+        <script>
+            jQuery(function($) {
+                if (!$.fn.select2) {
+                    return;
+                }
+
+                $('#ham_teacher_id').select2({
+                    ajax: {
+                        url: ajaxurl,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                action: 'ham_search_teachers',
                                 q: params.term,
                                 nonce: '<?php echo wp_create_nonce('ham_ajax_nonce'); ?>'
                             };
@@ -173,6 +237,20 @@ class HAM_Meta_Boxes
                     update_post_meta($post_id, HAM_ASSESSMENT_META_STUDENT_ID, $student_id);
                 } else {
                     delete_post_meta($post_id, HAM_ASSESSMENT_META_STUDENT_ID);
+                }
+            }
+        }
+
+        if (isset($_POST['ham_assessment_teacher_meta_box_nonce']) && wp_verify_nonce($_POST['ham_assessment_teacher_meta_box_nonce'], 'ham_assessment_teacher_meta_box')) {
+            if (isset($_POST['ham_teacher_id'])) {
+                $teacher_id = absint($_POST['ham_teacher_id']);
+                $teacher_user = $teacher_id ? get_user_by('id', $teacher_id) : null;
+
+                if ($teacher_id > 0 && $teacher_user) {
+                    wp_update_post([
+                        'ID' => $post_id,
+                        'post_author' => $teacher_id,
+                    ]);
                 }
             }
         }

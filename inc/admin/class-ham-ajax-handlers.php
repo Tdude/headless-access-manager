@@ -21,6 +21,7 @@ class HAM_Ajax_Handlers {
     public static function init() {
         // Existing AJAX handlers
         add_action('wp_ajax_ham_search_students', [__CLASS__, 'search_students']);
+        add_action('wp_ajax_ham_search_teachers', [__CLASS__, 'search_teachers']);
         
         // New AJAX handler for filtering admin list tables
         add_action('wp_ajax_ham_filter_admin_list_table', [__CLASS__, 'filter_admin_list_table']);
@@ -55,6 +56,43 @@ class HAM_Ajax_Handlers {
                 'text' => $student->post_title
             ];
         }, $students);
+
+        wp_send_json($results);
+    }
+
+    /**
+     * AJAX handler for teacher search.
+     */
+    public static function search_teachers() {
+        $nonce = isset($_REQUEST['nonce']) ? sanitize_text_field(wp_unslash($_REQUEST['nonce'])) : '';
+        $nonce_ok = $nonce ? wp_verify_nonce($nonce, 'ham_ajax_nonce') : false;
+
+        if (!$nonce_ok) {
+            wp_send_json_error('Invalid nonce');
+        }
+
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error('Unauthorized');
+        }
+
+        $search = sanitize_text_field($_GET['q'] ?? '');
+
+        $users = get_users([
+            'role'           => HAM_ROLE_TEACHER,
+            'search'         => '*' . $search . '*',
+            'search_columns' => ['display_name', 'user_login', 'user_nicename'],
+            'number'         => 20,
+            'orderby'        => 'display_name',
+            'order'          => 'ASC',
+            'fields'         => ['ID', 'display_name'],
+        ]);
+
+        $results = array_map(function($user) {
+            return [
+                'id' => $user->ID,
+                'text' => $user->display_name,
+            ];
+        }, $users);
 
         wp_send_json($results);
     }
