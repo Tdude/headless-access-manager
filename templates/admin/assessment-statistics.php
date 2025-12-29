@@ -317,48 +317,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <h3 style="margin-top: 20px;">
                     <?php echo esc_html__('Questions and answer alternatives', 'headless-access-manager'); ?>
                 </h3>
-                <?php if (!empty($drilldown['radar_questions']) && is_array($drilldown['radar_questions'])) : ?>
-                    <table class="wp-list-table widefat fixed striped ham-answer-alternatives-table">
-                        <thead>
-                            <tr>
-                                <th><?php echo esc_html__('Question', 'headless-access-manager'); ?></th>
-                                <th><?php echo esc_html__('Option 1', 'headless-access-manager'); ?></th>
-                                <th><?php echo esc_html__('Option 2', 'headless-access-manager'); ?></th>
-                                <th><?php echo esc_html__('Option 3', 'headless-access-manager'); ?></th>
-                                <th><?php echo esc_html__('Option 4', 'headless-access-manager'); ?></th>
-                                <th><?php echo esc_html__('Option 5', 'headless-access-manager'); ?></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($drilldown['radar_questions'] as $q) : ?>
-                                <?php
-                                $opts = isset($q['options']) && is_array($q['options']) ? $q['options'] : array();
-                                $opt = function($i) use ($opts) {
-                                    return isset($opts[$i]) ? $opts[$i] : '';
-                                };
-                                $label = '';
-                                if (isset($q['section']) && isset($q['text'])) {
-                                    $label = $q['section'] . ': ' . $q['text'];
-                                } elseif (isset($q['text'])) {
-                                    $label = $q['text'];
-                                } elseif (isset($q['key'])) {
-                                    $label = $q['key'];
-                                }
-                                ?>
-                                <tr>
-                                    <td><?php echo esc_html($label); ?></td>
-                                    <td><?php echo esc_html($opt(0)); ?></td>
-                                    <td><?php echo esc_html($opt(1)); ?></td>
-                                    <td><?php echo esc_html($opt(2)); ?></td>
-                                    <td><?php echo esc_html($opt(3)); ?></td>
-                                    <td><?php echo esc_html($opt(4)); ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else : ?>
-                    <p><?php echo esc_html__('No question data available.', 'headless-access-manager'); ?></p>
-                <?php endif; ?>
+                <div id="ham-answer-alternatives" class="ham-answer-alternatives"></div>
 
                 <h3 style="margin-top: 20px;">
                     <?php echo esc_html__('Per-question averages (by semester)', 'headless-access-manager'); ?>

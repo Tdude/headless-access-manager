@@ -436,9 +436,16 @@
     position: relative;
 }
 
-.ham-answer-alternatives-table th:nth-child(n+2),
-.ham-answer-alternatives-table td:nth-child(n+2) {
-    box-shadow: inset var(--ham-table-inset-border-px) 0 0 rgba(0, 0, 0, 0.08);
+.ham-answer-alternatives-table td {
+    vertical-align: top;
+}
+
+.ham-answer-alternatives-table td.ham-answer-choice {
+    min-width: 160px;
+}
+
+.ham-answer-alternatives-table td.ham-answer-choice--selected {
+    background: rgba(0, 0, 0, 0.02);
 }
 
 .ham-stats-column--half {

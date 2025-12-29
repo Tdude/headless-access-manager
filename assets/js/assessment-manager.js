@@ -55,10 +55,10 @@
         })();
         const CHART_RADAR_ANGLE_LINE_COLOR = 'rgba(0,0,0,0.08)';
 
-        const CHART_FONT_SIZE_TICKS = 10;
-        const CHART_FONT_SIZE_POINT_LABELS = 11;
-        const CHART_FONT_SIZE_TITLE = 13;
-        const CHART_FONT_SIZE_LEGEND = 11;
+        const CHART_FONT_SIZE_TICKS = 11;
+        const CHART_FONT_SIZE_POINT_LABELS = 12;
+        const CHART_FONT_SIZE_TITLE = 14;
+        const CHART_FONT_SIZE_LEGEND = 12;
 
         const t = (window.hamAssessment && window.hamAssessment.texts) ? window.hamAssessment.texts : {};
         const labelMonth = t.month || 'Month';
@@ -66,6 +66,11 @@
         const labelSchoolYear = t.schoolYear || 'School year';
         const labelHogstadium = t.hogstadium || 'Högstadium';
         const labelRadar = t.radar || 'Radar';
+        const labelOption1 = t.option1 || 'Option 1';
+        const labelOption2 = t.option2 || 'Option 2';
+        const labelOption3 = t.option3 || 'Option 3';
+        const labelOption4 = t.option4 || 'Option 4';
+        const labelOption5 = t.option5 || 'Option 5';
 
         if (!overview && !stats) {
             return;
@@ -205,6 +210,29 @@
 
             const seriesByKey = stats.avg_progress;
 
+            function buildFallbackFromSemesterSeries() {
+                if (!Array.isArray(stats.series)) {
+                    return [];
+                }
+                return stats.series
+                    .filter((b) => b && (b.semester_label || b.semester_key))
+                    .map((b) => ({
+                        label: b.semester_label || b.semester_key,
+                        overall_avg: b.overall_avg,
+                        count: b.count,
+                    }));
+            }
+
+            // Student buckets can be very sparse (often collapsing to a single point).
+            // If so, fall back to the richer semester series to avoid single-dot charts.
+            if (Array.isArray(stats.series)) {
+                ['month', 'term', 'school_year', 'hogstadium'].forEach((key) => {
+                    if (!Array.isArray(seriesByKey[key]) || seriesByKey[key].length <= 1) {
+                        seriesByKey[key] = buildFallbackFromSemesterSeries();
+                    }
+                });
+            }
+
             const titleByKey = {
                 month: labelMonth,
                 term: labelTerm,
@@ -287,6 +315,95 @@
                 return null;
             }
             return buckets[buckets.length - 1];
+        }
+
+        function renderAnswerAlternativesTable(containerId, radarQuestions, bucketGroup) {
+            const el = document.getElementById(containerId);
+            if (!el) {
+                return;
+            }
+
+            if (!radarQuestions || !Array.isArray(radarQuestions) || radarQuestions.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+
+            if (!bucketGroup || !Array.isArray(bucketGroup.labels) || !Array.isArray(bucketGroup.buckets)) {
+                el.innerHTML = '';
+                return;
+            }
+
+            const bucket = pickLatestBucket(bucketGroup.buckets);
+            if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+
+            const datasets = bucket.datasets;
+
+            let html = '';
+            html += '<div class="ham-radar-values-scroll">';
+            html += '<table class="wp-list-table widefat fixed striped ham-answer-alternatives-table">';
+            html += '<thead><tr>';
+            html += `<th>${escapeHtml(t.question || 'Question')}</th>`;
+            html += `<th>${escapeHtml(labelOption1)}</th>`;
+            html += `<th>${escapeHtml(labelOption2)}</th>`;
+            html += `<th>${escapeHtml(labelOption3)}</th>`;
+            html += `<th>${escapeHtml(labelOption4)}</th>`;
+            html += `<th>${escapeHtml(labelOption5)}</th>`;
+            html += '</tr></thead>';
+            html += '<tbody>';
+
+            for (let qi = 0; qi < radarQuestions.length; qi++) {
+                const q = radarQuestions[qi] || {};
+                const section = q.section ? String(q.section) : '';
+                const text = q.text ? String(q.text) : '';
+                const key = q.key ? String(q.key) : '';
+                const label = (section && text) ? `${section}: ${text}` : (text || key);
+                const options = Array.isArray(q.options) ? q.options : [];
+
+                // optionSelections[optionIndex] => [datasetIndex, datasetIndex, ...]
+                const optionSelections = [[], [], [], [], []];
+                datasets.forEach((ds, di) => {
+                    const v = Array.isArray(ds.values) ? ds.values[qi] : null;
+                    const vv = clampNumber(v, 1, 5);
+                    if (vv == null) {
+                        return;
+                    }
+                    // Answers are discrete 1-5; if stored as float, round to nearest.
+                    const optIdx = Math.max(0, Math.min(4, Math.round(vv) - 1));
+                    optionSelections[optIdx].push(di);
+                });
+
+                html += '<tr>';
+                html += `<td>${escapeHtml(label)}</td>`;
+
+                for (let oi = 0; oi < 5; oi++) {
+                    const optText = options[oi] ? String(options[oi]) : '';
+                    const sel = optionSelections[oi];
+
+                    let style = '';
+                    let cls = 'ham-answer-choice';
+
+                    if (sel.length > 0) {
+                        cls += ' ham-answer-choice--selected';
+                        // stack multiple inset stripes for multiple evaluations
+                        const shadows = sel.map((datasetIndex, stripeIndex) => {
+                            const c = datasetColor(datasetIndex);
+                            const offset = (stripeIndex + 1) * CHART_TABLE_INSET_BORDER_PX;
+                            return `inset ${offset}px 0 0 ${c.border}`;
+                        });
+                        style = ` style="box-shadow: ${shadows.join(', ')};"`;
+                    }
+
+                    html += `<td class="${cls}"${style}>${escapeHtml(optText)}</td>`;
+                }
+
+                html += '</tr>';
+            }
+
+            html += '</tbody></table></div>';
+            el.innerHTML = html;
         }
 
         function renderRadarValuesTable(containerId, bucketGroup) {
@@ -467,6 +584,11 @@
 
             function renderTableForBucket(bucketKey) {
                 renderRadarValuesTable('ham-student-radar-table', {
+                    labels,
+                    buckets: bucketsByKey[bucketKey] || [],
+                });
+
+                renderAnswerAlternativesTable('ham-answer-alternatives', stats.radar_questions || [], {
                     labels,
                     buckets: bucketsByKey[bucketKey] || [],
                 });
