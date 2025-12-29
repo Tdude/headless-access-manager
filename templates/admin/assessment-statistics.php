@@ -9,9 +9,51 @@
 if (! defined('ABSPATH')) {
     exit;
 }
+
+$overview_radar = array(
+    'title' => __('Overall question averages', 'headless-access-manager'),
+    'labels' => array(),
+    'values' => array(),
+);
+
+if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && is_array($stats['question_averages'])) {
+    $questions_structure = (new HAM_Assessment_Manager())->get_questions_structure();
+    $labels = array();
+    $values = array();
+
+    if (is_array($questions_structure)) {
+        foreach ($questions_structure as $section_key => $section) {
+            if (!isset($section['questions']) || !is_array($section['questions'])) {
+                continue;
+            }
+
+            $section_title = isset($section['title']) ? $section['title'] : $section_key;
+
+            foreach ($section['questions'] as $question_id => $q) {
+                $question_text = isset($q['text']) ? $q['text'] : $question_id;
+                $labels[] = $section_title . ': ' . $question_text;
+
+                $avg_key = $section_key . '_' . $question_id;
+                $avg = isset($stats['question_averages'][$avg_key]) ? $stats['question_averages'][$avg_key] : null;
+                $values[] = $avg === null ? null : (float) $avg;
+            }
+        }
+    }
+
+    $overview_radar['labels'] = $labels;
+    $overview_radar['values'] = $values;
+}
 ?>
 <div class="wrap">
     <h1><?php echo esc_html__('Evaluations by Tryggve', 'headless-access-manager'); ?></h1>
+
+    <script>
+        window.hamAssessmentOverview = <?php
+            echo wp_json_encode(array(
+                'radar' => $overview_radar,
+            ));
+        ?>;
+    </script>
 
     <?php if (isset($drilldown) && is_array($drilldown)) : ?>
 
@@ -603,6 +645,17 @@ if (! defined('ABSPATH')) {
                     }
                     echo '</div>';
                     ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ham-stats-row">
+        <div class="ham-stats-column">
+            <div class="ham-stats-panel">
+                <h2><?php echo esc_html__('Overall radar (question averages)', 'headless-access-manager'); ?></h2>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="ham-overview-radar"></canvas>
                 </div>
             </div>
         </div>

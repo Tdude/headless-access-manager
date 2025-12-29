@@ -27,11 +27,16 @@
     }
 
     function initStatsCharts() {
-        if (!window.hamAssessmentStats || !window.Chart) {
+        if (!window.Chart) {
             return;
         }
 
-        const stats = window.hamAssessmentStats;
+        const overview = window.hamAssessmentOverview || null;
+        const stats = window.hamAssessmentStats || null;
+
+        if (!overview && !stats) {
+            return;
+        }
 
         function clampNumber(val, min, max) {
             const num = typeof val === 'number' ? val : (val == null ? null : Number(val));
@@ -61,6 +66,11 @@
             const el = document.getElementById(canvasId);
             if (!el || !series || !Array.isArray(series) || series.length === 0) {
                 return;
+            }
+
+            const existing = Chart.getChart(el);
+            if (existing) {
+                existing.destroy();
             }
 
             const labels = series.map((p) => p.label);
@@ -110,6 +120,11 @@
             const el = document.getElementById(canvasId);
             if (!el || !bucketGroup || !bucketGroup.buckets) {
                 return;
+            }
+
+            const existing = Chart.getChart(el);
+            if (existing) {
+                existing.destroy();
             }
 
             const bucket = pickLatestBucket(bucketGroup.buckets);
@@ -169,8 +184,64 @@
             });
         }
 
+        function buildOverviewRadarChart(canvasId, radar) {
+            const el = document.getElementById(canvasId);
+            if (!el || !radar || !Array.isArray(radar.labels) || !Array.isArray(radar.values) || radar.labels.length === 0) {
+                return;
+            }
+
+            const existing = Chart.getChart(el);
+            if (existing) {
+                existing.destroy();
+            }
+
+            const c = datasetColor(0);
+            new Chart(el.getContext('2d'), {
+                type: 'radar',
+                data: {
+                    labels: radar.labels,
+                    datasets: [{
+                        label: radar.title || 'Radar',
+                        data: radar.values.map((v) => clampNumber(v, 1, 5)),
+                        borderColor: c.border,
+                        backgroundColor: c.fill,
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        fill: true,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: Boolean(radar.title),
+                            text: radar.title,
+                        },
+                    },
+                    scales: {
+                        r: {
+                            min: 1,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                showLabelBackdrop: false,
+                            },
+                            grid: {
+                                circular: false,
+                            },
+                            angleLines: {
+                                color: 'rgba(0,0,0,0.08)',
+                            },
+                        },
+                    },
+                },
+            });
+        }
+
         // Avg progress charts (school/class/student levels)
-        if (stats.avg_progress) {
+        if (stats && stats.avg_progress) {
             buildLineChart('ham-avg-progress-month', stats.avg_progress.month, hamAssessment?.texts?.date || 'Month');
             buildLineChart('ham-avg-progress-term', stats.avg_progress.term, 'Term');
             buildLineChart('ham-avg-progress-school-year', stats.avg_progress.school_year, 'School year');
@@ -178,7 +249,7 @@
         }
 
         // Student radar charts
-        if (stats.level === 'student' && stats.student_radar && stats.student_radar.buckets) {
+        if (stats && stats.level === 'student' && stats.student_radar && stats.student_radar.buckets) {
             buildRadarChart('ham-student-radar-month', {
                 labels: stats.student_radar.labels,
                 buckets: stats.student_radar.buckets.month,
@@ -195,6 +266,11 @@
                 labels: stats.student_radar.labels,
                 buckets: stats.student_radar.buckets.hogstadium,
             }, 'Högstadium');
+        }
+
+        // Overview radar chart
+        if (overview && overview.radar) {
+            buildOverviewRadarChart('ham-overview-radar', overview.radar);
         }
     }
 
