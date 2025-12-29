@@ -447,8 +447,8 @@
 
  .column-actions .ham-icon-button {
      padding: 0 8px;
-     min-width: 34px;
-     display: inline-flex
+     min-width: 32px;
+     display: inline-grid;
      align-items: center;
      justify-content: center;
  }
