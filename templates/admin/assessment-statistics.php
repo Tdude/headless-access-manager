@@ -312,6 +312,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <button type="button" class="button ham-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
                 </div>
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-student-radar"></canvas></div>
+                <div id="ham-student-radar-table" class="ham-radar-values"></div>
 
                 <h3 style="margin-top: 20px;">
                     <?php echo esc_html__('Questions and answer alternatives', 'headless-access-manager'); ?>
@@ -323,57 +324,6 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <button type="button" class="button ham-answer-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
                 </div>
                 <div id="ham-answer-alternatives" class="ham-answer-alternatives"></div>
-
-                <h3 style="margin-top: 20px;">
-                    <?php echo esc_html__('Per-question averages (by semester)', 'headless-access-manager'); ?>
-                </h3>
-
-                <?php if (!empty($drilldown['series'])) : ?>
-                    <?php
-                    $questions = isset($drilldown['top_questions']) && is_array($drilldown['top_questions']) ? $drilldown['top_questions'] : array();
-                    if (empty($questions)) {
-                        $questions = array();
-                    }
-                    ?>
-                    <table class="wp-list-table widefat fixed striped">
-                        <thead>
-                            <tr>
-                                <th><?php echo esc_html__('Question', 'headless-access-manager'); ?></th>
-                                <?php foreach ($drilldown['series'] as $bucket) : ?>
-                                    <th><?php echo esc_html($bucket['semester_label']); ?></th>
-                                <?php endforeach; ?>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (!empty($questions)) : ?>
-                                <?php foreach ($questions as $qk) : ?>
-                                    <?php
-                                    $label = $qk;
-                                    if (isset($drilldown['question_labels'][$qk])) {
-                                        $label = $drilldown['question_labels'][$qk]['section'] . ': ' . $drilldown['question_labels'][$qk]['text'];
-                                    }
-                                    ?>
-                                    <tr>
-                                        <td><?php echo esc_html($label); ?></td>
-                                        <?php foreach ($drilldown['series'] as $bucket) : ?>
-                                            <?php
-                                            $val = null;
-                                            if (isset($bucket['question_avgs'][$qk])) {
-                                                $val = $bucket['question_avgs'][$qk];
-                                            }
-                                            ?>
-                                            <td><?php echo $val === null ? '—' : esc_html(number_format((float) $val, 2)); ?></td>
-                                        <?php endforeach; ?>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php else : ?>
-                                <tr><td colspan="<?php echo esc_attr(1 + count($drilldown['series'])); ?>"><?php echo esc_html__('No per-question data available.', 'headless-access-manager'); ?></td></tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                <?php else : ?>
-                    <p><?php echo esc_html__('No evaluation data available for this student.', 'headless-access-manager'); ?></p>
-                <?php endif; ?>
 
             <?php endif; ?>
         </div>

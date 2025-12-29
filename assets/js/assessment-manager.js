@@ -188,7 +188,9 @@
                 onChange,
             } = options || {};
 
-            const btns = Array.isArray(buttons) ? buttons : [];
+            let btns = Array.isArray(buttons) ? buttons : [];
+            const btnSet = new Set(btns);
+
             if (btns.length === 0 || typeof onChange !== 'function') {
                 return null;
             }
@@ -216,23 +218,74 @@
                 onChange(bucketKey);
             }
 
-            btns.forEach((b) => {
-                b.addEventListener('click', () => {
-                    setBucket(b.getAttribute('data-bucket'));
+            function wireButtons(newButtons) {
+                const incoming = Array.isArray(newButtons) ? newButtons : [];
+                incoming.forEach((b) => {
+                    if (!b || btnSet.has(b)) {
+                        return;
+                    }
+                    btnSet.add(b);
+                    btns.push(b);
+                    b.addEventListener('click', () => {
+                        setBucket(b.getAttribute('data-bucket'));
+                    });
                 });
-            });
+                // Keep UI consistent for any newly added buttons.
+                setActive(activeKey);
+            }
+
+            wireButtons(btns);
 
             setBucket(activeKey);
 
             return {
                 getActiveKey: () => activeKey,
                 setBucket,
+                addButtons: wireButtons,
             };
+        }
+
+        // Student drilldown: we want multiple button groups (progress/radar/answers)
+        // to share one bucket state and stay in sync.
+        let studentBucketController = null;
+        const studentBucketHandlers = [];
+
+        function registerStudentBucketHandler(handler) {
+            if (typeof handler !== 'function') {
+                return;
+            }
+            studentBucketHandlers.push(handler);
+            if (studentBucketController) {
+                handler(studentBucketController.getActiveKey());
+            }
+        }
+
+        function ensureStudentBucketController(buttons, defaultKey, isKeyAvailable) {
+            if (studentBucketController) {
+                if (typeof studentBucketController.addButtons === 'function') {
+                    studentBucketController.addButtons(buttons);
+                }
+                return studentBucketController;
+            }
+
+            studentBucketController = initBucketToggle({
+                buttons,
+                defaultKey,
+                isKeyAvailable,
+                onChange: (bucketKey) => {
+                    studentBucketHandlers.forEach((h) => h(bucketKey));
+                },
+            });
+
+            return studentBucketController;
         }
 
         function buildStudentAvgProgressToggle() {
             const canvas = document.getElementById('ham-avg-progress-student');
             const btns = Array.from(document.querySelectorAll('.ham-progress-toggle-btn'));
+            const radarBtns = Array.from(document.querySelectorAll('.ham-radar-toggle-btn'));
+            const answerBtns = Array.from(document.querySelectorAll('.ham-answer-toggle-btn'));
+            const allBtns = btns.concat(radarBtns).concat(answerBtns);
 
             if (!canvas || btns.length === 0 || !stats || stats.level !== 'student' || !stats.avg_progress) {
                 return;
@@ -282,7 +335,7 @@
                 existing.destroy();
             }
 
-            const initial = buildDataForBucket('term');
+            const initial = buildDataForBucket('month');
             const c = datasetColor(0);
             const chart = new Chart(canvas.getContext('2d'), {
                 type: 'line',
@@ -332,12 +385,17 @@
                 chart.update();
             }
 
-            initBucketToggle({
-                buttons: btns,
-                defaultKey: 'term',
-                isKeyAvailable: (key) => Array.isArray(seriesByKey[key]) && seriesByKey[key].length > 0,
-                onChange: updateChart,
-            });
+            registerStudentBucketHandler(updateChart);
+
+            ensureStudentBucketController(
+                allBtns,
+                'month',
+                (key) => {
+                    const progressOk = Array.isArray(seriesByKey[key]) && seriesByKey[key].length > 0;
+                    const radarOk = stats.student_radar && stats.student_radar.buckets && Array.isArray(stats.student_radar.buckets[key]) && stats.student_radar.buckets[key].length > 0;
+                    return progressOk || radarOk;
+                }
+            );
         }
 
         function pickLatestBucket(buckets) {
@@ -585,7 +643,8 @@
             const canvas = document.getElementById('ham-student-radar');
             const btns = Array.from(document.querySelectorAll('.ham-radar-toggle-btn'));
             const answerBtns = Array.from(document.querySelectorAll('.ham-answer-toggle-btn'));
-            const allBtns = btns.concat(answerBtns);
+            const progressBtns = Array.from(document.querySelectorAll('.ham-progress-toggle-btn'));
+            const allBtns = btns.concat(answerBtns).concat(progressBtns);
 
             if (!canvas || allBtns.length === 0 || !stats || stats.level !== 'student' || !stats.student_radar || !stats.student_radar.buckets) {
                 return;
@@ -626,6 +685,11 @@
             }
 
             function renderTableForBucket(bucketKey) {
+                renderRadarValuesTable('ham-student-radar-table', {
+                    labels,
+                    buckets: bucketsByKey[bucketKey] || [],
+                });
+
                 renderAnswerAlternativesTable('ham-answer-alternatives', stats.radar_questions || [], {
                     labels,
                     buckets: bucketsByKey[bucketKey] || [],
@@ -695,12 +759,17 @@
                 renderTableForBucket(bucketKey);
             }
 
-            initBucketToggle({
-                buttons: allBtns,
-                defaultKey: 'month',
-                isKeyAvailable: (key) => Array.isArray(bucketsByKey[key]) && bucketsByKey[key].length > 0,
-                onChange: updateChart,
-            });
+            registerStudentBucketHandler(updateChart);
+
+            ensureStudentBucketController(
+                allBtns,
+                'month',
+                (key) => {
+                    const radarOk = Array.isArray(bucketsByKey[key]) && bucketsByKey[key].length > 0;
+                    const progressOk = stats.avg_progress && Array.isArray(stats.avg_progress[key]) && stats.avg_progress[key].length > 0;
+                    return radarOk || progressOk;
+                }
+            );
         }
 
         function buildOverviewRadarChart(canvasId, radar) {
