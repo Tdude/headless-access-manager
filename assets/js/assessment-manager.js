@@ -109,6 +109,26 @@
             };
         }
 
+        // Keep dataset colors stable across bucket toggles by assigning a persistent
+        // color index per dataset key (we use the dataset label as identity).
+        const datasetColorIndexByKey = new Map();
+        let nextDatasetColorIndex = 0;
+
+        function datasetKey(ds, fallbackIdx) {
+            if (ds && ds.label) {
+                return String(ds.label);
+            }
+            return `__dataset_${fallbackIdx}`;
+        }
+
+        function stableDatasetColor(ds, fallbackIdx) {
+            const key = datasetKey(ds, fallbackIdx);
+            if (!datasetColorIndexByKey.has(key)) {
+                datasetColorIndexByKey.set(key, nextDatasetColorIndex++);
+            }
+            return datasetColor(datasetColorIndexByKey.get(key));
+        }
+
         function buildLineChart(canvasId, series, label) {
             const el = document.getElementById(canvasId);
             if (!el || !series || !Array.isArray(series) || series.length === 0) {
@@ -455,7 +475,7 @@
             html += `<th class="ham-radar-values-th-question">${escapeHtml(t.question || 'Question')}</th>`;
 
             datasets.forEach((ds, idx) => {
-                const c = datasetColor(idx);
+                const c = stableDatasetColor(ds, idx);
                 const safeLabel = escapeHtml(ds.label || `${labelRadar} ${idx + 1}`);
                 html += `<th class="ham-radar-values-th-eval" style="box-shadow: inset ${CHART_TABLE_INSET_BORDER_PX}px 0 0 ${c.border};">${safeLabel}</th>`;
             });
@@ -467,7 +487,7 @@
                 html += '<tr>';
                 html += `<td class="ham-radar-values-td-question">${escapeHtml(qLabels[qi] || '')}</td>`;
                 datasets.forEach((ds, idx) => {
-                    const c = datasetColor(idx);
+                    const c = stableDatasetColor(ds, idx);
                     const v = Array.isArray(ds.values) ? ds.values[qi] : null;
                     const vv = clampNumber(v, 1, 5);
                     html += `<td class="ham-radar-values-td-eval" style="box-shadow: inset ${CHART_TABLE_INSET_BORDER_PX}px 0 0 ${c.border};">${vv == null ? '—' : vv.toFixed(1)}</td>`;
@@ -498,7 +518,7 @@
             const labels = Array.isArray(bucketGroup.labels) ? bucketGroup.labels : [];
 
             const datasets = bucket.datasets.map((ds, idx) => {
-                const c = datasetColor(idx);
+                const c = stableDatasetColor(ds, idx);
                 return {
                     label: ds.label,
                     data: Array.isArray(ds.values) ? ds.values.map((v) => clampNumber(v, 1, 5)) : [],
@@ -589,7 +609,7 @@
                 }
 
                 const datasets = bucket.datasets.map((ds, idx) => {
-                    const c = datasetColor(idx);
+                    const c = stableDatasetColor(ds, idx);
                     return {
                         label: ds.label,
                         data: Array.isArray(ds.values) ? ds.values.map((v) => clampNumber(v, 1, 5)) : [],
@@ -606,11 +626,6 @@
             }
 
             function renderTableForBucket(bucketKey) {
-                renderRadarValuesTable('ham-student-radar-table', {
-                    labels,
-                    buckets: bucketsByKey[bucketKey] || [],
-                });
-
                 renderAnswerAlternativesTable('ham-answer-alternatives', stats.radar_questions || [], {
                     labels,
                     buckets: bucketsByKey[bucketKey] || [],
@@ -682,7 +697,7 @@
 
             initBucketToggle({
                 buttons: allBtns,
-                defaultKey: 'term',
+                defaultKey: 'month',
                 isKeyAvailable: (key) => Array.isArray(bucketsByKey[key]) && bucketsByKey[key].length > 0,
                 onChange: updateChart,
             });

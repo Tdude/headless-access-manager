@@ -312,7 +312,6 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <button type="button" class="button ham-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
                 </div>
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-student-radar"></canvas></div>
-                <div id="ham-student-radar-table" class="ham-radar-values"></div>
 
                 <h3 style="margin-top: 20px;">
                     <?php echo esc_html__('Questions and answer alternatives', 'headless-access-manager'); ?>
