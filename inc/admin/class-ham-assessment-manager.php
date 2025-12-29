@@ -2045,54 +2045,30 @@ public function ajax_get_assessment_details()
             return;
         }
 
-        // Direct SQL filter for frontend submissions - more reliable than meta query
-        add_filter('posts_where', array($this, 'exclude_frontend_assessments_sql'), 10, 2);
-    }
+        // IMPORTANT:
+        // The Question Bank lives in the same CPT as evaluation answers.
+        // To prevent evaluation answer posts from appearing in the Question Bank list,
+        // we only show posts that do NOT have a linked student.
+        // (Evaluation answers have HAM_ASSESSMENT_META_STUDENT_ID set.)
+        $existing_meta_query = $query->get('meta_query');
+        if (!is_array($existing_meta_query)) {
+            $existing_meta_query = array();
+        }
 
-    /**
-     * Add SQL conditions to exclude frontend submissions
-     * This is more reliable than meta_query for complex conditions
-     *
-     * @param string $where The WHERE clause of the query
-     * @param WP_Query $query The WP_Query instance
-     * @return string Modified WHERE clause
-     */
-    public function exclude_frontend_assessments_sql($where, $query)
-    {
-        global $wpdb;
+        $existing_meta_query[] = array(
+            'relation' => 'OR',
+            array(
+                'key'     => HAM_ASSESSMENT_META_STUDENT_ID,
+                'compare' => 'NOT EXISTS',
+            ),
+            array(
+                'key'     => HAM_ASSESSMENT_META_STUDENT_ID,
+                'value'   => '',
+                'compare' => '=',
+            ),
+        );
 
-        // Only apply once per request
-        remove_filter('posts_where', array($this, 'exclude_frontend_assessments_sql'), 10);
-
-        // SQL to exclude frontend submissions based on multiple indicators
-        $where .= " AND (
-            /* Submissions with admin source */
-            EXISTS (
-                SELECT 1 FROM {$wpdb->postmeta}
-                WHERE {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID
-                AND {$wpdb->postmeta}.meta_key = '_ham_assessment_source'
-                AND {$wpdb->postmeta}.meta_value = 'admin'
-            )
-            OR
-            /* Identified admin posts */
-            (
-                {$wpdb->posts}.post_author != 0
-                AND NOT EXISTS (
-                    SELECT 1 FROM {$wpdb->postmeta}
-                    WHERE {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID
-                    AND (
-                        ({$wpdb->postmeta}.meta_key = '_ham_assessment_source' AND {$wpdb->postmeta}.meta_value = 'frontend')
-                        OR
-                        ({$wpdb->postmeta}.meta_key = '_ham_api_created' AND {$wpdb->postmeta}.meta_value = '1')
-                    )
-                )
-                AND {$wpdb->posts}.post_title NOT LIKE '%frontend%'
-                AND {$wpdb->posts}.post_title NOT LIKE '%submission%'
-                AND {$wpdb->posts}.post_title NOT LIKE '%tryggve%'
-            )
-        )";
-
-        return $where;
+        $query->set('meta_query', $existing_meta_query);
     }
 
     /**
