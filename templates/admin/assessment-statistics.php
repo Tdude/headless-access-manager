@@ -164,19 +164,19 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
                     <div>
                         <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-avg-progress-month" height="140"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-month"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-avg-progress-term" height="140"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-term"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-avg-progress-school-year" height="140"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-school-year"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('Högstadium (3 years)', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-avg-progress-hogstadium" height="140"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
                     </div>
                 </div>
 
@@ -227,19 +227,19 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
                     <div>
                         <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-avg-progress-month" height="140"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-month"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-avg-progress-term" height="140"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-term"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-avg-progress-school-year" height="140"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-school-year"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('Högstadium (3 years)', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-avg-progress-hogstadium" height="140"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
                     </div>
                 </div>
 
@@ -291,19 +291,19 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
                     <div>
                         <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-avg-progress-month" height="140"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-month"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-avg-progress-term" height="140"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-term"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-avg-progress-school-year" height="140"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-school-year"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('Högstadium (3 years)', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-avg-progress-hogstadium" height="140"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
                     </div>
                 </div>
 
@@ -313,19 +313,19 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
                     <div>
                         <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-student-radar-month" height="240"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--md"><canvas id="ham-student-radar-month"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-student-radar-term" height="240"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--md"><canvas id="ham-student-radar-term"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-student-radar-school-year" height="240"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--md"><canvas id="ham-student-radar-school-year"></canvas></div>
                     </div>
                     <div>
                         <strong><?php echo esc_html__('Högstadium (3 years)', 'headless-access-manager'); ?></strong>
-                        <canvas id="ham-student-radar-hogstadium" height="240"></canvas>
+                        <div class="ham-chart-wrapper ham-chart-wrapper--md"><canvas id="ham-student-radar-hogstadium"></canvas></div>
                     </div>
                 </div>
 
@@ -651,12 +651,10 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
     </div>
 
     <div class="ham-stats-row">
-        <div class="ham-stats-column">
+        <div class="ham-stats-column ham-stats-column--half">
             <div class="ham-stats-panel">
                 <h2><?php echo esc_html__('Overall radar (question averages)', 'headless-access-manager'); ?></h2>
-                <div style="height: 300px; position: relative;">
-                    <canvas id="ham-overview-radar"></canvas>
-                </div>
+                <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-overview-radar"></canvas></div>
             </div>
         </div>
     </div>

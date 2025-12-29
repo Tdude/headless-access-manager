@@ -350,6 +350,41 @@
     position: relative;
 }
 
+.ham-chart-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.ham-chart-wrapper canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.ham-chart-wrapper--sm {
+    height: 160px;
+}
+
+.ham-chart-wrapper--md {
+    height: 300px;
+}
+
+.ham-chart-wrapper--lg {
+    height: 300px;
+}
+
+.ham-stats-column--half {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+@media screen and (max-width: 782px) {
+    .ham-stats-column--half {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+}
+
 .ham-chart-legend {
     margin-top: 15px;
     display: flex;
