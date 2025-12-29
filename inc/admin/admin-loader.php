@@ -25,10 +25,10 @@ class HAM_Admin_Loader
      */
     public static function enqueue_select2_for_class_edit($hook) {
         global $post;
-        // Only enqueue on class edit screens
+        // Only enqueue on supported edit screens
         if (
             ($hook === 'post.php' || $hook === 'post-new.php') &&
-            isset($post) && $post->post_type === HAM_CPT_CLASS
+            isset($post) && in_array($post->post_type, array(HAM_CPT_CLASS, HAM_CPT_ASSESSMENT), true)
         ) {
 
             //error_log('HAM DEBUG: enqueue_select2_for_class_edit IS FIRING for post ID: ' . (isset($post->ID) ? $post->ID : 'N/A') . ' on hook: ' . $hook);

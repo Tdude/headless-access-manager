@@ -64,6 +64,35 @@ class HAM_Meta_Boxes
             </select>
             <span class="description"><?php echo esc_html__('Type to search for a student by name.', 'headless-access-manager'); ?></span>
         </p>
+        <script>
+            jQuery(function($) {
+                if (!$.fn.select2) {
+                    return;
+                }
+
+                $('#ham_student_id').select2({
+                    ajax: {
+                        url: ajaxurl,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                action: 'ham_search_students',
+                                q: params.term,
+                                nonce: '<?php echo wp_create_nonce('ham_ajax_nonce'); ?>'
+                            };
+                        },
+                        processResults: function(data) {
+                            return { results: data };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 2,
+                    width: '100%',
+                    allowClear: true
+                });
+            });
+        </script>
         <?php
     }
 
@@ -291,7 +320,7 @@ class HAM_Meta_Boxes
         add_action('save_post_' . HAM_CPT_ASSESSMENT, [__CLASS__, 'save_meta_boxes']);
         add_action('before_delete_post', [__CLASS__, 'on_delete_assessment']);
         add_action('admin_enqueue_scripts', [__CLASS__, 'enqueue_assessment_edit_scripts']);
-        add_action('wp_ajax_ham_search_students', [__CLASS__, 'search_students_ajax_handler']);
+        // Note: student search is handled by HAM_Ajax_Handlers::search_students
 
         // Other CPTs
         add_action('add_meta_boxes_' . HAM_CPT_SCHOOL, ['HAM_School_Meta_Boxes', 'register_meta_boxes']);
