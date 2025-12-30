@@ -6,6 +6,58 @@
 (function($) {
     'use strict';
 
+    function getQueryParam(name) {
+        try {
+            var url = new URL(window.location.href);
+            var val = url.searchParams.get(name);
+            return val ? val : '';
+        } catch (e) {
+            return '';
+        }
+    }
+
+    function overrideGutenbergCloseLink() {
+        if (typeof window.hamAssessmentEditor === 'undefined') {
+            return;
+        }
+
+        var redirectTo = getQueryParam('redirect_to');
+        var targetUrl = redirectTo || window.hamAssessmentEditor.returnUrl;
+        if (!targetUrl) {
+            return;
+        }
+
+        var selectors = [
+            'a.edit-post-fullscreen-mode-close__view-mode-toggle',
+            '.edit-post-fullscreen-mode-close__view-mode-toggle a',
+            '.edit-post-fullscreen-mode-close a'
+        ];
+
+        var links = document.querySelectorAll(selectors.join(','));
+        if (!links || !links.length) {
+            return;
+        }
+
+        links.forEach(function(link) {
+            try {
+                link.setAttribute('href', targetUrl);
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = targetUrl;
+                });
+            } catch (e) {
+                // ignore
+            }
+        });
+    }
+
+    $(function() {
+        // Gutenberg renders the header asynchronously; try immediately and shortly after.
+        overrideGutenbergCloseLink();
+        setTimeout(overrideGutenbergCloseLink, 250);
+        setTimeout(overrideGutenbergCloseLink, 1000);
+    });
+
     // Main Assessment Editor class
     var AssessmentEditor = function() {
         // DOM elements

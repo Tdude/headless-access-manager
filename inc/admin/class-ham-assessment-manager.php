@@ -38,8 +38,41 @@ class HAM_Assessment_Manager
         // Filter out frontend assessments from the default post type listing
         add_action('pre_get_posts', array($this, 'filter_assessment_admin_listing'));
 
+        // Warn when viewing the default CPT list (question bank) to avoid accidental edits.
+        add_action('admin_notices', array($this, 'render_assessment_question_bank_notice'));
+
         // Delete button functionality in the modal list for assessments
         add_action('wp_ajax_ham_delete_assessment', array($this, 'ajax_delete_assessment'));
+    }
+
+    /**
+     * Show a warning on the default assessment CPT list page.
+     *
+     * The assessment CPT contains both evaluation answers and the global question bank.
+     * We want admins to use the custom evaluations list (admin.php?page=ham-assessments)
+     * rather than navigating into question bank screens by accident.
+     */
+    public function render_assessment_question_bank_notice()
+    {
+        if (!is_admin()) {
+            return;
+        }
+
+        global $pagenow, $typenow;
+
+        if ($pagenow !== 'edit.php' || $typenow !== HAM_CPT_ASSESSMENT) {
+            return;
+        }
+
+        $safe_list_url = admin_url('admin.php?page=ham-assessments');
+
+        echo '<div class="notice notice-warning">';
+        echo '<p><strong>' . esc_html__('Heads up:', 'headless-access-manager') . '</strong> ';
+        echo esc_html__('This page contains the global evaluation question bank that the whole system depends on.', 'headless-access-manager') . ' ';
+        echo esc_html__('For normal work with student evaluations, use the Evaluations list instead:', 'headless-access-manager') . ' ';
+        echo '<a href="' . esc_url($safe_list_url) . '">' . esc_html__('Go to Evaluations', 'headless-access-manager') . '</a>';
+        echo '</p>';
+        echo '</div>';
     }
 
     /**

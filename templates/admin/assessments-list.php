@@ -116,7 +116,7 @@ if (! defined('ABSPATH')) {
                                     <?php echo esc_html__('View', 'headless-access-manager'); ?>
                                 </button>
                                 <?php if (current_user_can('manage_options')) : ?>
-                                    <a class="button ham-icon-button ham-edit-assessment" href="<?php echo esc_url(admin_url('post.php?post=' . intval($assessment['id']) . '&action=edit')); ?>" aria-label="<?php echo esc_attr__('Edit', 'headless-access-manager'); ?>">
+                                    <a class="button ham-icon-button ham-edit-assessment" href="<?php echo esc_url(add_query_arg('redirect_to', rawurlencode(admin_url('admin.php?page=ham-assessments')), admin_url('post.php?post=' . intval($assessment['id']) . '&action=edit'))); ?>" aria-label="<?php echo esc_attr__('Edit', 'headless-access-manager'); ?>">
                                         <span class="dashicons dashicons-edit" aria-hidden="true"></span>
                                     </a>
                                 <?php endif; ?>

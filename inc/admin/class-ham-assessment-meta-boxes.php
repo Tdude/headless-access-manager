@@ -199,6 +199,7 @@ class HAM_Assessment_Meta_Boxes
             wp_localize_script('ham-assessment-editor-v2', 'hamAssessmentEditor', array(
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('ham_save_assessment'),
+                'returnUrl' => admin_url('admin.php?page=ham-assessments'),
                 'texts' => array(
                     'question'     => __('Question', 'headless-access-manager'),
                     'option'       => __('Option', 'headless-access-manager'),
