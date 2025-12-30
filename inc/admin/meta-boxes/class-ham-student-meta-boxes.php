@@ -121,6 +121,31 @@ class HAM_Student_Meta_Boxes {
         wp_nonce_field('ham_student_school_assignment_meta_box_nonce', 'ham_student_school_assignment_meta_box_nonce');
 
         $assigned_school_id = get_post_meta($post->ID, '_ham_school_id', true);
+        $assigned_school_id = absint($assigned_school_id);
+
+        // Backward compatibility: older students might only be linked via Class CPTs.
+        if ($assigned_school_id === 0) {
+            $class_query = new WP_Query([
+                'post_type'      => HAM_CPT_CLASS,
+                'post_status'    => 'publish',
+                'posts_per_page' => 1,
+                'fields'         => 'ids',
+                'meta_query'     => [
+                    [
+                        'key'     => '_ham_student_ids',
+                        'value'   => 'i:' . $post->ID . ';',
+                        'compare' => 'LIKE',
+                    ],
+                ],
+            ]);
+
+            if (!empty($class_query->posts)) {
+                $maybe_school_id = absint(get_post_meta(absint($class_query->posts[0]), '_ham_school_id', true));
+                if ($maybe_school_id > 0) {
+                    $assigned_school_id = $maybe_school_id;
+                }
+            }
+        }
 
         $all_schools = get_posts([
             'post_type' => HAM_CPT_SCHOOL,
@@ -156,8 +181,37 @@ class HAM_Student_Meta_Boxes {
         $assigned_class_ids = get_post_meta($student_id, '_ham_class_ids', true);
         $assigned_class_ids = is_array($assigned_class_ids) ? array_map('absint', $assigned_class_ids) : [];
 
+        // Backward compatibility: older students might only be linked via Class CPTs.
+        if (empty($assigned_class_ids)) {
+            $class_query = new WP_Query([
+                'post_type'      => HAM_CPT_CLASS,
+                'post_status'    => 'publish',
+                'posts_per_page' => -1,
+                'fields'         => 'ids',
+                'meta_query'     => [
+                    [
+                        'key'     => '_ham_student_ids',
+                        'value'   => 'i:' . $student_id . ';',
+                        'compare' => 'LIKE',
+                    ],
+                ],
+            ]);
+
+            if (!empty($class_query->posts)) {
+                $assigned_class_ids = array_map('absint', (array)$class_query->posts);
+            }
+        }
+
         // Get the student's school ID for filtering selectable classes
         $student_school_id = get_post_meta($student_id, '_ham_school_id', true);
+        $student_school_id = absint($student_school_id);
+
+        if (empty($student_school_id) && !empty($assigned_class_ids)) {
+            $first_class_id = absint(reset($assigned_class_ids));
+            if ($first_class_id > 0) {
+                $student_school_id = absint(get_post_meta($first_class_id, '_ham_school_id', true));
+            }
+        }
 
         // Arguments for fetching classes to populate the dropdown
         $selectable_classes_args = [

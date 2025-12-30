@@ -1311,6 +1311,28 @@ class HAM_Assessment_Manager
             // Class + School (stored on the student CPT).
             $class_ids = $student_post ? get_post_meta($student_post->ID, '_ham_class_ids', true) : array();
             $class_ids = is_array($class_ids) ? array_map('absint', $class_ids) : array();
+
+            // Backward compatibility: older data may only have the reverse relation stored on Class CPTs.
+            if (empty($class_ids) && $student_post) {
+                $class_query = new WP_Query([
+                    'post_type'      => HAM_CPT_CLASS,
+                    'post_status'    => 'publish',
+                    'posts_per_page' => -1,
+                    'fields'         => 'ids',
+                    'meta_query'     => [
+                        [
+                            'key'     => '_ham_student_ids',
+                            'value'   => 'i:' . $student_post->ID . ';',
+                            'compare' => 'LIKE',
+                        ],
+                    ],
+                ]);
+
+                if (!empty($class_query->posts)) {
+                    $class_ids = array_map('absint', (array)$class_query->posts);
+                }
+            }
+
             $class_names = array();
             foreach ($class_ids as $class_id) {
                 if ($class_id > 0) {
@@ -1323,6 +1345,12 @@ class HAM_Assessment_Manager
             $class_name = !empty($class_names) ? implode(', ', $class_names) : '';
 
             $school_id = $student_post ? absint(get_post_meta($student_post->ID, '_ham_school_id', true)) : 0;
+            if ($school_id === 0 && !empty($class_ids)) {
+                $first_class_id = absint(reset($class_ids));
+                if ($first_class_id > 0) {
+                    $school_id = absint(get_post_meta($first_class_id, '_ham_school_id', true));
+                }
+            }
             $school_post = $school_id > 0 ? get_post($school_id) : null;
             $school_name = $school_post ? $school_post->post_title : '';
             

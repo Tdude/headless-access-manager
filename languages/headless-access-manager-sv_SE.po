@@ -51,6 +51,10 @@ msgstr "ID"
 msgid "Completion"
 msgstr "Slutförande"
 
+#: templates/admin/assessments-list.php
+msgid "Responsible teacher"
+msgstr "Ansvarig pedagog"
+
 #: templates/admin/assessments-list.php:108
 msgid "Assessment Details"
 msgstr "Bedömningsdetaljer"
