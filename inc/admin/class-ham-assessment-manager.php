@@ -1130,7 +1130,7 @@ class HAM_Assessment_Manager
         }
         
         // If student is in classes, find teachers assigned to those classes
-        if (!empty($student_class_ids)) {
+        if ($teacher_name === esc_html__('Unknown Teacher', 'headless-access-manager') && !empty($student_class_ids)) {
             $teacher_args = array(
                 'post_type' => HAM_CPT_TEACHER,
                 'posts_per_page' => 1, // Just get the first matching teacher
@@ -1304,9 +1304,18 @@ class HAM_Assessment_Manager
 
             $completion_percentage = self::calculate_completion_percentage($assessment_data);
 
-            // Get teacher info - first check based on class relationship, fallback to post_author
+            // Get teacher info - prefer explicitly saved teacher meta, fallback to class relationship and post_author
             $teacher_name = esc_html__('Unknown Teacher', 'headless-access-manager');
             $teacher_id = $post->post_author; // Default to post_author for backward compatibility
+
+            $saved_teacher_user_id = absint(get_post_meta($post->ID, '_ham_teacher_user_id', true));
+            if ($saved_teacher_user_id > 0) {
+                $saved_teacher_user = get_user_by('id', $saved_teacher_user_id);
+                if ($saved_teacher_user) {
+                    $teacher_id = $saved_teacher_user_id;
+                    $teacher_name = $saved_teacher_user->display_name;
+                }
+            }
             
             // Find all classes the student is part of
             $student_classes = array();
@@ -1335,7 +1344,7 @@ class HAM_Assessment_Manager
             }
             
             // If student is in classes, find teachers assigned to those classes
-            if (!empty($student_class_ids)) {
+            if ($teacher_name === esc_html__('Unknown Teacher', 'headless-access-manager') && !empty($student_class_ids)) {
                 $teacher_args = array(
                     'post_type' => HAM_CPT_TEACHER,
                     'posts_per_page' => 1, // Just get the first matching teacher
@@ -1982,9 +1991,18 @@ public function ajax_get_assessment_details()
         //error_log('Raw assessment data: ' . print_r($assessment_data, true));
         //error_log('Processed assessment data: ' . print_r($processed_assessment_data, true));
 
-        // Get teacher info - first check based on class relationship, fallback to post_author
+        // Get teacher info - prefer explicitly saved teacher meta, fallback to class relationship and post_author
         $teacher_name = esc_html__('Unknown Teacher', 'headless-access-manager');
         $teacher_id = $assessment->post_author; // Default to post_author for backward compatibility
+
+        $saved_teacher_user_id = absint(get_post_meta($assessment_id, '_ham_teacher_user_id', true));
+        if ($saved_teacher_user_id > 0) {
+            $saved_teacher_user = get_user_by('id', $saved_teacher_user_id);
+            if ($saved_teacher_user) {
+                $teacher_id = $saved_teacher_user_id;
+                $teacher_name = $saved_teacher_user->display_name;
+            }
+        }
         
         // Find all classes the student is part of
         $student_classes = array();
