@@ -63,12 +63,12 @@ if (! defined('ABSPATH')) {
         <table class="wp-list-table widefat fixed striped ham-assessments-table">
             <thead>
                 <tr>
-                    <th class="column-id"><?php echo esc_html__('ID', 'headless-access-manager'); ?></th>
-                    <th class="column-title"><?php echo esc_html__('Title', 'headless-access-manager'); ?></th>
-                    <th class="column-student"><?php echo esc_html__('Student', 'headless-access-manager'); ?></th>
-                    <th class="column-date"><?php echo esc_html__('Date', 'headless-access-manager'); ?></th>
-                    <th class="column-author"><?php echo esc_html__('Author', 'headless-access-manager'); ?></th>
-                    <th class="column-completion"><?php echo esc_html__('Status', 'headless-access-manager'); ?></th>
+                    <th class="column-student"><a class="ham-sort" href="#" data-sort-key="student"><?php echo esc_html__('Student', 'headless-access-manager'); ?></a></th>
+                    <th class="column-class"><a class="ham-sort" href="#" data-sort-key="class"><?php echo esc_html__('Class', 'headless-access-manager'); ?></a></th>
+                    <th class="column-school"><a class="ham-sort" href="#" data-sort-key="school"><?php echo esc_html__('School', 'headless-access-manager'); ?></a></th>
+                    <th class="column-date"><a class="ham-sort" href="#" data-sort-key="date"><?php echo esc_html__('Date', 'headless-access-manager'); ?></a></th>
+                    <th class="column-author"><a class="ham-sort" href="#" data-sort-key="author"><?php echo esc_html__('Responsible teacher', 'headless-access-manager'); ?></a></th>
+                    <th class="column-completion"><a class="ham-sort" href="#" data-sort-key="status"><?php echo esc_html__('Status', 'headless-access-manager'); ?></a></th>
                     <th class="column-actions"><?php echo esc_html__('Actions', 'headless-access-manager'); ?></th>
                 </tr>
             </thead>
@@ -84,10 +84,29 @@ if (! defined('ABSPATH')) {
                             data-date="<?php echo esc_attr(date('Y-m-d', strtotime($assessment['date']))); ?>"
                             data-date-raw="<?php echo esc_attr($assessment['date']); ?>"
                             data-completion="<?php echo esc_attr($assessment['completion']); ?>"
-                            data-stage="<?php echo esc_attr($assessment['stage'] ?? 'not'); ?>">
-                            <td class="column-id"><?php echo esc_html($assessment['id']); ?></td>
-                            <td class="column-title"><?php echo esc_html($assessment['title']); ?></td>
+                            data-stage="<?php echo esc_attr($assessment['stage'] ?? 'not'); ?>"
+                            data-student-name="<?php echo esc_attr($assessment['student_name']); ?>"
+                            data-class="<?php echo esc_attr($assessment['class_name'] ?? ''); ?>"
+                            data-school="<?php echo esc_attr($assessment['school_name'] ?? ''); ?>"
+                            data-author="<?php echo esc_attr($assessment['author_name']); ?>">
                             <td class="column-student"><?php echo esc_html($assessment['student_name']); ?></td>
+                            <td class="column-class"><?php echo esc_html($assessment['class_name'] ?? ''); ?></td>
+                            <td class="column-school">
+                                <?php
+                                $school_name = (string)($assessment['school_name'] ?? '');
+                                $school_initial = '';
+                                if ($school_name !== '') {
+                                    $school_initial = mb_strtoupper(mb_substr($school_name, 0, 1));
+                                }
+                                ?>
+                                <?php if ($school_name !== '' && $school_initial !== '') : ?>
+                                    <span class="ham-school-avatar" data-school-name="<?php echo esc_attr($school_name); ?>" title="<?php echo esc_attr($school_name); ?>" aria-label="<?php echo esc_attr($school_name); ?>">
+                                        <?php echo esc_html($school_initial); ?>
+                                    </span>
+                                <?php else : ?>
+                                    <span class="ham-school-avatar ham-school-avatar--empty" aria-hidden="true"></span>
+                                <?php endif; ?>
+                            </td>
                             <td class="column-date"><?php echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($assessment['date']))); ?></td>
                             <td class="column-author" data-author-id="<?php echo esc_attr($assessment['author_id'] ?? 0); ?>"><?php echo esc_html($assessment['author_name']); ?></td>
                             <td class="column-completion">

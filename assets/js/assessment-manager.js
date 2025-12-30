@@ -13,6 +13,8 @@
         // Initialize filters
         initFilters();
 
+        initSchoolAvatars();
+
         // Initialize modal
         initModal();
 
@@ -24,6 +26,42 @@
 
         // Initialize statistics charts (only runs on stats page)
         initStatsCharts();
+    }
+
+    function initSchoolAvatars() {
+        const avatars = document.querySelectorAll('.ham-school-avatar[data-school-name]');
+        if (!avatars.length) {
+            return;
+        }
+
+        const palette = [
+            '#dbeafe',
+            '#dcfce7',
+            '#fef9c3',
+            '#ffe4e6',
+            '#e0e7ff',
+            '#f3e8ff',
+            '#cffafe',
+            '#fae8ff',
+        ];
+
+        function hashString(input) {
+            let hash = 0;
+            for (let i = 0; i < input.length; i++) {
+                hash = ((hash << 5) - hash) + input.charCodeAt(i);
+                hash |= 0;
+            }
+            return Math.abs(hash);
+        }
+
+        avatars.forEach(function(el) {
+            const name = String(el.getAttribute('data-school-name') || '').trim();
+            if (!name) {
+                return;
+            }
+            const idx = hashString(name.toLowerCase()) % palette.length;
+            el.style.backgroundColor = palette[idx];
+        });
     }
 
     function initStatsCharts() {
@@ -956,6 +994,11 @@
         const $filterReset = $('#ham-filter-reset');
         const $assessmentRows = $('.ham-assessments-table tbody tr');
 
+        const sortState = {
+            key: '',
+            dir: 'asc',
+        };
+
         if ($filterStudent.length && $.fn.select2 && window.hamAssessment && hamAssessment.studentSearchNonce) {
             $filterStudent.select2({
                 ajax: {
@@ -995,6 +1038,23 @@
             resetFilters();
         });
 
+        // Click-to-sort headers
+        $('.ham-assessments-table thead').on('click', '.ham-sort', function(e) {
+            e.preventDefault();
+            const key = String($(this).data('sortKey') || '');
+            if (!key) {
+                return;
+            }
+            if (sortState.key === key) {
+                sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortState.key = key;
+                sortState.dir = 'asc';
+            }
+            sortRows();
+            applyFilters();
+        });
+
         /**
          * Apply all active filters.
          */
@@ -1008,7 +1068,7 @@
                 let show = true;
 
                 // Apply student filter
-                if (studentFilter && $row.data('student') !== studentFilter) {
+                if (studentFilter && String($row.data('student')) !== String(studentFilter)) {
                     show = false;
                 }
 
@@ -1086,7 +1146,7 @@
 
                     if (completionFilter === 'full' && stage !== 'full') {
                         show = false;
-                    } else if (completionFilter === 'transition' && stage !== 'transition') {
+                    } else if (completionFilter === 'transition' && stage !== 'trans') {
                         show = false;
                     } else if (completionFilter === 'not' && stage !== 'not') {
                         show = false;
@@ -1103,18 +1163,63 @@
 
             if ($visibleRows.length === 0) {
                 if ($noResults.length === 0) {
-                    $('<tr id="ham-no-results"><td colspan="7">' + hamAssessment.texts.noData + '</td></tr>').appendTo('.ham-assessments-table tbody');
+                    const colCount = $('.ham-assessments-table thead th').length || 1;
+                    $('<tr id="ham-no-results"><td colspan="' + colCount + '">' + hamAssessment.texts.noData + '</td></tr>').appendTo('.ham-assessments-table tbody');
                 }
             } else {
                 $noResults.remove();
             }
         }
 
+        function getSortValue($row, key) {
+            if (key === 'date') {
+                return String($row.data('date') || '');
+            }
+            if (key === 'status') {
+                return String($row.data('stage') || '');
+            }
+
+            const val = $row.data(key);
+            if (typeof val !== 'undefined') {
+                return String(val);
+            }
+
+            const $cell = $row.find('.column-' + key);
+            return $cell.length ? $cell.text().trim() : '';
+        }
+
+        function sortRows() {
+            if (!sortState.key) {
+                return;
+            }
+
+            const $tbody = $('.ham-assessments-table tbody');
+            const $rows = $tbody.children('tr').not('#ham-no-results');
+            const dirFactor = sortState.dir === 'desc' ? -1 : 1;
+
+            const rowsArray = $rows.get();
+            rowsArray.sort(function(a, b) {
+                const $a = $(a);
+                const $b = $(b);
+                const av = getSortValue($a, sortState.key).toLowerCase();
+                const bv = getSortValue($b, sortState.key).toLowerCase();
+                if (av < bv) {
+                    return -1 * dirFactor;
+                }
+                if (av > bv) {
+                    return 1 * dirFactor;
+                }
+                return 0;
+            });
+
+            $tbody.append(rowsArray);
+        }
+
         /**
          * Reset all filters.
          */
         function resetFilters() {
-            $filterStudent.val('');
+            $filterStudent.val(null).trigger('change');
             $filterDate.val('');
             $filterCompletion.val('');
             applyFilters();

@@ -604,6 +604,26 @@
      padding: 0 10px;
  }
 
+ .ham-school-avatar {
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
+     width: 26px;
+     height: 26px;
+     border-radius: 999px;
+     font-weight: 700;
+     font-size: 12px;
+     line-height: 1;
+     color: #1d2327;
+     border: 1px solid rgba(0, 0, 0, 0.15);
+     user-select: none;
+ }
+
+ .ham-school-avatar--empty {
+     background: transparent;
+     border-color: transparent;
+ }
+
  .column-actions .ham-icon-button {
      padding: 0 8px;
      min-width: 32px;

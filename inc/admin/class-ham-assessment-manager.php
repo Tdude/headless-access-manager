@@ -1307,6 +1307,24 @@ class HAM_Assessment_Manager
             // Student is a CPT, not a WordPress user - get the student name from the CPT
             $student_post = get_post($student_id);
             $student_name = $student_post ? $student_post->post_title : esc_html__('Unknown Student', 'headless-access-manager');
+
+            // Class + School (stored on the student CPT).
+            $class_ids = $student_post ? get_post_meta($student_post->ID, '_ham_class_ids', true) : array();
+            $class_ids = is_array($class_ids) ? array_map('absint', $class_ids) : array();
+            $class_names = array();
+            foreach ($class_ids as $class_id) {
+                if ($class_id > 0) {
+                    $class_post = get_post($class_id);
+                    if ($class_post) {
+                        $class_names[] = $class_post->post_title;
+                    }
+                }
+            }
+            $class_name = !empty($class_names) ? implode(', ', $class_names) : '';
+
+            $school_id = $student_post ? absint(get_post_meta($student_post->ID, '_ham_school_id', true)) : 0;
+            $school_post = $school_id > 0 ? get_post($school_id) : null;
+            $school_name = $school_post ? $school_post->post_title : '';
             
             // Debug information about the student CPT
             //error_log('Student CPT found: ' . ($student_post ? 'Yes' : 'No') . ', Name: ' . $student_name);
@@ -1445,6 +1463,8 @@ class HAM_Assessment_Manager
                 'date'         => get_the_date('Y-m-d H:i:s', $post->ID),
                 'student_id'   => $student_id,
                 'student_name' => $student_name,
+                'class_name'   => $class_name,
+                'school_name'  => $school_name,
                 'completion'   => $completion_percentage,
                 'author_id'    => $teacher_id,
                 'author_name'  => $teacher_name,
