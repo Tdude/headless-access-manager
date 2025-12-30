@@ -1362,6 +1362,9 @@ class HAM_Assessment_Manager
             // Debug: Log the assessment data structure
             //error_log('Assessment data structure for post ' . $post->ID . ': ' . (is_array($assessment_data) ? json_encode(array_keys($assessment_data)) : 'not an array'));
 
+            $effective_ts = self::get_assessment_effective_date($post);
+            $effective_date = wp_date('Y-m-d H:i:s', $effective_ts);
+
             // Fine-grained numeric evaluation logic
             $values = array();
             if (is_array($assessment_data)) {
@@ -1488,7 +1491,8 @@ class HAM_Assessment_Manager
             $assessments[] = array(
                 'id'           => $post->ID,
                 'title'        => $post->post_title,
-                'date'         => $post->post_date,
+                'date'         => $effective_date,
+                'modified'     => $post->post_modified,
                 'student_id'   => $student_id,
                 'student_name' => $student_name,
                 'class_name'   => $class_name,
@@ -2175,11 +2179,15 @@ public function ajax_get_assessment_details()
         }
         
         //error_log('Modal display - Teacher resolution: Student ID: ' . $student_id . ', Classes: ' . implode(',', $student_class_ids) . ', Teacher name: ' . $teacher_name);
-        
+
+        $effective_ts = self::get_assessment_effective_date($assessment);
+        $effective_date = wp_date('Y-m-d H:i:s', $effective_ts);
+
         $response = array(
             'id' => $assessment_id,
             'title' => $assessment->post_title,
-            'date' => $assessment->post_date,
+            'date' => $effective_date,
+            'modified' => $assessment->post_modified,
             'student_id' => $student_id,
             'student_name' => $student_name,
             'author_id' => $teacher_id,
