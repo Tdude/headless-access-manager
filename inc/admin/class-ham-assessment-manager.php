@@ -1488,7 +1488,7 @@ class HAM_Assessment_Manager
             $assessments[] = array(
                 'id'           => $post->ID,
                 'title'        => $post->post_title,
-                'date'         => get_the_date('Y-m-d H:i:s', $post->ID),
+                'date'         => $post->post_date,
                 'student_id'   => $student_id,
                 'student_name' => $student_name,
                 'class_name'   => $class_name,
@@ -2179,7 +2179,7 @@ public function ajax_get_assessment_details()
         $response = array(
             'id' => $assessment_id,
             'title' => $assessment->post_title,
-            'date' => get_the_date('Y-m-d H:i:s', $assessment_id),
+            'date' => $assessment->post_date,
             'student_id' => $student_id,
             'student_name' => $student_name,
             'author_id' => $teacher_id,
