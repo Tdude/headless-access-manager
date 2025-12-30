@@ -19,6 +19,8 @@ if (! defined('ABSPATH')) {
  */
 class HAM_Meta_Boxes
 {
+    private const ASSESSMENT_META_TEACHER_USER_ID = '_ham_teacher_user_id';
+
     /**
      * Register assessment meta boxes.
      *
@@ -115,7 +117,11 @@ class HAM_Meta_Boxes
     {
         wp_nonce_field('ham_assessment_teacher_meta_box', 'ham_assessment_teacher_meta_box_nonce');
 
-        $teacher_id = isset($post->post_author) ? absint($post->post_author) : 0;
+        $teacher_id = absint(get_post_meta($post->ID, self::ASSESSMENT_META_TEACHER_USER_ID, true));
+
+        if ($teacher_id <= 0) {
+            $teacher_id = isset($post->post_author) ? absint($post->post_author) : 0;
+        }
         $teacher_user = $teacher_id ? get_user_by('id', $teacher_id) : null;
         $teacher_name = $teacher_user ? $teacher_user->display_name : '';
         ?>
@@ -247,6 +253,8 @@ class HAM_Meta_Boxes
                 $teacher_user = $teacher_id ? get_user_by('id', $teacher_id) : null;
 
                 if ($teacher_id > 0 && $teacher_user) {
+                    update_post_meta($post_id, self::ASSESSMENT_META_TEACHER_USER_ID, $teacher_id);
+
                     $post = get_post($post_id);
                     $current_author = $post ? absint($post->post_author) : 0;
 
@@ -256,9 +264,11 @@ class HAM_Meta_Boxes
                         wp_update_post([
                             'ID' => $post_id,
                             'post_author' => $teacher_id,
-                        ]);
+                        ], true);
                         add_action('save_post_' . HAM_CPT_ASSESSMENT, [__CLASS__, 'save_meta_boxes']);
                     }
+                } else {
+                    delete_post_meta($post_id, self::ASSESSMENT_META_TEACHER_USER_ID);
                 }
             }
         }
