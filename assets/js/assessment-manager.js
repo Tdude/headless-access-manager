@@ -399,6 +399,92 @@
             );
         }
 
+        function buildDrilldownAvgProgressToggle() {
+            const canvas = document.getElementById('ham-avg-progress-drilldown');
+            const btns = Array.from(document.querySelectorAll('.ham-drilldown-progress-toggle-btn'));
+
+            if (!canvas || btns.length === 0 || !stats || (stats.level !== 'school' && stats.level !== 'class') || !stats.avg_progress) {
+                return;
+            }
+
+            const seriesByKey = stats.avg_progress;
+            const titleByKey = {
+                month: labelMonth,
+                term: labelTerm,
+                school_year: labelSchoolYear,
+                hogstadium: labelHogstadium,
+            };
+
+            function buildDataForBucket(bucketKey) {
+                const series = seriesByKey && Array.isArray(seriesByKey[bucketKey]) ? seriesByKey[bucketKey] : [];
+                const labels = series.map((p) => p.label);
+                const data = series.map((p) => clampNumber(p.overall_avg, 1, 5));
+                return { labels, data, title: titleByKey[bucketKey] || labelRadar };
+            }
+
+            const existing = Chart.getChart(canvas);
+            if (existing) {
+                existing.destroy();
+            }
+
+            const initial = buildDataForBucket('month');
+            const c = datasetColor(0);
+            const chart = new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: initial.labels,
+                    datasets: [{
+                        label: initial.title,
+                        data: initial.data,
+                        borderColor: c.border,
+                        backgroundColor: c.fill,
+                        fill: true,
+                        tension: CHART_LINE_TENSION,
+                        pointRadius: CHART_LINE_POINT_RADIUS,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: CHART_ANIMATION_DURATION_MS,
+                        easing: CHART_ANIMATION_EASING,
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: initial.title,
+                        },
+                        tooltip: { enabled: true },
+                    },
+                    scales: {
+                        y: {
+                            min: 1,
+                            max: 5,
+                            ticks: { stepSize: 1 },
+                        },
+                    },
+                },
+            });
+
+            function updateChart(bucketKey) {
+                const next = buildDataForBucket(bucketKey);
+                chart.data.labels = next.labels;
+                chart.data.datasets[0].data = next.data;
+                chart.data.datasets[0].label = next.title;
+                chart.options.plugins.title.text = next.title;
+                chart.update();
+            }
+
+            initBucketToggle({
+                buttons: btns,
+                defaultKey: 'month',
+                isKeyAvailable: (key) => Array.isArray(seriesByKey[key]) && seriesByKey[key].length > 0,
+                onChange: updateChart,
+            });
+        }
+
         function pickLatestBucket(buckets) {
             if (!Array.isArray(buckets) || buckets.length === 0) {
                 return null;
@@ -846,6 +932,11 @@
         // Student radar chart + bucket toggle
         if (stats && stats.level === 'student' && stats.student_radar && stats.student_radar.buckets) {
             buildStudentRadarToggle();
+        }
+
+        // School/class drilldown avg progress toggle
+        if (stats && (stats.level === 'school' || stats.level === 'class') && stats.avg_progress) {
+            buildDrilldownAvgProgressToggle();
         }
 
         // Overview radar chart

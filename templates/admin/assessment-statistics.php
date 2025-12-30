@@ -167,24 +167,13 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <h3 style="margin-top: 10px;">
                     <?php echo esc_html__('School average progress', 'headless-access-manager'); ?>
                 </h3>
-                <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
-                    <div>
-                        <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-month"></canvas></div>
-                    </div>
-                    <div>
-                        <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-term"></canvas></div>
-                    </div>
-                    <div>
-                        <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-school-year"></canvas></div>
-                    </div>
-                    <div>
-                        <strong><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
-                    </div>
+                <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
+                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
                 </div>
+                <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-drilldown"></canvas></div>
 
                 <h3 style="margin-top: 10px;">
                     <?php echo esc_html__('School Progress (by semester)', 'headless-access-manager'); ?>
@@ -230,24 +219,13 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <h3 style="margin-top: 10px;">
                     <?php echo esc_html__('Class average progress', 'headless-access-manager'); ?>
                 </h3>
-                <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
-                    <div>
-                        <strong><?php echo esc_html__('Month', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-month"></canvas></div>
-                    </div>
-                    <div>
-                        <strong><?php echo esc_html__('Term', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-term"></canvas></div>
-                    </div>
-                    <div>
-                        <strong><?php echo esc_html__('School year', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-school-year"></canvas></div>
-                    </div>
-                    <div>
-                        <strong><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></strong>
-                        <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-avg-progress-hogstadium"></canvas></div>
-                    </div>
+                <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
+                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
                 </div>
+                <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-drilldown"></canvas></div>
 
                 <h3 style="margin-top: 10px;">
                     <?php echo esc_html__('Class Progress (by semester)', 'headless-access-manager'); ?>
