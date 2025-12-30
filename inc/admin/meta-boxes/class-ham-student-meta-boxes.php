@@ -153,29 +153,11 @@ class HAM_Student_Meta_Boxes {
         wp_nonce_field('ham_student_class_assignment_meta_box_nonce', 'ham_student_class_assignment_meta_box_nonce');
 
         $student_id = $post->ID;
-        $assigned_class_ids = []; // This will store IDs of classes the student is currently in
+        $assigned_class_ids = get_post_meta($student_id, '_ham_class_ids', true);
+        $assigned_class_ids = is_array($assigned_class_ids) ? array_map('absint', $assigned_class_ids) : [];
 
         // Get the student's school ID for filtering selectable classes
         $student_school_id = get_post_meta($student_id, '_ham_school_id', true);
-
-        // Get all classes and check if this student is in them (for pre-selecting options)
-        $all_classes_query_args = [
-            'post_type' => HAM_CPT_CLASS,
-            'posts_per_page' => -1,
-            // No school filter here, as a student might have been in a class from another school previously
-            // Or, if strictness is desired, this could also be filtered by student_school_id
-        ];
-        $all_classes_for_membership_check = get_posts($all_classes_query_args);
-
-        if (!empty($all_classes_for_membership_check)) {
-            foreach ($all_classes_for_membership_check as $class_cpt) {
-                $students_in_class = get_post_meta($class_cpt->ID, '_ham_student_ids', true);
-                $students_in_class = is_array($students_in_class) ? $students_in_class : [];
-                if (in_array($student_id, $students_in_class)) {
-                    $assigned_class_ids[] = $class_cpt->ID;
-                }
-            }
-        }
 
         // Arguments for fetching classes to populate the dropdown
         $selectable_classes_args = [
@@ -274,30 +256,31 @@ class HAM_Student_Meta_Boxes {
             $student_id_to_update = $post_id;
             $newly_selected_class_ids = isset($_POST['ham_student_class_ids']) ? array_map('absint', (array)$_POST['ham_student_class_ids']) : [];
 
-            // Get all class IDs to iterate for changes
-            $all_class_cpt_ids_query = new WP_Query([
-                'post_type' => HAM_CPT_CLASS,
-                'posts_per_page' => -1,
-                'fields' => 'ids',
-            ]);
-            $all_class_cpt_ids = $all_class_cpt_ids_query->posts;
+            $previous_class_ids = get_post_meta($student_id_to_update, '_ham_class_ids', true);
+            $previous_class_ids = is_array($previous_class_ids) ? array_map('absint', $previous_class_ids) : [];
 
-            foreach ($all_class_cpt_ids as $class_cpt_id) {
+            $added_class_ids = array_values(array_diff($newly_selected_class_ids, $previous_class_ids));
+            $removed_class_ids = array_values(array_diff($previous_class_ids, $newly_selected_class_ids));
+
+            foreach ($added_class_ids as $class_cpt_id) {
                 $current_students_in_class = get_post_meta($class_cpt_id, '_ham_student_ids', true);
-                $current_students_in_class = is_array($current_students_in_class) ? $current_students_in_class : [];
-                $student_was_in_class = in_array($student_id_to_update, $current_students_in_class);
-                $student_is_now_selected_for_class = in_array($class_cpt_id, $newly_selected_class_ids);
-
-                if ($student_is_now_selected_for_class && !$student_was_in_class) {
-                    // Add student to class
+                $current_students_in_class = is_array($current_students_in_class) ? array_map('absint', $current_students_in_class) : [];
+                if (!in_array($student_id_to_update, $current_students_in_class, true)) {
                     $current_students_in_class[] = $student_id_to_update;
-                    update_post_meta($class_cpt_id, '_ham_student_ids', array_unique($current_students_in_class));
-                } elseif (!$student_is_now_selected_for_class && $student_was_in_class) {
-                    // Remove student from class
-                    $current_students_in_class = array_diff($current_students_in_class, [$student_id_to_update]);
-                    update_post_meta($class_cpt_id, '_ham_student_ids', array_unique($current_students_in_class));
+                    update_post_meta($class_cpt_id, '_ham_student_ids', array_values(array_unique($current_students_in_class)));
                 }
             }
+
+            foreach ($removed_class_ids as $class_cpt_id) {
+                $current_students_in_class = get_post_meta($class_cpt_id, '_ham_student_ids', true);
+                $current_students_in_class = is_array($current_students_in_class) ? array_map('absint', $current_students_in_class) : [];
+                if (in_array($student_id_to_update, $current_students_in_class, true)) {
+                    $current_students_in_class = array_values(array_diff($current_students_in_class, [$student_id_to_update]));
+                    update_post_meta($class_cpt_id, '_ham_student_ids', array_values(array_unique($current_students_in_class)));
+                }
+            }
+
+            update_post_meta($student_id_to_update, '_ham_class_ids', array_values(array_unique($newly_selected_class_ids)));
         }
     }
 }

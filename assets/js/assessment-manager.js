@@ -401,7 +401,8 @@
 
         function buildDrilldownAvgProgressToggle() {
             const canvas = document.getElementById('ham-avg-progress-drilldown');
-            const btns = Array.from(document.querySelectorAll('.ham-drilldown-progress-toggle-btn'));
+            const btnRoot = canvas ? canvas.closest('.ham-stats-panel') : null;
+            const btns = Array.from((btnRoot || document).querySelectorAll('.ham-progress-toggle-btn'));
 
             if (!canvas || btns.length === 0 || !stats || (stats.level !== 'school' && stats.level !== 'class') || !stats.avg_progress) {
                 return;

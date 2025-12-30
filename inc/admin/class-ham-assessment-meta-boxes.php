@@ -70,10 +70,10 @@ class HAM_Assessment_Meta_Boxes
             //error_log('HAM Debug - Using default structure');
             require_once dirname(__FILE__, 2) . '/assessment-constants.php';
             $assessment_data = HAM_ASSESSMENT_DEFAULT_STRUCTURE;
+
+            // Save default structure only when missing.
+            update_post_meta($post->ID, '_ham_assessment_data', $assessment_data);
         }
-            
-        // Save default structure
-        update_post_meta($post->ID, '_ham_assessment_data', $assessment_data);
         ?>
 
         <div id="ham-assessment-editor" class="ham-assessment-editor">

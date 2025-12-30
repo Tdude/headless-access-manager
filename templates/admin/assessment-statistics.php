@@ -168,10 +168,10 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <?php echo esc_html__('School average progress', 'headless-access-manager'); ?>
                 </h3>
                 <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
-                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
                 </div>
                 <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-drilldown"></canvas></div>
 
@@ -220,10 +220,10 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <?php echo esc_html__('Class average progress', 'headless-access-manager'); ?>
                 </h3>
                 <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
-                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-drilldown-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
                 </div>
                 <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-drilldown"></canvas></div>
 

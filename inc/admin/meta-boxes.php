@@ -247,10 +247,18 @@ class HAM_Meta_Boxes
                 $teacher_user = $teacher_id ? get_user_by('id', $teacher_id) : null;
 
                 if ($teacher_id > 0 && $teacher_user) {
-                    wp_update_post([
-                        'ID' => $post_id,
-                        'post_author' => $teacher_id,
-                    ]);
+                    $post = get_post($post_id);
+                    $current_author = $post ? absint($post->post_author) : 0;
+
+                    if ($current_author !== $teacher_id) {
+                        // Avoid infinite recursion: wp_update_post triggers save_post hooks.
+                        remove_action('save_post_' . HAM_CPT_ASSESSMENT, [__CLASS__, 'save_meta_boxes']);
+                        wp_update_post([
+                            'ID' => $post_id,
+                            'post_author' => $teacher_id,
+                        ]);
+                        add_action('save_post_' . HAM_CPT_ASSESSMENT, [__CLASS__, 'save_meta_boxes']);
+                    }
                 }
             }
         }
@@ -287,6 +295,21 @@ class HAM_Meta_Boxes
     private static function clear_class_caches_for_student($student_id)
     {
         if (empty($student_id)) {
+            return;
+        }
+
+        // Fast path: if the student stores class membership, use it to avoid expensive
+        // meta_query LIKE scans on the class CPT.
+        $student_class_ids = get_post_meta($student_id, '_ham_class_ids', true);
+        $student_class_ids = is_array($student_class_ids) ? array_map('absint', $student_class_ids) : array();
+
+        if (!empty($student_class_ids)) {
+            foreach ($student_class_ids as $class_id) {
+                if ($class_id > 0) {
+                    delete_transient("ham_class_evaluations_{$class_id}");
+                    delete_transient("ham_class_avg_score_{$class_id}");
+                }
+            }
             return;
         }
 
