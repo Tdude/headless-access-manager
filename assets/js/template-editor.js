@@ -84,7 +84,18 @@
             });
 
             // Input change events
+            // Use both 'input' and 'change' so text edits are captured even if the user
+            // clicks "Update" without blurring the field.
+            this.$container.on('input', 'input', function() {
+                self.updateStructureFromDOM();
+            });
             this.$container.on('change', 'input, select', function() {
+                self.updateStructureFromDOM();
+            });
+
+            // Ensure the hidden textarea is up-to-date right before the post is saved.
+            // WordPress saves via the #post form submit.
+            $(document).on('submit', '#post', function() {
                 self.updateStructureFromDOM();
             });
 
