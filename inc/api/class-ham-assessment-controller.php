@@ -496,7 +496,7 @@ class HAM_Assessment_Controller extends HAM_Base_Controller
         $completion = 'not'; // Default to 'not established'
         if (!empty($assessment_data)) {
             $threshold = 3;
-            $majority_factor = 0.7;
+            $majority_factor = 0.7; //super majority
             $steps = array();
 
             if (is_array($assessment_data)) {

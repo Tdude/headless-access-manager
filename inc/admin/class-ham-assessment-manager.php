@@ -23,6 +23,112 @@ class HAM_Assessment_Manager
     private const ACTIVE_QUESTION_BANK_OPTION = 'ham_active_question_bank_id';
     private const QUESTION_BANK_META_KEY = '_ham_assessment_data';
 
+    private static function calculate_stage_from_assessment_data($assessment_data, $threshold = 3, $majority_factor = 0.7)
+    {
+        $steps = array();
+        if (is_array($assessment_data)) {
+            foreach (array('anknytning', 'ansvar') as $section_key) {
+                if (!isset($assessment_data[$section_key]['questions']) || !is_array($assessment_data[$section_key]['questions'])) {
+                    continue;
+                }
+                foreach ($assessment_data[$section_key]['questions'] as $answer) {
+                    if ($answer === '' || $answer === null) {
+                        continue;
+                    }
+                    if (!is_numeric($answer)) {
+                        continue;
+                    }
+                    $steps[] = (float) $answer;
+                }
+            }
+        }
+
+        $n = count($steps);
+        if ($n === 0) {
+            return array(
+                'stage' => 'not',
+                'k' => 0,
+                'n' => 0,
+            );
+        }
+
+        $k = 0;
+        foreach ($steps as $s) {
+            if ($s >= $threshold) {
+                $k++;
+            }
+        }
+
+        $m = (int) ceil($majority_factor * $n);
+        $half = (int) ceil($n / 2);
+
+        if ($k >= $m) {
+            $stage = 'full';
+        } elseif ($k >= $half) {
+            $stage = 'trans';
+        } else {
+            $stage = 'not';
+        }
+
+        return array(
+            'stage' => $stage,
+            'k' => $k,
+            'n' => $n,
+        );
+    }
+
+    private static function calculate_latest_stage_counts_for_students(array $student_ids)
+    {
+        $student_ids = array_values(array_filter(array_map('absint', $student_ids)));
+        if (empty($student_ids)) {
+            return array(
+                'counts' => array(
+                    'not' => 0,
+                    'trans' => 0,
+                    'full' => 0,
+                ),
+                'by_student' => array(),
+            );
+        }
+
+        $posts = self::fetch_evaluation_posts($student_ids);
+        $latest_by_student = array();
+
+        foreach ($posts as $post) {
+            $sid = (int) get_post_meta($post->ID, HAM_ASSESSMENT_META_STUDENT_ID, true);
+            if ($sid <= 0 || isset($latest_by_student[$sid])) {
+                continue;
+            }
+
+            $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
+            $calc = self::calculate_stage_from_assessment_data($assessment_data);
+            $stage = isset($calc['stage']) ? (string) $calc['stage'] : 'not';
+            if ($stage !== 'full' && $stage !== 'trans' && $stage !== 'not') {
+                $stage = 'not';
+            }
+
+            $latest_by_student[$sid] = $stage;
+        }
+
+        $counts = array(
+            'not' => 0,
+            'trans' => 0,
+            'full' => 0,
+        );
+
+        foreach ($student_ids as $sid) {
+            $s = isset($latest_by_student[$sid]) ? $latest_by_student[$sid] : 'not';
+            if (isset($counts[$s])) {
+                $counts[$s]++;
+            }
+        }
+
+        return array(
+            'counts' => $counts,
+            'by_student' => $latest_by_student,
+        );
+    }
+
     /**
      * Constructor.
      */
@@ -984,6 +1090,9 @@ class HAM_Assessment_Manager
                 $students_map = isset($school_to_students[$school->ID]) ? $school_to_students[$school->ID] : array();
                 $student_ids = array_keys($students_map);
 
+                $stage_rollup = self::calculate_latest_stage_counts_for_students($student_ids);
+                $stage_counts = isset($stage_rollup['counts']) ? $stage_rollup['counts'] : array('not' => 0, 'trans' => 0, 'full' => 0);
+
                 $class_count = 0;
                 $classes = get_posts(array(
                     'post_type'      => HAM_CPT_CLASS,
@@ -1019,7 +1128,7 @@ class HAM_Assessment_Manager
                     'class_count' => $class_count,
                     'student_count' => count($student_ids),
                     'evaluation_count' => $total_evals,
-                    'overall_avg' => $overall_avg,
+                    'stage_counts' => $stage_counts,
                     'series' => $series,
                     'url' => admin_url('admin.php?page=ham-assessment-stats&school_id=' . $school->ID),
                 );
@@ -1072,6 +1181,9 @@ class HAM_Assessment_Manager
             foreach ($classes as $class_post) {
                 $class_student_ids = get_post_meta($class_post->ID, '_ham_student_ids', true);
                 $class_student_ids = is_array($class_student_ids) ? array_map('absint', $class_student_ids) : array();
+
+                $stage_rollup = self::calculate_latest_stage_counts_for_students($class_student_ids);
+                $stage_counts = isset($stage_rollup['counts']) ? $stage_rollup['counts'] : array('not' => 0, 'trans' => 0, 'full' => 0);
                 $series = empty($class_student_ids) ? array() : self::aggregate_evaluations_by_semester(self::fetch_evaluation_posts($class_student_ids));
 
                 $total_evals = 0;
@@ -1091,7 +1203,7 @@ class HAM_Assessment_Manager
                     'name' => $class_post->post_title,
                     'student_count' => count($class_student_ids),
                     'evaluation_count' => $total_evals,
-                    'overall_avg' => $overall_avg,
+                    'stage_counts' => $stage_counts,
                     'series' => $series,
                     'url' => admin_url('admin.php?page=ham-assessment-stats&school_id=' . $school_id . '&class_id=' . $class_post->ID),
                 );
@@ -1137,11 +1249,15 @@ class HAM_Assessment_Manager
                 }
                 $overall_avg = $overall_count > 0 ? ($overall_sum / $overall_count) : null;
 
+                $stage_rollup = self::calculate_latest_stage_counts_for_students(array($student_post->ID));
+                $by_student = isset($stage_rollup['by_student']) ? $stage_rollup['by_student'] : array();
+                $latest_stage = isset($by_student[$student_post->ID]) ? $by_student[$student_post->ID] : 'not';
+
                 $view['students'][] = array(
                     'id' => $student_post->ID,
                     'name' => $student_post->post_title,
                     'evaluation_count' => $total_evals,
-                    'overall_avg' => $overall_avg,
+                    'stage' => $latest_stage,
                     'series' => $series,
                     'url' => admin_url('admin.php?page=ham-assessment-stats&school_id=' . $school_id . '&class_id=' . $class_id . '&student_id=' . $student_post->ID),
                 );
@@ -1449,43 +1565,10 @@ class HAM_Assessment_Manager
             $effective_ts = self::get_assessment_effective_date($post);
             $effective_date = wp_date('Y-m-d H:i:s', $effective_ts);
 
-            $threshold = 3;
-            $majority_factor = 0.7;
-            $steps = array();
-            if (is_array($assessment_data)) {
-                foreach (array('anknytning', 'ansvar') as $section_key) {
-                    if (isset($assessment_data[$section_key]['questions']) && is_array($assessment_data[$section_key]['questions'])) {
-                        foreach ($assessment_data[$section_key]['questions'] as $question_id => $answer) {
-                            if ($answer === '' || $answer === null) {
-                                continue;
-                            }
-                            if (!is_numeric($answer)) {
-                                continue;
-                            }
-                            $steps[] = (float) $answer;
-                        }
-                    }
-                }
-            }
-
-            $n = count($steps);
-            $k = 0;
-            foreach ($steps as $s) {
-                if ($s >= $threshold) {
-                    $k++;
-                }
-            }
-            $m = $n > 0 ? (int) ceil($majority_factor * $n) : 0;
-            $half = $n > 0 ? (int) ceil($n / 2) : 0;
-
-            if ($n > 0 && $k >= $m) {
-                $summary_stage = 'full';
-            } elseif ($n > 0 && $k >= $half) {
-                $summary_stage = 'trans';
-            } else {
-                $summary_stage = 'not';
-            }
-
+            $calc = self::calculate_stage_from_assessment_data($assessment_data);
+            $summary_stage = isset($calc['stage']) ? $calc['stage'] : 'not';
+            $k = isset($calc['k']) ? (int) $calc['k'] : 0;
+            $n = isset($calc['n']) ? (int) $calc['n'] : 0;
             $stage_score = $n > 0 ? ($k / $n) : 0;
 
             $completion_percentage = self::calculate_completion_percentage($assessment_data);
@@ -1664,6 +1747,11 @@ class HAM_Assessment_Manager
             'total_assessments' => count($assessments),
             'total_students' => 0,
             'average_completion' => 0,
+            'student_stage_counts' => array(
+                'not' => 0,
+                'trans' => 0,
+                'full' => 0,
+            ),
             'section_averages' => array(
                 'anknytning' => 0,
                 'ansvar' => 0
@@ -1686,6 +1774,7 @@ class HAM_Assessment_Manager
         // Process each assessment
         $student_ids = array();
         $completion_sum = 0;
+        $latest_stage_by_student_id = array();
         $section_sums = array('anknytning' => 0, 'ansvar' => 0);
         $section_counts = array('anknytning' => 0, 'ansvar' => 0);
         $question_sums = array();
@@ -1699,6 +1788,16 @@ class HAM_Assessment_Manager
             // Track unique students
             if (!in_array($assessment['student_id'], $student_ids)) {
                 $student_ids[] = $assessment['student_id'];
+            }
+
+            // Capture the most recent stage per student (assessments are ordered newest -> oldest)
+            $sid = isset($assessment['student_id']) ? (int) $assessment['student_id'] : 0;
+            if ($sid > 0 && !isset($latest_stage_by_student_id[$sid])) {
+                $s = isset($assessment['stage']) ? (string) $assessment['stage'] : 'not';
+                if ($s !== 'full' && $s !== 'trans' && $s !== 'not') {
+                    $s = 'not';
+                }
+                $latest_stage_by_student_id[$sid] = $s;
             }
 
             // Sum completion percentages
@@ -1777,6 +1876,12 @@ class HAM_Assessment_Manager
         // Calculate final statistics
         $stats['total_students'] = count($student_ids);
         $stats['average_completion'] = $stats['total_assessments'] > 0 ? round($completion_sum / $stats['total_assessments']) : 0;
+
+        foreach ($latest_stage_by_student_id as $s) {
+            if (isset($stats['student_stage_counts'][$s])) {
+                $stats['student_stage_counts'][$s]++;
+            }
+        }
 
         // Calculate section averages
         foreach ($section_sums as $section => $sum) {
