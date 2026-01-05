@@ -1375,12 +1375,11 @@ class HAM_Assessment_Manager
                 'hogstadium' => self::aggregate_evaluations_overall_by_bucket($school_posts, 'hogstadium'),
             );
 
-            // Group radar: School vs All (baseline), counts >= 3 per question based on latest assessment per student per bucket.
-            $threshold = 3;
+            // Group radar: School vs All (baseline), average score per question (1-5) based on latest assessment per student per bucket.
             $all_posts = self::fetch_evaluation_posts();
-            $build_group_bucket = function($bucket_type) use ($school_posts, $all_posts, $threshold) {
-                $school_series = self::build_group_radar_bucket_counts($school_posts, $bucket_type, $threshold);
-                $all_series = self::build_group_radar_bucket_counts($all_posts, $bucket_type, $threshold);
+            $build_group_bucket = function($bucket_type) use ($school_posts, $all_posts) {
+                $school_series = self::build_group_radar_bucket_avgs($school_posts, $bucket_type);
+                $all_series = self::build_group_radar_bucket_avgs($all_posts, $bucket_type);
 
                 $school_by_key = array();
                 foreach ($school_series as $b) {
@@ -1548,8 +1547,7 @@ class HAM_Assessment_Manager
             };
 
             $view['group_radar'] = array(
-                'mode' => 'counts',
-                'threshold' => $threshold,
+                'mode' => 'avg',
                 'labels' => isset($radar_meta['labels']) ? $radar_meta['labels'] : array(),
                 'buckets' => array(
                     'month' => $build_group_bucket('month'),

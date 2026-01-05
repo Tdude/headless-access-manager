@@ -227,7 +227,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
             <?php elseif ($drilldown['level'] === 'school') : ?>
 
                 <h3 style="margin-top: 10px;">
-                    <?php echo esc_html__('Radar (counts per question)', 'headless-access-manager'); ?>
+                    <?php echo esc_html__('Radar (avg per question)', 'headless-access-manager'); ?>
                 </h3>
                 <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
@@ -303,7 +303,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
             <?php elseif ($drilldown['level'] === 'class') : ?>
 
                 <h3 style="margin-top: 10px;">
-                    <?php echo esc_html__('Radar (counts per question)', 'headless-access-manager'); ?>
+                    <?php echo esc_html__('Radar (avg per question)', 'headless-access-manager'); ?>
                 </h3>
                 <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
