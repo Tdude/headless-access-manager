@@ -555,6 +555,30 @@
 
             const datasets = bucket.datasets;
 
+            // Fade older datasets in the answer alternatives table. We assume datasets
+            // are ordered newest -> oldest (idx 0 is most recent).
+            function datasetRecencyAlpha(datasetIndex) {
+                const idx = Math.max(0, Number.isFinite(datasetIndex) ? datasetIndex : 0);
+                const latestAlpha = 0.70;
+                const decay = 0.65;
+                const minAlpha = 0.10;
+                const a = latestAlpha * Math.pow(decay, idx);
+                return Math.max(minAlpha, a);
+            }
+
+            function selectionAlpha(selectedDatasetIndexes) {
+                if (!Array.isArray(selectedDatasetIndexes) || selectedDatasetIndexes.length === 0) {
+                    return 0;
+                }
+                let maxA = 0;
+                selectedDatasetIndexes.forEach((di) => {
+                    maxA = Math.max(maxA, datasetRecencyAlpha(di));
+                });
+                // If multiple datasets share the same choice, bump slightly, but cap.
+                const bump = Math.min(0.10, Math.max(0, selectedDatasetIndexes.length - 1) * 0.03);
+                return Math.min(0.80, maxA + bump);
+            }
+
             function optionBgColor(optionIndex, alpha) {
                 const a = typeof alpha === 'number' ? alpha : 0.22;
                 // 1..5 => red -> orange -> yellow -> light green -> green
@@ -617,7 +641,7 @@
 
                     if (sel.length > 0) {
                         cls += ' ham-answer-choice--selected';
-                        const alpha = Math.min(0.45, 0.18 + (sel.length * 0.07));
+                        const alpha = selectionAlpha(sel);
                         style = ` style="background-color: ${optionBgColor(oi, alpha)};"`;
                     }
 

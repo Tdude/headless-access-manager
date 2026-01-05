@@ -416,6 +416,11 @@
     overflow-x: auto;
 }
 
+.ham-radar-values-scroll .widefat,
+.ham-radar-values-scroll .wp-list-table {
+    margin: 0;
+}
+
 .ham-radar-values-table {
     border-collapse: collapse;
 }
@@ -439,11 +444,16 @@
     position: relative;
 }
 
+.ham-answer-alternatives {
+    margin-top: 10px;
+}
+
 .ham-answer-alternatives-table {
     border: 0;
     box-shadow: none;
     border-collapse: separate;
     border-spacing: 0;
+    width: 100%;
 }
 
 .ham-answer-alternatives-table thead th,
@@ -461,8 +471,26 @@
     background: transparent !important;
 }
 
+.ham-answer-alternatives-table th,
+.ham-answer-alternatives-table td {
+    padding: 10px 12px;
+}
+
+.ham-answer-alternatives-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
 .ham-answer-alternatives-table td {
     vertical-align: top;
+}
+
+.ham-answer-alternatives-table td:first-child {
+    min-width: 260px;
+    font-weight: 600;
 }
 
 .ham-answer-alternatives-table td.ham-answer-choice {
@@ -471,6 +499,7 @@
 
 .ham-answer-alternatives-table td.ham-answer-choice--selected {
     border-radius: 4px;
+    transition: background-color 150ms ease-in-out;
 }
 
 /* Section-specific dividers (student answer alternatives table)
