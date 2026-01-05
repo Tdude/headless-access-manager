@@ -566,6 +566,14 @@
                 return Math.max(minAlpha, a);
             }
 
+            function datasetRecencyStrength(datasetIndex) {
+                const idx = Math.max(0, Number.isFinite(datasetIndex) ? datasetIndex : 0);
+                const decay = 0.65;
+                const minStrength = 0.12;
+                const s = Math.pow(decay, idx);
+                return Math.max(minStrength, Math.min(1, s));
+            }
+
             function selectionAlpha(selectedDatasetIndexes) {
                 if (!Array.isArray(selectedDatasetIndexes) || selectedDatasetIndexes.length === 0) {
                     return 0;
@@ -579,12 +587,24 @@
                 return Math.min(0.80, maxA + bump);
             }
 
-            function optionBgColor(optionIndex, alpha) {
+            function selectionStrength(selectedDatasetIndexes) {
+                if (!Array.isArray(selectedDatasetIndexes) || selectedDatasetIndexes.length === 0) {
+                    return 0;
+                }
+                // Newest dataset is idx 0, so the selection "age" is the smallest index.
+                const newestIdx = Math.min.apply(null, selectedDatasetIndexes.map((di) => (Number.isFinite(di) ? di : 0)));
+                return datasetRecencyStrength(newestIdx);
+            }
+
+            function optionBgColor(optionIndex, alpha, strength) {
                 const a = typeof alpha === 'number' ? alpha : 0.22;
+                const s = typeof strength === 'number' ? strength : 1;
                 // 1..5 => red -> orange -> yellow -> light green -> green
                 const hues = [0, 28, 50, 90, 120];
                 const hue = hues[Math.max(0, Math.min(4, optionIndex))];
-                return `hsla(${hue}, 85%, 60%, ${a})`;
+                const sat = Math.round(85 * s);
+                const light = Math.round(60 + ((1 - s) * 22));
+                return `hsla(${hue}, ${sat}%, ${light}%, ${a})`;
             }
 
             let html = '';
@@ -642,7 +662,8 @@
                     if (sel.length > 0) {
                         cls += ' ham-answer-choice--selected';
                         const alpha = selectionAlpha(sel);
-                        style = ` style="background-color: ${optionBgColor(oi, alpha)};"`;
+                        const strength = selectionStrength(sel);
+                        style = ` style="background-color: ${optionBgColor(oi, alpha, strength)};"`;
                     }
 
                     html += `<td class="${cls}"${style}>${escapeHtml(optText)}</td>`;
