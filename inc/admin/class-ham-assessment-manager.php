@@ -1449,24 +1449,44 @@ class HAM_Assessment_Manager
             $effective_ts = self::get_assessment_effective_date($post);
             $effective_date = wp_date('Y-m-d H:i:s', $effective_ts);
 
-            // Fine-grained numeric evaluation logic
-            $values = array();
+            $threshold = 3;
+            $majority_factor = 0.7;
+            $steps = array();
             if (is_array($assessment_data)) {
                 foreach (array('anknytning', 'ansvar') as $section_key) {
                     if (isset($assessment_data[$section_key]['questions']) && is_array($assessment_data[$section_key]['questions'])) {
                         foreach ($assessment_data[$section_key]['questions'] as $question_id => $answer) {
-                            if ($answer !== '' && $answer !== null) {
-                                $numeric = floatval($answer);
-                                // Normalize 1-5 scale to 0-1
-                                $normalized = ($numeric - 1) / 4;
-                                $values[] = $normalized;
+                            if ($answer === '' || $answer === null) {
+                                continue;
                             }
+                            if (!is_numeric($answer)) {
+                                continue;
+                            }
+                            $steps[] = (float) $answer;
                         }
                     }
                 }
             }
-            $average = count($values) ? array_sum($values) / count($values) : 0;
-            $summary_stage = self::map_average_to_stage($average);
+
+            $n = count($steps);
+            $k = 0;
+            foreach ($steps as $s) {
+                if ($s >= $threshold) {
+                    $k++;
+                }
+            }
+            $m = $n > 0 ? (int) ceil($majority_factor * $n) : 0;
+            $half = $n > 0 ? (int) ceil($n / 2) : 0;
+
+            if ($n > 0 && $k >= $m) {
+                $summary_stage = 'full';
+            } elseif ($n > 0 && $k >= $half) {
+                $summary_stage = 'trans';
+            } else {
+                $summary_stage = 'not';
+            }
+
+            $stage_score = $n > 0 ? ($k / $n) : 0;
 
             $completion_percentage = self::calculate_completion_percentage($assessment_data);
 
@@ -1585,7 +1605,7 @@ class HAM_Assessment_Manager
                 'author_id'    => $teacher_id,
                 'author_name'  => $teacher_name,
                 'stage'        => $summary_stage,
-                'stage_score'  => $average,
+                'stage_score'  => $stage_score,
             );
         }
 

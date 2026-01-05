@@ -495,39 +495,41 @@ class HAM_Assessment_Controller extends HAM_Base_Controller
         // Determine completion status
         $completion = 'not'; // Default to 'not established'
         if (!empty($assessment_data)) {
-            // You may want to customize this logic based on your specific requirements
-            // This is just a simple example of determining completion status
-            $anknytning_questions = !empty($assessment_data['anknytning']['questions']) ? $assessment_data['anknytning']['questions'] : array();
-            $ansvar_questions = !empty($assessment_data['ansvar']['questions']) ? $assessment_data['ansvar']['questions'] : array();
-            
-            $total_questions = count($anknytning_questions) + count($ansvar_questions);
-            $answered_questions = 0;
-            $high_scores = 0; // Scores of 4-5
-            
-            foreach ($anknytning_questions as $score) {
-                if (!empty($score)) {
-                    $answered_questions++;
-                    if ((int) $score >= 4) {
-                        $high_scores++;
+            $threshold = 3;
+            $majority_factor = 0.7;
+            $steps = array();
+
+            if (is_array($assessment_data)) {
+                foreach (array('anknytning', 'ansvar') as $section_key) {
+                    $questions = !empty($assessment_data[$section_key]['questions']) && is_array($assessment_data[$section_key]['questions']) ? $assessment_data[$section_key]['questions'] : array();
+                    foreach ($questions as $score) {
+                        if ($score === '' || $score === null) {
+                            continue;
+                        }
+                        if (!is_numeric($score)) {
+                            continue;
+                        }
+                        $steps[] = (float) $score;
                     }
                 }
             }
-            
-            foreach ($ansvar_questions as $score) {
-                if (!empty($score)) {
-                    $answered_questions++;
-                    if ((int) $score >= 4) {
-                        $high_scores++;
+
+            $n = count($steps);
+            if ($n > 0) {
+                $k = 0;
+                foreach ($steps as $s) {
+                    if ($s >= $threshold) {
+                        $k++;
                     }
                 }
-            }
-            
-            if ($answered_questions > 0) {
-                $high_score_percentage = ($high_scores / $answered_questions) * 100;
-                if ($high_score_percentage >= 80) {
-                    $completion = 'full'; // Established
-                } elseif ($high_score_percentage >= 40) {
-                    $completion = 'trans'; // Developing
+
+                $m = (int) ceil($majority_factor * $n);
+                $half = (int) ceil($n / 2);
+
+                if ($k >= $m) {
+                    $completion = 'full';
+                } elseif ($k >= $half) {
+                    $completion = 'trans';
                 }
             }
         }
