@@ -64,6 +64,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     'student' => isset($drilldown['student']) ? $drilldown['student'] : null,
                     'avg_progress' => isset($drilldown['avg_progress']) ? $drilldown['avg_progress'] : array(),
                     'student_radar' => isset($drilldown['student_radar']) ? $drilldown['student_radar'] : array(),
+                    'group_radar' => isset($drilldown['group_radar']) ? $drilldown['group_radar'] : array(),
                     'radar_questions' => isset($drilldown['radar_questions']) ? $drilldown['radar_questions'] : array(),
                 ));
             ?>;
@@ -89,9 +90,9 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     ?>
 
             <?php
-            // Teachers prefer not to see averages. We keep all data available in PHP,
-            // but hide the average-based drilldown charts/sections below.
-            $hide_drilldown_extras = true;
+            // Keep radar + answer alternatives visible (required).
+            // Hide aggregated avg-progress charts for school/class, but keep the student chart.
+            $hide_avg_progress_charts = isset($drilldown['level']) ? ($drilldown['level'] !== 'student') : true;
             ?>
                 </div>
             <?php endif; ?>
@@ -104,25 +105,73 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 }
 
                 $max_count = 1;
+                $points = array();
+                $labels = array();
                 foreach ($series as $bucket) {
                     $count = isset($bucket['count']) ? (int) $bucket['count'] : 0;
                     if ($count > $max_count) {
                         $max_count = $count;
                     }
+                    $label = isset($bucket['semester_label']) ? (string) $bucket['semester_label'] : (isset($bucket['semester_key']) ? (string) $bucket['semester_key'] : '');
+                    $labels[] = $label;
+                    $points[] = $count;
                 }
 
-                echo '<div class="ham-simple-chart" style="height: 220px; display: flex; align-items: flex-end; justify-content: center; gap: 20px;">';
-                foreach ($series as $bucket) {
-                    $count = isset($bucket['count']) ? (int) $bucket['count'] : 0;
-                    $heightPct = ($count / $max_count) * $max_height_pct;
-                    $label = isset($bucket['semester_label']) ? $bucket['semester_label'] : (isset($bucket['semester_key']) ? $bucket['semester_key'] : '');
-
-                    echo '<div class="ham-bar-wrapper" style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center;">';
-                    echo '<div class="ham-bar" style="display: block; height: ' . esc_attr($heightPct) . '%; width: 34px; background-color: #0073aa;"></div>';
-                    echo '<div class="ham-bar-label" style="margin-top: 5px;">' . esc_html($label) . '</div>';
-                    echo '<div class="ham-bar-value" style="font-weight: bold;">' . esc_html($count) . '</div>';
-                    echo '</div>';
+                $n = count($points);
+                if ($n === 0) {
+                    echo '<p>' . esc_html__('No evaluation data available.', 'headless-access-manager') . '</p>';
+                    return;
                 }
+
+                // Compact inline line chart with ring markers
+                $w = 100;
+                $h = 30;
+                $pad_x = 6;
+                $pad_y = 6;
+
+                $svg_points = array();
+                $circle_nodes = array();
+                for ($i = 0; $i < $n; $i++) {
+                    $x = ($n === 1)
+                        ? ($w / 2)
+                        : ($pad_x + ($i * (($w - 2 * $pad_x) / ($n - 1))));
+                    $count = (int) $points[$i];
+                    $ratio = $max_count > 0 ? ($count / $max_count) : 0;
+                    $y = ($h - $pad_y) - ($ratio * ($h - 2 * $pad_y));
+                    $svg_points[] = $x . ',' . $y;
+                    $circle_nodes[] = array(
+                        'x' => $x,
+                        'y' => $y,
+                        'count' => $count,
+                        'label' => $labels[$i],
+                    );
+                }
+
+                echo '<div class="ham-mini-line" style="display: inline-block; width: 100%;">';
+                echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="none" style="width: 100%; height: 38px; overflow: visible;">';
+
+                // Baseline
+                echo '<line x1="' . esc_attr($pad_x) . '" y1="' . esc_attr($h - $pad_y) . '" x2="' . esc_attr($w - $pad_x) . '" y2="' . esc_attr($h - $pad_y) . '" stroke="#dcdcde" stroke-width="1" />';
+
+                // Connecting line (only if > 1 point)
+                if ($n > 1) {
+                    echo '<polyline fill="none" stroke="#0073aa" stroke-width="2" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
+                }
+
+                // Ring markers + counts
+                foreach ($circle_nodes as $node) {
+                    echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="3.5" fill="#ffffff" stroke="#0073aa" stroke-width="2" />';
+                    echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr(max(8, $node['y'] - 6)) . '" text-anchor="middle" font-size="7" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
+                }
+                echo '</svg>';
+
+                // Labels row
+                echo '<div style="display: grid; grid-template-columns: repeat(' . esc_attr($n) . ', 1fr); gap: 6px; margin-top: 2px;">';
+                for ($i = 0; $i < $n; $i++) {
+                    echo '<div style="text-align: center; font-size: 11px; color: #646970; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' . esc_html($labels[$i]) . '</div>';
+                }
+                echo '</div>';
+
                 echo '</div>';
             };
             ?>
@@ -177,7 +226,19 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
             <?php elseif ($drilldown['level'] === 'school') : ?>
 
-                <?php if (!$hide_drilldown_extras) : ?>
+                <h3 style="margin-top: 10px;">
+                    <?php echo esc_html__('Radar (counts per question)', 'headless-access-manager'); ?>
+                </h3>
+                <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                </div>
+                <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-group-radar"></canvas></div>
+                <div id="ham-group-radar-table" class="ham-radar-values"></div>
+
+                <?php if (!$hide_avg_progress_charts) : ?>
                     <h3 style="margin-top: 10px;">
                         <?php echo esc_html__('School average progress', 'headless-access-manager'); ?>
                     </h3>
@@ -241,7 +302,19 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
             <?php elseif ($drilldown['level'] === 'class') : ?>
 
-                <?php if (!$hide_drilldown_extras) : ?>
+                <h3 style="margin-top: 10px;">
+                    <?php echo esc_html__('Radar (counts per question)', 'headless-access-manager'); ?>
+                </h3>
+                <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                </div>
+                <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-group-radar"></canvas></div>
+                <div id="ham-group-radar-table" class="ham-radar-values"></div>
+
+                <?php if (!$hide_avg_progress_charts) : ?>
                     <h3 style="margin-top: 10px;">
                         <?php echo esc_html__('Class average progress', 'headless-access-manager'); ?>
                     </h3>
@@ -308,7 +381,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
             <?php elseif ($drilldown['level'] === 'student') : ?>
 
-                <?php if (!$hide_drilldown_extras) : ?>
+                <?php if (!$hide_avg_progress_charts) : ?>
                     <h3 style="margin-top: 10px;">
                         <?php echo esc_html__('Student average progress', 'headless-access-manager'); ?>
                         <?php if (!empty($drilldown['student']['name'])) : ?>
@@ -322,30 +395,30 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
                     </div>
                     <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-student"></canvas></div>
-
-                    <h3 style="margin-top: 20px;">
-                        <?php echo esc_html__('Radar (per evaluation within bucket)', 'headless-access-manager'); ?>
-                    </h3>
-                    <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
-                        <button type="button" class="button ham-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
-                    </div>
-                    <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-student-radar"></canvas></div>
-                    <div id="ham-student-radar-table" class="ham-radar-values"></div>
-
-                    <h3 style="margin-top: 20px;">
-                        <?php echo esc_html__('Questions and answer alternatives', 'headless-access-manager'); ?>
-                    </h3>
-                    <div class="ham-radar-toggle ham-answer-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
-                        <button type="button" class="button ham-answer-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-answer-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-answer-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-answer-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
-                    </div>
-                    <div id="ham-answer-alternatives" class="ham-answer-alternatives"></div>
                 <?php endif; ?>
+
+                <h3 style="margin-top: 20px;">
+                    <?php echo esc_html__('Radar (per evaluation within bucket)', 'headless-access-manager'); ?>
+                </h3>
+                <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
+                    <button type="button" class="button ham-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                </div>
+                <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-student-radar"></canvas></div>
+                <div id="ham-student-radar-table" class="ham-radar-values"></div>
+
+                <h3 style="margin-top: 20px;">
+                    <?php echo esc_html__('Questions and answer alternatives', 'headless-access-manager'); ?>
+                </h3>
+                <div class="ham-radar-toggle ham-answer-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
+                    <button type="button" class="button ham-answer-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-answer-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-answer-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-answer-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                </div>
+                <div id="ham-answer-alternatives" class="ham-answer-alternatives"></div>
 
             <?php endif; ?>
         </div>
@@ -477,28 +550,65 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     if (empty($chartData)) {
                         echo '<p>' . esc_html__('No data to display', 'headless-access-manager') . '</p>';
                     } else {
-                        $maxCount = 0;
+                        $maxCount = 1;
+                        $points = array();
+                        $labels = array();
                         foreach ($chartData as $item) {
                             $count = isset($item['count']) ? (int) $item['count'] : 0;
                             if ($count > $maxCount) {
                                 $maxCount = $count;
                             }
-                        }
-                        if ($maxCount < 1) {
-                            $maxCount = 1;
+                            $labels[] = isset($item['label']) ? (string) $item['label'] : '';
+                            $points[] = $count;
                         }
 
-                        echo '<div class="ham-simple-chart" style="height: 220px; display: flex; align-items: flex-end; justify-content: center; gap: 20px;">';
-                        foreach ($chartData as $item) {
-                            $count = isset($item['count']) ? (int) $item['count'] : 0;
-                            $heightPct = ($count / $maxCount) * 100;
-                            echo '<div class="ham-bar-wrapper" style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center;">';
-                            echo '<div class="ham-bar" style="display: block; height: ' . esc_attr($heightPct) . '%; width: 30px; background-color: #0073aa;"></div>';
-                            echo '<div class="ham-bar-label" style="margin-top: 5px;">' . esc_html($item['label']) . '</div>';
-                            echo '<div class="ham-bar-value" style="font-weight: bold;">' . esc_html($item['count']) . '</div>';
+                        $n = count($points);
+                        if ($n === 0) {
+                            echo '<p>' . esc_html__('No data to display', 'headless-access-manager') . '</p>';
+                        } else {
+                            $w = 100;
+                            $h = 34;
+                            $pad_x = 6;
+                            $pad_y = 7;
+
+                            $svg_points = array();
+                            $circle_nodes = array();
+                            for ($i = 0; $i < $n; $i++) {
+                                $x = ($n === 1)
+                                    ? ($w / 2)
+                                    : ($pad_x + ($i * (($w - 2 * $pad_x) / ($n - 1))));
+                                $count = (int) $points[$i];
+                                $ratio = $maxCount > 0 ? ($count / $maxCount) : 0;
+                                $y = ($h - $pad_y) - ($ratio * ($h - 2 * $pad_y));
+                                $svg_points[] = $x . ',' . $y;
+                                $circle_nodes[] = array(
+                                    'x' => $x,
+                                    'y' => $y,
+                                    'count' => $count,
+                                    'label' => $labels[$i],
+                                );
+                            }
+
+                            echo '<div class="ham-mini-line" style="width: 100%;">';
+                            echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="none" style="width: 100%; height: 46px; overflow: visible;">';
+                            echo '<line x1="' . esc_attr($pad_x) . '" y1="' . esc_attr($h - $pad_y) . '" x2="' . esc_attr($w - $pad_x) . '" y2="' . esc_attr($h - $pad_y) . '" stroke="#dcdcde" stroke-width="1" />';
+                            if ($n > 1) {
+                                echo '<polyline fill="none" stroke="#0073aa" stroke-width="2" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
+                            }
+                            foreach ($circle_nodes as $node) {
+                                echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="3.5" fill="#ffffff" stroke="#0073aa" stroke-width="2" />';
+                                echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr(max(9, $node['y'] - 6)) . '" text-anchor="middle" font-size="7" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
+                            }
+                            echo '</svg>';
+
+                            echo '<div style="display: grid; grid-template-columns: repeat(' . esc_attr($n) . ', 1fr); gap: 6px; margin-top: 2px;">';
+                            for ($i = 0; $i < $n; $i++) {
+                                echo '<div style="text-align: center; font-size: 11px; color: #646970; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' . esc_html($labels[$i]) . '</div>';
+                            }
+                            echo '</div>';
+
                             echo '</div>';
                         }
-                        echo '</div>';
                     }
                     ?>
                 </div>

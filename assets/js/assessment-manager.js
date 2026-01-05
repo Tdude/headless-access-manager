@@ -218,6 +218,215 @@
             });
         }
 
+        function renderGroupRadarValuesTable(containerId, bucketGroup) {
+            const el = document.getElementById(containerId);
+            if (!el) {
+                return;
+            }
+
+            if (!bucketGroup || !bucketGroup.buckets) {
+                el.innerHTML = '';
+                return;
+            }
+
+            const labels = Array.isArray(bucketGroup.labels) ? bucketGroup.labels : [];
+            const bucket = pickLatestBucket(bucketGroup.buckets);
+
+            if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+
+            const datasets = bucket.datasets;
+
+            let html = '';
+            html += `<div class="ham-radar-values-header">${bucket.label ? String(bucket.label) : ''}</div>`;
+            html += '<div class="ham-radar-values-scroll">';
+            html += '<table class="widefat fixed striped ham-radar-values-table">';
+            html += '<thead><tr>';
+            html += `<th class="ham-radar-values-th-question">${escapeHtml(t.question || 'Question')}</th>`;
+
+            datasets.forEach((ds, idx) => {
+                const c = stableDatasetColor(ds, idx);
+                const safeLabel = escapeHtml(ds.label || `${labelRadar} ${idx + 1}`);
+                html += `<th class="ham-radar-values-th-eval" style="box-shadow: inset ${CHART_TABLE_INSET_BORDER_PX}px 0 0 ${c.border};">${safeLabel}</th>`;
+            });
+
+            html += '</tr></thead>';
+            html += '<tbody>';
+
+            for (let qi = 0; qi < labels.length; qi++) {
+                html += '<tr>';
+                html += `<td class="ham-radar-values-td-question">${escapeHtml(labels[qi] || '')}</td>`;
+                datasets.forEach((ds, idx) => {
+                    const c = stableDatasetColor(ds, idx);
+                    const v = Array.isArray(ds.values) ? ds.values[qi] : null;
+                    const vv = v == null ? null : Number(v);
+                    html += `<td class="ham-radar-values-td-eval" style="box-shadow: inset ${CHART_TABLE_INSET_BORDER_PX}px 0 0 ${c.border};">${vv == null || Number.isNaN(vv) ? '—' : String(Math.round(vv))}</td>`;
+                });
+                html += '</tr>';
+            }
+
+            html += '</tbody></table></div>';
+            el.innerHTML = html;
+        }
+
+        function buildGroupRadarToggle() {
+            const canvas = document.getElementById('ham-group-radar');
+            const btns = Array.from(document.querySelectorAll('.ham-group-radar-toggle-btn'));
+
+            if (!canvas || btns.length === 0 || !stats || (stats.level !== 'school' && stats.level !== 'class') || !stats.group_radar || !stats.group_radar.buckets) {
+                return;
+            }
+
+            const labels = Array.isArray(stats.group_radar.labels) ? stats.group_radar.labels : [];
+            const bucketsByKey = stats.group_radar.buckets;
+
+            const titleByKey = {
+                month: labelMonth,
+                term: labelTerm,
+                school_year: labelSchoolYear,
+                hogstadium: labelHogstadium,
+            };
+
+            function computeDynamicMax(datasets) {
+                let maxN = 0;
+                (datasets || []).forEach((ds) => {
+                    const n = Number(ds && ds.student_count);
+                    if (Number.isFinite(n) && n > maxN) {
+                        maxN = n;
+                    }
+                });
+
+                (datasets || []).forEach((ds) => {
+                    if (!ds || !Array.isArray(ds.values)) {
+                        return;
+                    }
+                    ds.values.forEach((v) => {
+                        const vv = Number(v);
+                        if (Number.isFinite(vv) && vv > maxN) {
+                            maxN = vv;
+                        }
+                    });
+                });
+
+                if (maxN < 1) {
+                    maxN = 1;
+                }
+                return maxN;
+            }
+
+            function buildDatasetsForBucket(bucketKey) {
+                const buckets = bucketsByKey && Array.isArray(bucketsByKey[bucketKey]) ? bucketsByKey[bucketKey] : [];
+                const bucket = pickLatestBucket(buckets);
+                if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
+                    return { title: titleByKey[bucketKey] || labelRadar, datasets: [], max: 1, bucketGroup: { labels, buckets: [] } };
+                }
+
+                const max = computeDynamicMax(bucket.datasets);
+
+                const datasets = bucket.datasets.map((ds, idx) => {
+                    const c = stableDatasetColor(ds, idx);
+                    return {
+                        label: ds.label,
+                        data: Array.isArray(ds.values) ? ds.values.map((v) => clampNumber(v, 0, max)) : [],
+                        borderColor: c.border,
+                        backgroundColor: c.fill,
+                        borderWidth: CHART_BORDER_WIDTH,
+                        pointRadius: CHART_POINT_RADIUS,
+                        fill: true,
+                        borderDash: idx === 0 ? [] : CHART_OVERLAY_DASH,
+                    };
+                });
+
+                return {
+                    title: bucket.label || (titleByKey[bucketKey] || labelRadar),
+                    datasets,
+                    max,
+                    bucketGroup: {
+                        labels,
+                        buckets,
+                    },
+                };
+            }
+
+            const existing = Chart.getChart(canvas);
+            if (existing) {
+                existing.destroy();
+            }
+
+            const initial = buildDatasetsForBucket('term');
+            const chart = new Chart(canvas.getContext('2d'), {
+                type: 'radar',
+                data: {
+                    labels,
+                    datasets: initial.datasets,
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: CHART_ANIMATION_DURATION_MS,
+                        easing: CHART_ANIMATION_EASING,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: CHART_FONT_SIZE_LEGEND },
+                            },
+                        },
+                        title: {
+                            display: true,
+                            text: initial.title,
+                            font: { size: CHART_FONT_SIZE_TITLE },
+                        },
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: initial.max,
+                            ticks: {
+                                stepSize: Math.max(1, Math.ceil(initial.max / 5)),
+                                showLabelBackdrop: false,
+                                font: { size: CHART_FONT_SIZE_TICKS },
+                            },
+                            pointLabels: {
+                                font: { size: CHART_FONT_SIZE_POINT_LABELS },
+                            },
+                            grid: {
+                                circular: false,
+                            },
+                            angleLines: {
+                                color: CHART_RADAR_ANGLE_LINE_COLOR,
+                            },
+                        },
+                    },
+                },
+            });
+
+            function updateChart(bucketKey) {
+                const next = buildDatasetsForBucket(bucketKey);
+                chart.data.datasets = next.datasets;
+                chart.options.plugins.title.text = next.title;
+                chart.options.scales.r.max = next.max;
+                chart.options.scales.r.ticks.stepSize = Math.max(1, Math.ceil(next.max / 5));
+                chart.update();
+                renderGroupRadarValuesTable('ham-group-radar-table', next.bucketGroup);
+            }
+
+            const controller = initBucketToggle({
+                buttons: btns,
+                defaultKey: 'term',
+                isKeyAvailable: (key) => Array.isArray(bucketsByKey[key]) && bucketsByKey[key].length > 0,
+                onChange: updateChart,
+            });
+
+            if (controller) {
+                updateChart(controller.getActiveKey());
+            }
+        }
+
         function initBucketToggle(options) {
             const {
                 buttons,
@@ -1016,6 +1225,11 @@
         // Student radar chart + bucket toggle
         if (stats && stats.level === 'student' && stats.student_radar && stats.student_radar.buckets) {
             buildStudentRadarToggle();
+        }
+
+        // School/class radar chart + bucket toggle (counts mode)
+        if (stats && (stats.level === 'school' || stats.level === 'class') && stats.group_radar && stats.group_radar.buckets) {
+            buildGroupRadarToggle();
         }
 
         // School/class drilldown avg progress toggle
