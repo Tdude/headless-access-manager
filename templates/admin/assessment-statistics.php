@@ -125,9 +125,9 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
                 // Compact inline line chart with ring markers
                 $w = 100;
-                $h = 30;
+                $h = 44;
                 $pad_x = 6;
-                $pad_y = 6;
+                $pad_y = 9;
 
                 $svg_points = array();
                 $circle_nodes = array();
@@ -148,20 +148,20 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 }
 
                 echo '<div class="ham-mini-line" style="display: inline-block; width: 100%;">';
-                echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="none" style="width: 100%; height: 38px; overflow: visible;">';
+                echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; aspect-ratio: ' . esc_attr($w) . ' / ' . esc_attr($h) . '; max-height: 54px; overflow: visible;">';
 
                 // Baseline
                 echo '<line x1="' . esc_attr($pad_x) . '" y1="' . esc_attr($h - $pad_y) . '" x2="' . esc_attr($w - $pad_x) . '" y2="' . esc_attr($h - $pad_y) . '" stroke="#dcdcde" stroke-width="1" />';
 
                 // Connecting line (only if > 1 point)
                 if ($n > 1) {
-                    echo '<polyline fill="none" stroke="#0073aa" stroke-width="2" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
+                    echo '<polyline fill="none" stroke="#0073aa" stroke-width="2.5" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
                 }
 
                 // Ring markers + counts
                 foreach ($circle_nodes as $node) {
-                    echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="3.5" fill="#ffffff" stroke="#0073aa" stroke-width="2" />';
-                    echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr(max(8, $node['y'] - 6)) . '" text-anchor="middle" font-size="7" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
+                    echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="4.5" fill="#ffffff" stroke="#0073aa" stroke-width="2.5" />';
+                    echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr(max(10, $node['y'] - 8)) . '" text-anchor="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
                 }
                 echo '</svg>';
 
@@ -567,9 +567,9 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                             echo '<p>' . esc_html__('No data to display', 'headless-access-manager') . '</p>';
                         } else {
                             $w = 100;
-                            $h = 34;
+                            $h = 48;
                             $pad_x = 6;
-                            $pad_y = 7;
+                            $pad_y = 10;
 
                             $svg_points = array();
                             $circle_nodes = array();
@@ -590,14 +590,14 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                             }
 
                             echo '<div class="ham-mini-line" style="width: 100%;">';
-                            echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="none" style="width: 100%; height: 46px; overflow: visible;">';
+                            echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; aspect-ratio: ' . esc_attr($w) . ' / ' . esc_attr($h) . '; max-height: 62px; overflow: visible;">';
                             echo '<line x1="' . esc_attr($pad_x) . '" y1="' . esc_attr($h - $pad_y) . '" x2="' . esc_attr($w - $pad_x) . '" y2="' . esc_attr($h - $pad_y) . '" stroke="#dcdcde" stroke-width="1" />';
                             if ($n > 1) {
-                                echo '<polyline fill="none" stroke="#0073aa" stroke-width="2" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
+                                echo '<polyline fill="none" stroke="#0073aa" stroke-width="2.5" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
                             }
                             foreach ($circle_nodes as $node) {
-                                echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="3.5" fill="#ffffff" stroke="#0073aa" stroke-width="2" />';
-                                echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr(max(9, $node['y'] - 6)) . '" text-anchor="middle" font-size="7" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
+                                echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="4.5" fill="#ffffff" stroke="#0073aa" stroke-width="2.5" />';
+                                echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr(max(11, $node['y'] - 8)) . '" text-anchor="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
                             }
                             echo '</svg>';
 
