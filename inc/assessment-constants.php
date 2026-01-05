@@ -144,6 +144,16 @@ define('HAM_ASSESSMENT_DEFAULT_STRUCTURE', array(
                     array('value' => '5', 'label' => 'Tar ansvar för självständigt arbete utanför skolan', 'stage' => 'full'),
                 ),
             ),
+            'b7' => array(
+                'text' => 'Tid',
+                'options' => array(
+                    array('value' => '1', 'label' => 'Ingen tidsuppfattning', 'stage' => 'ej'),
+                    array('value' => '2', 'label' => 'Börjar använda andra konkreta referenser', 'stage' => 'ej'),
+                    array('value' => '3', 'label' => 'Har begrepp för en kvart', 'stage' => 'trans'),
+                    array('value' => '4', 'label' => 'Kan beskriva tidslängd och ordningsförlopp', 'stage' => 'trans'),
+                    array('value' => '5', 'label' => 'God tidsuppfattning', 'stage' => 'full'),
+                ),
+            )
         ),
         'comments' => array(),
     ),
