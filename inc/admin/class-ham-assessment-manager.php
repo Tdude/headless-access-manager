@@ -20,6 +20,9 @@ if (! defined('ABSPATH')) {
  */
 class HAM_Assessment_Manager
 {
+    private const ACTIVE_QUESTION_BANK_OPTION = 'ham_active_question_bank_id';
+    private const QUESTION_BANK_META_KEY = '_ham_assessment_data';
+
     /**
      * Constructor.
      */
@@ -228,6 +231,87 @@ class HAM_Assessment_Manager
 
         // Include the template
         include HAM_PLUGIN_DIR . 'templates/admin/assessment-statistics.php';
+    }
+
+    private static function get_active_question_bank_post_id(): int
+    {
+        $configured = absint(get_option(self::ACTIVE_QUESTION_BANK_OPTION, 0));
+        if ($configured > 0) {
+            return $configured;
+        }
+
+        $posts = get_posts(array(
+            'post_type'      => HAM_CPT_ASSESSMENT,
+            'post_status'    => 'publish',
+            'posts_per_page' => 1,
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+            'meta_query'     => array(
+                array(
+                    'key'     => self::QUESTION_BANK_META_KEY,
+                    'compare' => 'EXISTS',
+                ),
+                array(
+                    'relation' => 'OR',
+                    array(
+                        'key'     => HAM_ASSESSMENT_META_STUDENT_ID,
+                        'compare' => 'NOT EXISTS',
+                    ),
+                    array(
+                        'key'     => HAM_ASSESSMENT_META_STUDENT_ID,
+                        'value'   => '',
+                        'compare' => '=',
+                    ),
+                ),
+            ),
+        ));
+
+        if (empty($posts)) {
+            return 0;
+        }
+
+        return absint($posts[0]->ID);
+    }
+
+    private static function get_question_bank_structure_from_db(int $post_id): array
+    {
+        if ($post_id <= 0) {
+            return array();
+        }
+
+        $raw = get_post_meta($post_id, self::QUESTION_BANK_META_KEY, true);
+        if (!is_array($raw)) {
+            return array();
+        }
+
+        $structure = array();
+        foreach (array('anknytning', 'ansvar') as $section) {
+            if (!isset($raw[$section]) || !is_array($raw[$section])) {
+                continue;
+            }
+            $structure[$section] = array(
+                'title'     => isset($raw[$section]['title']) ? $raw[$section]['title'] : ucfirst($section),
+                'questions' => isset($raw[$section]['questions']) && is_array($raw[$section]['questions']) ? $raw[$section]['questions'] : array(),
+            );
+        }
+
+        return $structure;
+    }
+
+    public static function get_question_bank_structure(): array
+    {
+        $bank_id = self::get_active_question_bank_post_id();
+        $db_structure = self::get_question_bank_structure_from_db($bank_id);
+        if (!empty($db_structure)) {
+            return $db_structure;
+        }
+
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $message = 'HAM: Active Question Bank structure missing/invalid. Option=' . self::ACTIVE_QUESTION_BANK_OPTION . ' value=' . absint(get_option(self::ACTIVE_QUESTION_BANK_OPTION, 0)) . ' resolved_bank_id=' . $bank_id;
+            wp_die(esc_html($message));
+        }
+
+        return self::get_canonical_questions_structure();
     }
 
     private static function get_assessment_effective_date(WP_Post $post)
@@ -2008,14 +2092,6 @@ public function ajax_get_assessment_details()
         // Process the assessment data to ensure it's in the right format
         $processed_assessment_data = $this->process_assessment_data($assessment_data);
 
-        // Ensure canonical questions/options structure is available.
-        if (!defined('HAM_ASSESSMENT_DEFAULT_STRUCTURE')) {
-            $constants_file = dirname(__FILE__, 2) . '/assessment-constants.php';
-            if (file_exists($constants_file)) {
-                require_once $constants_file;
-            }
-        }
-
         // Log processed data in a more readable way
         //error_log('PROCESSED ASSESSMENT DATA STRUCTURE:');
         /*
@@ -2046,27 +2122,8 @@ public function ajax_get_assessment_details()
         }
         */
 
-        // Get the questions structure - prefer the canonical default structure so the modal can show
-        // full question text and full option labels.
-        $questions_structure = array();
-
-        if (defined('HAM_ASSESSMENT_DEFAULT_STRUCTURE') && is_array(HAM_ASSESSMENT_DEFAULT_STRUCTURE)) {
-            foreach (array('anknytning', 'ansvar') as $section) {
-                if (!isset(HAM_ASSESSMENT_DEFAULT_STRUCTURE[$section]) || !is_array(HAM_ASSESSMENT_DEFAULT_STRUCTURE[$section])) {
-                    continue;
-                }
-
-                $questions_structure[$section] = array(
-                    'title'     => isset(HAM_ASSESSMENT_DEFAULT_STRUCTURE[$section]['title']) ? HAM_ASSESSMENT_DEFAULT_STRUCTURE[$section]['title'] : ucfirst($section),
-                    'questions' => isset(HAM_ASSESSMENT_DEFAULT_STRUCTURE[$section]['questions']) ? HAM_ASSESSMENT_DEFAULT_STRUCTURE[$section]['questions'] : array(),
-                );
-            }
-        }
-
-        // Fallback: if the canonical structure isn't available for some reason.
-        if (empty($questions_structure)) {
-            $questions_structure = self::get_questions_structure();
-        }
+        // Get the question structure from the active Question Bank (admin-managed), not from code.
+        $questions_structure = self::get_question_bank_structure();
 
         // Dump processed data for debugging
         $this->debug_dump($processed_assessment_data, 'processed-assessment-data-' . $assessment_id);

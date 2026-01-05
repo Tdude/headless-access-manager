@@ -269,6 +269,7 @@ class HAM_Admin_Menu
         register_setting('ham_settings', 'ham_jwt_secret');
         register_setting('ham_settings', 'ham_jwt_expiration');
         register_setting('ham_settings', 'ham_cleanup_on_deactivation');
+        register_setting('ham_settings', 'ham_active_question_bank_id');
 
         add_settings_section(
             'ham_settings_jwt',
@@ -304,6 +305,14 @@ class HAM_Admin_Menu
             'ham_cleanup_on_deactivation',
             __('Cleanup on Deactivation', 'headless-access-manager'),
             array( __CLASS__, 'render_cleanup_field' ),
+            'ham_settings',
+            'ham_settings_general'
+        );
+
+        add_settings_field(
+            'ham_active_question_bank_id',
+            __('Active Question Bank', 'headless-access-manager'),
+            array( __CLASS__, 'render_active_question_bank_field' ),
             'ham_settings',
             'ham_settings_general'
         );
@@ -373,6 +382,51 @@ class HAM_Admin_Menu
 </label>
 <p class="description" style="color: red; font-weight: bold;">
     <?php echo esc_html__('DANGER: Checking this box will permanently delete ALL data associated with this plugin upon deactivation. This includes all Questions, Student Evaluations, Students, Teachers, Classes, Schools, and user roles. This action cannot be undone.', 'headless-access-manager'); ?>
+</p>
+<?php
+    }
+
+    public static function render_active_question_bank_field()
+    {
+        $active_id = absint(get_option('ham_active_question_bank_id', 0));
+
+        $posts = get_posts(array(
+            'post_type'      => HAM_CPT_ASSESSMENT,
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+            'meta_query'     => array(
+                array(
+                    'key'     => '_ham_assessment_data',
+                    'compare' => 'EXISTS',
+                ),
+                array(
+                    'relation' => 'OR',
+                    array(
+                        'key'     => HAM_ASSESSMENT_META_STUDENT_ID,
+                        'compare' => 'NOT EXISTS',
+                    ),
+                    array(
+                        'key'     => HAM_ASSESSMENT_META_STUDENT_ID,
+                        'value'   => '',
+                        'compare' => '=',
+                    ),
+                ),
+            ),
+        ));
+
+        ?>
+<select name="ham_active_question_bank_id" class="regular-text">
+    <option value="0" <?php selected($active_id, 0); ?>><?php echo esc_html__('Auto (latest Question Bank)', 'headless-access-manager'); ?></option>
+    <?php foreach ($posts as $post) : ?>
+        <option value="<?php echo esc_attr($post->ID); ?>" <?php selected($active_id, $post->ID); ?>>
+            <?php echo esc_html($post->post_title); ?> (<?php echo esc_html((string) $post->ID); ?>)
+        </option>
+    <?php endforeach; ?>
+</select>
+<p class="description">
+    <?php echo esc_html__('Select which Assessment post acts as the Question Bank that powers the evaluation form and admin reporting. Choose Auto to use the newest available bank.', 'headless-access-manager'); ?>
 </p>
 <?php
     }

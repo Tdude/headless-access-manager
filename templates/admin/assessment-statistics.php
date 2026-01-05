@@ -17,7 +17,7 @@ $overview_radar = array(
 );
 
 if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && is_array($stats['question_averages'])) {
-    $questions_structure = (new HAM_Assessment_Manager())->get_questions_structure();
+    $questions_structure = HAM_Assessment_Manager::get_question_bank_structure();
     $labels = array();
     $values = array();
 

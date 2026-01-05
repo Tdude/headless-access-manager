@@ -35,14 +35,14 @@
         }
 
         const palette = [
-            '#dbeafe',
-            '#dcfce7',
-            '#fef9c3',
-            '#ffe4e6',
-            '#e0e7ff',
-            '#f3e8ff',
-            '#cffafe',
-            '#fae8ff',
+            '#cde1fcff',
+            '#d2fae0ff',
+            '#f8f3baff',
+            '#f8d6d8ff',
+            '#d4ddf9ff',
+            '#d7baf6ff',
+            '#bff6fbff',
+            '#efccf9ff',
         ];
 
         function hashString(input) {
