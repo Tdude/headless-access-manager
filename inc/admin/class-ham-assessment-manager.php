@@ -669,6 +669,110 @@ class HAM_Assessment_Manager
         return $out;
     }
 
+    private static function build_group_radar_bucket_avgs($posts, $bucket_type)
+    {
+        $groups = array();
+        $radar = self::get_radar_question_labels_and_options();
+        $order = isset($radar['order']) && is_array($radar['order']) ? $radar['order'] : array();
+
+        // For each bucket, we want the latest assessment per student in that bucket.
+        foreach ($posts as $post) {
+            $ts = self::get_assessment_effective_date($post);
+
+            $bucket_key = '';
+            $bucket_label = '';
+            if ($bucket_type === 'month') {
+                $bucket_key = gmdate('Y-m', $ts);
+                $bucket_label = date_i18n('M Y', strtotime($bucket_key . '-01'));
+            } elseif ($bucket_type === 'school_year') {
+                $bucket_key = (string) self::get_school_year_start_from_timestamp($ts);
+                $bucket_label = self::format_school_year_label($bucket_key);
+            } elseif ($bucket_type === 'hogstadium') {
+                $bucket_key = self::get_hogstadium_key_from_timestamp($ts);
+                $bucket_label = self::format_hogstadium_label($bucket_key);
+            } else {
+                $bucket_key = self::get_term_key_from_timestamp($ts);
+                $bucket_label = self::format_term_label($bucket_key);
+            }
+
+            if (!isset($groups[$bucket_key])) {
+                $groups[$bucket_key] = array(
+                    'key' => $bucket_key,
+                    'label' => $bucket_label,
+                    'latest_by_student' => array(),
+                );
+            }
+
+            $sid = (int) get_post_meta($post->ID, HAM_ASSESSMENT_META_STUDENT_ID, true);
+            if ($sid <= 0) {
+                continue;
+            }
+
+            $existing = isset($groups[$bucket_key]['latest_by_student'][$sid]) ? $groups[$bucket_key]['latest_by_student'][$sid] : null;
+            if ($existing && isset($existing['ts']) && (int) $existing['ts'] >= (int) $ts) {
+                continue;
+            }
+
+            $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
+            $scores = self::extract_scores_from_assessment_data($assessment_data);
+
+            $groups[$bucket_key]['latest_by_student'][$sid] = array(
+                'ts' => $ts,
+                'question_values' => isset($scores['question_values']) ? $scores['question_values'] : array(),
+            );
+        }
+
+        ksort($groups);
+
+        $out = array();
+        foreach ($groups as $bucket) {
+            $sums = array();
+            $counts = array();
+            foreach ($order as $qk) {
+                $sums[$qk] = 0.0;
+                $counts[$qk] = 0;
+            }
+
+            $student_count = 0;
+            foreach ($bucket['latest_by_student'] as $sid => $item) {
+                $student_count++;
+                foreach ($order as $qk) {
+                    $val = null;
+                    if (isset($item['question_values'][$qk]) && is_array($item['question_values'][$qk]) && count($item['question_values'][$qk]) > 0) {
+                        $val = $item['question_values'][$qk][0];
+                    }
+                    if ($val === '' || $val === null) {
+                        continue;
+                    }
+                    if (!is_numeric($val)) {
+                        continue;
+                    }
+
+                    $sums[$qk] += (float) $val;
+                    $counts[$qk]++;
+                }
+            }
+
+            $values = array();
+            foreach ($order as $qk) {
+                if (!empty($counts[$qk])) {
+                    $values[] = $sums[$qk] / $counts[$qk];
+                } else {
+                    $values[] = null;
+                }
+            }
+
+            $out[] = array(
+                'key' => $bucket['key'],
+                'label' => $bucket['label'],
+                'student_count' => $student_count,
+                'values' => $values,
+            );
+        }
+
+        return $out;
+    }
+
     private static function build_group_radar_bucket_counts($posts, $bucket_type, $threshold = 3)
     {
         $groups = array();
@@ -1320,8 +1424,7 @@ class HAM_Assessment_Manager
             };
 
             $view['group_radar'] = array(
-                'mode' => 'counts',
-                'threshold' => $threshold,
+                'mode' => 'avg',
                 'labels' => isset($radar_meta['labels']) ? $radar_meta['labels'] : array(),
                 'buckets' => array(
                     'month' => $build_group_bucket('month'),
@@ -1379,8 +1482,7 @@ class HAM_Assessment_Manager
                 'hogstadium' => self::aggregate_evaluations_overall_by_bucket($class_posts, 'hogstadium'),
             );
 
-            // Group radar: Class vs School, counts >= 3 per question based on latest assessment per student per bucket.
-            $threshold = 3;
+            // Group radar: Class vs School, average score per question (1-5) based on latest assessment per student per bucket.
             $school_posts = array();
             if ($school_id > 0) {
                 $school_student_posts = get_posts(array(
@@ -1400,9 +1502,9 @@ class HAM_Assessment_Manager
                 $school_posts = empty($school_student_ids) ? array() : self::fetch_evaluation_posts($school_student_ids);
             }
 
-            $build_group_bucket = function($bucket_type) use ($class_posts, $school_posts, $threshold) {
-                $class_series = self::build_group_radar_bucket_counts($class_posts, $bucket_type, $threshold);
-                $school_series = self::build_group_radar_bucket_counts($school_posts, $bucket_type, $threshold);
+            $build_group_bucket = function($bucket_type) use ($class_posts, $school_posts) {
+                $class_series = self::build_group_radar_bucket_avgs($class_posts, $bucket_type);
+                $school_series = self::build_group_radar_bucket_avgs($school_posts, $bucket_type);
 
                 $class_by_key = array();
                 foreach ($class_series as $b) {

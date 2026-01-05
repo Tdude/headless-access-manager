@@ -227,6 +227,10 @@ msgstr "Antal klasser"
 msgid "# Students evaluated"
 msgstr "Antal bedömda elever"
 
+#: templates/admin/assessment-statistics.php
+msgid "Status (students)"
+msgstr "Status (elever)"
+
 #: templates/admin/assessment-statistics.php:77
 #: templates/admin/assessment-statistics.php:117
 #: templates/admin/assessment-statistics.php:155

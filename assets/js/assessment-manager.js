@@ -218,11 +218,13 @@
             });
         }
 
-        function renderGroupRadarValuesTable(containerId, bucketGroup) {
+        function renderGroupRadarValuesTable(containerId, bucketGroup, options) {
             const el = document.getElementById(containerId);
             if (!el) {
                 return;
             }
+
+            const mode = options && options.mode ? String(options.mode) : 'counts';
 
             if (!bucketGroup || !bucketGroup.buckets) {
                 el.innerHTML = '';
@@ -262,7 +264,17 @@
                     const c = stableDatasetColor(ds, idx);
                     const v = Array.isArray(ds.values) ? ds.values[qi] : null;
                     const vv = v == null ? null : Number(v);
-                    html += `<td class="ham-radar-values-td-eval" style="box-shadow: inset ${CHART_TABLE_INSET_BORDER_PX}px 0 0 ${c.border};">${vv == null || Number.isNaN(vv) ? '—' : String(Math.round(vv))}</td>`;
+
+                    let out = '—';
+                    if (vv != null && !Number.isNaN(vv)) {
+                        if (mode === 'avg') {
+                            out = vv.toFixed(1);
+                        } else {
+                            out = String(Math.round(vv));
+                        }
+                    }
+
+                    html += `<td class="ham-radar-values-td-eval" style="box-shadow: inset ${CHART_TABLE_INSET_BORDER_PX}px 0 0 ${c.border};">${out}</td>`;
                 });
                 html += '</tr>';
             }
@@ -281,6 +293,7 @@
 
             const labels = Array.isArray(stats.group_radar.labels) ? stats.group_radar.labels : [];
             const bucketsByKey = stats.group_radar.buckets;
+            const mode = stats.group_radar && stats.group_radar.mode ? String(stats.group_radar.mode) : 'counts';
 
             const titleByKey = {
                 month: labelMonth,
@@ -290,6 +303,10 @@
             };
 
             function computeDynamicMax(datasets) {
+                if (mode === 'avg') {
+                    return 5;
+                }
+
                 let maxN = 0;
                 (datasets || []).forEach((ds) => {
                     const n = Number(ds && ds.student_count);
@@ -329,7 +346,14 @@
                     const c = stableDatasetColor(ds, idx);
                     return {
                         label: ds.label,
-                        data: Array.isArray(ds.values) ? ds.values.map((v) => clampNumber(v, 0, max)) : [],
+                        data: Array.isArray(ds.values)
+                            ? ds.values.map((v) => {
+                                if (mode === 'avg') {
+                                    return clampNumber(v, 1, 5);
+                                }
+                                return clampNumber(v, 0, max);
+                            })
+                            : [],
                         borderColor: c.border,
                         backgroundColor: c.fill,
                         borderWidth: CHART_BORDER_WIDTH,
@@ -384,10 +408,10 @@
                     },
                     scales: {
                         r: {
-                            min: 0,
+                            min: mode === 'avg' ? 1 : 0,
                             max: initial.max,
                             ticks: {
-                                stepSize: Math.max(1, Math.ceil(initial.max / 5)),
+                                stepSize: mode === 'avg' ? 1 : Math.max(1, Math.ceil(initial.max / 5)),
                                 showLabelBackdrop: false,
                                 font: { size: CHART_FONT_SIZE_TICKS },
                             },
@@ -410,9 +434,9 @@
                 chart.data.datasets = next.datasets;
                 chart.options.plugins.title.text = next.title;
                 chart.options.scales.r.max = next.max;
-                chart.options.scales.r.ticks.stepSize = Math.max(1, Math.ceil(next.max / 5));
+                chart.options.scales.r.ticks.stepSize = mode === 'avg' ? 1 : Math.max(1, Math.ceil(next.max / 5));
                 chart.update();
-                renderGroupRadarValuesTable('ham-group-radar-table', next.bucketGroup);
+                renderGroupRadarValuesTable('ham-group-radar-table', next.bucketGroup, { mode });
             }
 
             const controller = initBucketToggle({
