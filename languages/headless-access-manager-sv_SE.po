@@ -1002,6 +1002,18 @@ msgstr "Skolor"
 msgid "School"
 msgstr "Skola"
 
+#: inc/admin/class-ham-assessment-manager.php
+msgid "This school"
+msgstr "Denna skola"
+
+#: inc/admin/class-ham-assessment-manager.php
+msgid "All schools"
+msgstr "Alla skolor"
+
+#: inc/admin/class-ham-assessment-manager.php
+msgid "All schools (%d)"
+msgstr "Alla skolor (%dst)"
+
 #: inc/core/post-types.php
 msgid "Add New School"
 msgstr "Lägg till ny skola"

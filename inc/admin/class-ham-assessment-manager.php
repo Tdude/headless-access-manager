@@ -1406,12 +1406,14 @@ class HAM_Assessment_Manager
                         'label' => $label,
                         'datasets' => array(
                             array(
-                                'label' => __('School', 'headless-access-manager') . ($school_n > 0 ? (' (n=' . $school_n . ')') : ''),
+                                'label' => __('This school', 'headless-access-manager'),
                                 'values' => $school_values,
                                 'student_count' => $school_n,
                             ),
                             array(
-                                'label' => __('All', 'headless-access-manager') . ($all_n > 0 ? (' (n=' . $all_n . ')') : ''),
+                                'label' => $all_n > 0
+                                    ? sprintf(__('All schools (%d)', 'headless-access-manager'), $all_n)
+                                    : __('All schools', 'headless-access-manager'),
                                 'values' => $all_values,
                                 'student_count' => $all_n,
                             ),
