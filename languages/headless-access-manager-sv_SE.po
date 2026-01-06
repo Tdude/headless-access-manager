@@ -448,7 +448,7 @@ msgid "Student Evaluations"
 msgstr "Elevbedömningar"
 
 msgid "Evaluations by Tryggve"
-msgstr "Tryggve Statistik"
+msgstr "Obs-schemat Statistik"
 
 msgid "Filter by student:"
 msgstr "Filtrera efter elev:"
@@ -687,7 +687,7 @@ msgid "Settings"
 msgstr "Inställningar"
 
 msgid "Headless Access Manager Dashboard"
-msgstr "Tryggves kontrollpanel"
+msgstr "Observationsschemat kontrollpanel"
 
 msgid "System Overview"
 msgstr "Systemöversikt"
@@ -750,7 +750,7 @@ msgstr "Gå till inställningar"
 
 # Plugin Settings
 msgid "Headless Access Manager Settings"
-msgstr "Tryggve Inställningar"
+msgstr "Observationsschemat Inställningar"
 
 msgid "JSON Web Token Authentication Settings"
 msgstr "JSON Web Token Autentiseringsinställningar"
@@ -759,7 +759,7 @@ msgid "General Settings"
 msgstr "Allmänna inställningar"
 
 msgid "Here you can configure the main settings for the Headless Access Manager plugin."
-msgstr "Här kan du konfigurera huvudinställningarna för Tryggve-pluginet."
+msgstr "Här kan du konfigurera huvudinställningarna för Observationsschemat."
 
 # JWT Settings
 msgid "JWT Secret Key"
@@ -772,10 +772,10 @@ msgid "Configure JWT authentication settings for the API."
 msgstr "Konfigurera JWT autentiseringsinställningar för API."
 
 msgid "Secret key used to sign the JWT. This key should be kept secure and only shared with authorized personnel."
-msgstr "Hemlig nyckel används för att signera JWT. Den här nyckeln bör hållas säker och delas endast med godkända personer."
+msgstr "Hemlig nyckel används för att signera JWT (Jason Web Token). Den här nyckeln bör hållas säker och delas endast med godkända personer."
 
 msgid "Enter your secret key for signing JWT tokens. This must match the key in your Next.js frontend."
-msgstr "Ange din hemliga nyckel för att signera JWT-token. Detta måste matcha nyckeln i din Next.js frontend."
+msgstr "Ange din hemliga nyckel för att signera JWT-token. Detta måste matcha nyckeln i din Next.js frontend. Om du byter nyckel här slutar frontend att fungera korrekt."
 
 msgid "The secret key is defined in wp-config.php and cannot be changed here."
 msgstr "Hemlig nyckel definieras i wp-config.php och kan inte ändras här."
@@ -791,7 +791,7 @@ msgid "CORS Allowed Origins"
 msgstr "CORS tillåtna ursprung"
 
 msgid "Enter the allowed origins for CORS requests, separated by commas. Example: http://localhost:3000, https://your-frontend.com"
-msgstr "Ange de tillåtna ursprungen för CORS-begäran, separerade med komma. Exempel: http://localhost:3000, https://your-frontend.com"
+msgstr "Ange de tillåtna ursprungen (allowed origins) för CORS-begäran, separerade med komma. Exempel: http://localhost:3000, https://din-frontend.com"
 
 # Role Management
 msgid "Role Management"

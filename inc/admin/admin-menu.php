@@ -26,8 +26,8 @@ class HAM_Admin_Menu
     {
         // Main menu
         add_menu_page(
-            __('Tryggve App', 'headless-access-manager'),
-            __('Tryggve App', 'headless-access-manager'),
+            __('Observationsschemat', 'headless-access-manager'),
+            __('Observationsschemat', 'headless-access-manager'),
             'manage_options',
             'headless-access-manager',
             array( __CLASS__, 'render_dashboard_page' ),
