@@ -296,6 +296,17 @@ class HAM_Admin_Menu
         $principals_count = count(get_users(array( 'role' => HAM_ROLE_PRINCIPAL )));
         $school_heads_count = count(get_users(array( 'role' => HAM_ROLE_SCHOOL_HEAD )));
 
+        $stats = HAM_Assessment_Manager::get_assessment_statistics('all');
+        $ssc = isset($stats['student_stage_counts']) && is_array($stats['student_stage_counts']) ? $stats['student_stage_counts'] : array();
+        $ssc_not = isset($ssc['not']) ? (int) $ssc['not'] : 0;
+        $ssc_trans = isset($ssc['trans']) ? (int) $ssc['trans'] : 0;
+        $ssc_full = isset($ssc['full']) ? (int) $ssc['full'] : 0;
+
+        $time_bucket = isset($_GET['time_bucket']) ? sanitize_text_field(wp_unslash($_GET['time_bucket'])) : 'term';
+        if ($time_bucket !== 'month' && $time_bucket !== 'school_year' && $time_bucket !== 'term') {
+            $time_bucket = 'term';
+        }
+
         ?>
 <div class="wrap">
         <h1><?php echo esc_html__('Handle Access Dashboard', 'headless-access-manager'); ?></h1>
@@ -389,6 +400,233 @@ class HAM_Admin_Menu
             </a>
         </div>
     </div>
+
+    <div class="ham-dashboard-assessment-overview">
+        <h2><?php echo esc_html__('Assessment overview', 'headless-access-manager'); ?></h2>
+
+        <div class="ham-stats-overview">
+            <div class="ham-stats-card">
+                <div class="ham-stats-icon">
+                    <span class="dashicons dashicons-clipboard"></span>
+                </div>
+                <div class="ham-stats-data">
+                    <div class="ham-stats-value"><?php echo esc_html(isset($stats['total_assessments']) ? (int) $stats['total_assessments'] : 0); ?></div>
+                    <div class="ham-stats-label"><?php echo esc_html__('Total Evaluations', 'headless-access-manager'); ?></div>
+                </div>
+            </div>
+
+            <div class="ham-stats-card">
+                <div class="ham-stats-icon">
+                    <span class="dashicons dashicons-yes"></span>
+                </div>
+                <div class="ham-stats-data">
+                    <div class="ham-stats-value"><?php echo esc_html($ssc_full); ?></div>
+                    <div class="ham-stats-label"><?php echo esc_html__('Established students', 'headless-access-manager'); ?></div>
+                </div>
+            </div>
+
+            <div class="ham-stats-card">
+                <div class="ham-stats-icon">
+                    <span class="dashicons dashicons-minus"></span>
+                </div>
+                <div class="ham-stats-data">
+                    <div class="ham-stats-value"><?php echo esc_html($ssc_trans); ?></div>
+                    <div class="ham-stats-label"><?php echo esc_html__('Developing students', 'headless-access-manager'); ?></div>
+                </div>
+            </div>
+
+            <div class="ham-stats-card">
+                <div class="ham-stats-icon">
+                    <span class="dashicons dashicons-no"></span>
+                </div>
+                <div class="ham-stats-data">
+                    <div class="ham-stats-value"><?php echo esc_html($ssc_not); ?></div>
+                    <div class="ham-stats-label"><?php echo esc_html__('Not established students', 'headless-access-manager'); ?></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ham-stats-row">
+            <div class="ham-stats-column">
+                <div class="postbox" style="margin-top: 0;">
+                    <div class="postbox-header">
+                        <h2 class="hndle">
+                            <?php
+                            if ($time_bucket === 'month') {
+                                echo esc_html__('Monthly Evaluations', 'headless-access-manager');
+                            } elseif ($time_bucket === 'school_year') {
+                                echo esc_html__('School Year Evaluations', 'headless-access-manager');
+                            } else {
+                                echo esc_html__('Term Evaluations', 'headless-access-manager');
+                            }
+                            ?>
+                        </h2>
+                    </div>
+                    <div class="inside">
+                        <div style="margin-bottom: 12px;">
+                            <?php
+                            $base_args = $_GET;
+                            $base_args = is_array($base_args) ? $base_args : array();
+                            $base_args['page'] = 'headless-access-manager';
+
+                            $make_link = function($bucket, $label) use ($base_args, $time_bucket) {
+                                $args = $base_args;
+                                $args['time_bucket'] = $bucket;
+                                $url = add_query_arg(array_map('sanitize_text_field', $args), admin_url('admin.php'));
+                                $is_active = $time_bucket === $bucket;
+
+                                $style = 'display:inline-block; padding: 4px 10px; border-radius: 999px; text-decoration:none; margin-right: 6px; border: 1px solid #c3c4c7;';
+                                if ($is_active) {
+                                    $style .= ' background:#2271b1; color:#fff; border-color:#2271b1;';
+                                } else {
+                                    $style .= ' background:#fff; color:#1d2327;';
+                                }
+
+                                return '<a href="' . esc_url($url) . '" style="' . esc_attr($style) . '">' . esc_html($label) . '</a>';
+                            };
+
+                            echo $make_link('month', __('Month', 'headless-access-manager'));
+                            echo $make_link('term', __('Term', 'headless-access-manager'));
+                            echo $make_link('school_year', __('School year', 'headless-access-manager'));
+                            ?>
+                        </div>
+
+                        <div class="ham-chart-container" style="padding: 20px; text-align: center;">
+                            <?php
+                            $chartData = array();
+                            if ($time_bucket === 'month') {
+                                $chartData = array_map(function($item) {
+                                    return array(
+                                        'label' => date_i18n('M Y', strtotime($item['month'] . '-01')),
+                                        'count' => $item['count']
+                                    );
+                                }, isset($stats['monthly_submissions']) ? $stats['monthly_submissions'] : array());
+                            } elseif ($time_bucket === 'school_year') {
+                                $chartData = array_map(function($item) {
+                                    return array(
+                                        'label' => isset($item['label']) ? $item['label'] : '',
+                                        'count' => $item['count']
+                                    );
+                                }, isset($stats['school_year_submissions']) ? $stats['school_year_submissions'] : array());
+                            } else {
+                                $chartData = array_map(function($item) {
+                                    return array(
+                                        'label' => isset($item['label']) ? $item['label'] : '',
+                                        'count' => $item['count']
+                                    );
+                                }, isset($stats['term_submissions']) ? $stats['term_submissions'] : array());
+                            }
+
+                            if (empty($chartData)) {
+                                echo '<p>' . esc_html__('No data to display', 'headless-access-manager') . '</p>';
+                            } else {
+                                $maxCount = 1;
+                                $points = array();
+                                $labels = array();
+                                foreach ($chartData as $item) {
+                                    $count = isset($item['count']) ? (int) $item['count'] : 0;
+                                    if ($count > $maxCount) {
+                                        $maxCount = $count;
+                                    }
+                                    $labels[] = isset($item['label']) ? (string) $item['label'] : '';
+                                    $points[] = $count;
+                                }
+
+                                $n = count($points);
+                                if ($n === 0) {
+                                    echo '<p>' . esc_html__('No data to display', 'headless-access-manager') . '</p>';
+                                } else {
+                                    $w = 100;
+                                    $h = 48;
+                                    $pad_x = 6;
+                                    $pad_y = 10;
+
+                                    $svg_points = array();
+                                    $circle_nodes = array();
+                                    for ($i = 0; $i < $n; $i++) {
+                                        $x = ($n === 1)
+                                            ? ($w / 2)
+                                            : ($pad_x + ($i * (($w - 2 * $pad_x) / ($n - 1))));
+                                        $count = (int) $points[$i];
+                                        $ratio = $maxCount > 0 ? ($count / $maxCount) : 0;
+                                        $y = ($h - $pad_y) - ($ratio * ($h - 2 * $pad_y));
+                                        $svg_points[] = $x . ',' . $y;
+                                        $circle_nodes[] = array(
+                                            'x' => $x,
+                                            'y' => $y,
+                                            'count' => $count,
+                                            'label' => $labels[$i],
+                                        );
+                                    }
+
+                                    echo '<div class="ham-mini-line" style="width: 100%;">';
+                                    echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; aspect-ratio: ' . esc_attr($w) . ' / ' . esc_attr($h) . '; max-height: 62px; overflow: visible;">';
+                                    echo '<line x1="' . esc_attr($pad_x) . '" y1="' . esc_attr($h - $pad_y) . '" x2="' . esc_attr($w - $pad_x) . '" y2="' . esc_attr($h - $pad_y) . '" stroke="#dcdcde" stroke-width="1" />';
+                                    if ($n > 1) {
+                                        echo '<polyline fill="none" stroke="#0073aa" stroke-width="2" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
+                                    }
+                                    foreach ($circle_nodes as $node) {
+                                        echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="9" fill="#ffffff" stroke="#0073aa" stroke-width="2" />';
+                                        echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr($node['y']) . '" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
+                                    }
+                                    echo '</svg>';
+
+                                    echo '<div style="display: grid; grid-template-columns: repeat(' . esc_attr($n) . ', 1fr); gap: 6px; margin-top: 2px;">';
+                                    for ($i = 0; $i < $n; $i++) {
+                                        echo '<div style="text-align: center; font-size: 11px; color: #646970; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' . esc_html($labels[$i]) . '</div>';
+                                    }
+                                    echo '</div>';
+
+                                    echo '</div>';
+                                }
+                            }
+                            ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ham-stats-column">
+                <div class="postbox" style="margin-top: 0;">
+                    <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Status Distribution', 'headless-access-manager'); ?></h2></div>
+                    <div class="inside">
+                        <div class="ham-chart-container" style="padding: 20px; text-align: center;">
+                            <?php
+                            $stageData = array(
+                                array(
+                                    'label' => esc_html__('Not Established', 'headless-access-manager'),
+                                    'value' => $ssc_not,
+                                    'color' => 'hsl(11, 97.00%, 87.10%)'
+                                ),
+                                array(
+                                    'label' => esc_html__('Developing', 'headless-access-manager'),
+                                    'value' => $ssc_trans,
+                                    'color' => 'hsl(40, 97%, 87%)'
+                                ),
+                                array(
+                                    'label' => esc_html__('Established', 'headless-access-manager'),
+                                    'value' => $ssc_full,
+                                    'color' => 'hsl(105, 97%, 87%)'
+                                )
+                            );
+
+                            echo '<div class="ham-simple-pie" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap;">';
+                            foreach ($stageData as $item) {
+                                echo '<div style="margin: 10px; text-align: center; width: 120px;">';
+                                echo '<div style="height: 80px; width: 80px; margin: 0 auto; background-color: ' . esc_attr($item['color']) . '; border-radius: 50%;"></div>';
+                                echo '<div style="margin-top: 10px;"><strong>' . esc_html($item['label']) . '</strong>: ' . esc_html($item['value']) . '</div>';
+                                echo '</div>';
+                            }
+                            echo '</div>';
+                            ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="clear"></div>
+    </div>
 </div>
 <style>
 .ham-dashboard-stats {
@@ -439,6 +677,71 @@ class HAM_Admin_Menu
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+}
+
+.ham-dashboard-assessment-overview {
+    margin-top: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+}
+
+.ham-stats-overview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.ham-stats-card {
+    flex: 1;
+    min-width: 200px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.ham-stats-icon {
+    margin-right: 15px;
+}
+
+.ham-stats-icon .dashicons {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    color: #0073aa;
+}
+
+.ham-stats-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: #23282d;
+}
+
+.ham-stats-label {
+    font-size: 14px;
+    color: #646970;
+}
+
+.ham-stats-row {
+    display: flex;
+    gap: 20px;
+}
+
+.ham-stats-column {
+    flex: 1;
+    min-width: 300px;
+}
+
+@media (max-width: 1200px) {
+    .ham-stats-row {
+        flex-direction: column;
+    }
 }
 </style>
 <?php
