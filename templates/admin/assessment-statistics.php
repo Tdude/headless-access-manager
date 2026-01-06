@@ -317,8 +317,14 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     </div>
                 </details>
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-group-radar"></canvas></div>
-                <div id="ham-group-radar-table" class="ham-radar-values"></div>
 
+                    </div>
+                </div>
+
+                <div id="ham-postbox-school-radar-table" class="postbox">
+                    <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Radar values', 'headless-access-manager'); ?></h2></div>
+                    <div class="inside">
+                        <div id="ham-group-radar-table" class="ham-radar-values"></div>
                     </div>
                 </div>
 
@@ -436,8 +442,14 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     </div>
                 </details>
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-group-radar"></canvas></div>
-                <div id="ham-group-radar-table" class="ham-radar-values"></div>
 
+                    </div>
+                </div>
+
+                <div id="ham-postbox-class-radar-table" class="postbox">
+                    <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Radar values', 'headless-access-manager'); ?></h2></div>
+                    <div class="inside">
+                        <div id="ham-group-radar-table" class="ham-radar-values"></div>
                     </div>
                 </div>
 
@@ -956,10 +968,10 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 }
 
 .ham-stats-panel {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+    background-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
 }
 
 .ham-stats-panel h2 {

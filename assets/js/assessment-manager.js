@@ -41,6 +41,36 @@
             return;
         }
 
+        // Ensure WP-native collapse indicator exists in each postbox header.
+        // WP normally renders this markup, but our custom templates omit it.
+        try {
+            holders.forEach((holder) => {
+                const postboxes = Array.from(holder.querySelectorAll('.postbox'));
+                postboxes.forEach((pb) => {
+                    const header = pb.querySelector('.postbox-header');
+                    if (!header) {
+                        return;
+                    }
+                    if (header.querySelector('button.handlediv')) {
+                        return;
+                    }
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'handlediv';
+                    btn.setAttribute('aria-expanded', pb.classList.contains('closed') ? 'false' : 'true');
+
+                    const span = document.createElement('span');
+                    span.className = 'toggle-indicator';
+                    span.setAttribute('aria-hidden', 'true');
+                    btn.appendChild(span);
+
+                    header.insertBefore(btn, header.firstChild);
+                });
+            });
+        } catch (e) {
+        }
+
         const page = holders[0].getAttribute('data-page')
             ? String(holders[0].getAttribute('data-page'))
             : 'ham-assessment-stats';
