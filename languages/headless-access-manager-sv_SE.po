@@ -17,7 +17,7 @@ msgstr ""
 # Assessment List Interface
 #: templates/admin/assessments-list.php:14
 msgid "Student Assessments"
-msgstr "Elevbedömningar"
+msgstr "Elevobservationer"
 
 #: templates/admin/assessments-list.php:41
 msgid "Filter by Completion:"
@@ -90,38 +90,38 @@ msgstr "Laddar..."
 # Assessment Post Type
 msgid "Assessment"
 msgid_plural "Assessments"
-msgstr[0] "Bedömning"
-msgstr[1] "Bedömningar"
+msgstr[0] "Elevobservation"
+msgstr[1] "Elevobservationer"
 
 msgid "Assessment Title"
 msgstr "Titel"
 
 msgid "All Assessments"
-msgstr "Alla bedömningar"
+msgstr "Alla observationer"
 
 msgid "Add New Assessment"
-msgstr "Lägg till ny bedömning"
+msgstr "Lägg till ny observationer"
 
 msgid "Edit Assessment"
-msgstr "Redigera bedömning"
+msgstr "Redigera observationer"
 
 msgid "New Assessment"
-msgstr "Ny bedömning"
+msgstr "Ny observationer"
 
 msgid "View Assessment"
-msgstr "Visa bedömning"
+msgstr "Visa observation"
 
 msgid "Search Assessments"
-msgstr "Sök bedömningar"
+msgstr "Sök elevobservationer"
 
 msgid "No assessments found"
-msgstr "Inga bedömningar hittades"
+msgstr "Inga elevobservationer hittades"
 
 msgid "No assessments found in Trash"
-msgstr "Inga bedömningar hittades i papperskorgen"
+msgstr "Inga observationer hittades i papperskorgen"
 
 msgid "No assessments match your search criteria."
-msgstr "Inga bedömningar matchar dina sökkriterier."
+msgstr "Inga observationer matchar dina sökkriterier."
 
 msgid "Parent Assessment:"
 msgstr "Överordnad bedömning:"
@@ -205,11 +205,11 @@ msgstr "Bedömning borttagen från papperskorgen"
 
 #: templates/admin/assessment-statistics.php:18
 msgid "Evaluation Drilldown"
-msgstr "Fördelning av bedömningar"
+msgstr "Fördelning av observationer"
 
 #: templates/admin/assessment-statistics.php:35
 msgid "No evaluation data available."
-msgstr "Ingen bedömningsdata tillgänglig."
+msgstr "Ingen observationsdata tillgänglig."
 
 #: templates/admin/assessment-statistics.php:59
 msgid "Avg"
@@ -235,7 +235,7 @@ msgstr "Status (elever)"
 #: templates/admin/assessment-statistics.php:117
 #: templates/admin/assessment-statistics.php:155
 msgid "# Evaluations"
-msgstr "Antal bedömningar"
+msgstr "Antal observationer"
 
 #: templates/admin/assessment-statistics.php:78
 #: templates/admin/assessment-statistics.php:118
@@ -445,7 +445,7 @@ msgstr "Filtrera efter status:"
 
 # Student Evaluations Interface
 msgid "Student Evaluations"
-msgstr "Elevbedömningar"
+msgstr "Elevobservationer"
 
 msgid "Evaluations by Tryggve"
 msgstr "Obs-schemat Statistik"
@@ -641,7 +641,7 @@ msgstr "Genomsnittligt utfall"
 
 # Evaluation Interface
 msgid "No evaluations found."
-msgstr "Inga bedömningar hittades."
+msgstr "Inga observationer hittades."
 
 msgid "View"
 msgstr "Visa"
@@ -678,7 +678,7 @@ msgid "Overview"
 msgstr "Översikt"
 
 msgid "Evaluations"
-msgstr "Bedömningar"
+msgstr "Observationer"
 
 msgid "Statistics"
 msgstr "Statistik"
@@ -713,7 +713,7 @@ msgstr "Aktiva ämnen"
 
 # Management Links
 msgid "View Evaluations"
-msgstr "Visa bedömningar"
+msgstr "Visa observationer"
 
 msgid "Manage Students"
 msgstr "Hantera elever"
@@ -826,7 +826,7 @@ msgid "Delete all plugin data upon deactivation"
 msgstr "Ta bort all plugin data vid inaktivering"
 
 msgid "DANGER: Checking this box will permanently delete ALL data associated with this plugin upon deactivation. This includes all Questions, Student Evaluations, Students, Teachers, Classes, Schools, and user roles. This action cannot be undone."
-msgstr "FARA: Detta kommer att radera all data såsom elever, lärare, klasser, rektorer, skolledare, bedömningar, anpassade roller, behörigheter och plugininställningar när pluginet inaktiveras. Avmarkera detta för att behålla inställningarna i databasen. Denna åtgärd kan inte återställas."
+msgstr "FARA: Detta kommer att radera all data såsom elever, lärare, klasser, rektorer, skolledare, observationer, anpassade roller, behörigheter och plugininställningar när pluginet inaktiveras. Avmarkera detta för att behålla inställningarna i databasen. Denna åtgärd kan inte återställas."
 
 #: inc/core/post-types.php
 msgid "Add New"
