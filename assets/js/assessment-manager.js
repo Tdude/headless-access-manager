@@ -183,6 +183,9 @@
         const CHART_FONT_SIZE_TITLE = 14;
         const CHART_FONT_SIZE_LEGEND = 12;
 
+        const CHART_TARGET_SCORE = 3;
+        const CHART_TARGET_COLOR = 'rgba(245, 158, 11, 0.95)';
+
         const t = (window.hamAssessment && window.hamAssessment.texts) ? window.hamAssessment.texts : {};
         const labelMonth = t.month || 'Month';
         const labelTerm = t.term || 'Term';
@@ -197,6 +200,20 @@
 
         if (!overview && !stats) {
             return;
+        }
+
+        function buildTargetDataset(labelCount) {
+            const n = Math.max(0, Number.isFinite(labelCount) ? labelCount : 0);
+            return {
+                label: t.targetScore || 'Målnivå 3',
+                data: Array.from({ length: n }, () => CHART_TARGET_SCORE),
+                borderColor: CHART_TARGET_COLOR,
+                backgroundColor: 'rgba(0,0,0,0)',
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: false,
+                borderDash: [],
+            };
         }
 
         function isMonthKey(val) {
@@ -810,6 +827,10 @@
                         borderDash: idx === 0 ? [] : CHART_OVERLAY_DASH,
                     };
                 });
+
+                if (mode === 'avg') {
+                    datasets.unshift(buildTargetDataset(labels.length));
+                }
 
                 return {
                     title: bucket.label || (titleByKey[bucketKey] || labelRadar),
@@ -1558,6 +1579,8 @@
                     };
                 });
 
+                datasets.unshift(buildTargetDataset(labels.length));
+
                 return { title: bucket.label || (titleByKey[bucketKey] || labelRadar), datasets };
             }
 
@@ -1675,7 +1698,9 @@
                 type: 'radar',
                 data: {
                     labels: radar.labels,
-                    datasets: [{
+                    datasets: [
+                        buildTargetDataset(radar.labels.length),
+                        {
                         label: radar.title || labelRadar,
                         data: radar.values.map((v) => clampNumber(v, 1, 5)),
                         borderColor: c.border,
@@ -1683,7 +1708,8 @@
                         borderWidth: CHART_BORDER_WIDTH,
                         pointRadius: CHART_POINT_RADIUS,
                         fill: true,
-                    }],
+                        },
+                    ],
                 },
                 options: {
                     responsive: true,
