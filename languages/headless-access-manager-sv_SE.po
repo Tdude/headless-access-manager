@@ -456,6 +456,15 @@ msgstr "Filtrera efter elev:"
 msgid "All Students"
 msgstr "Alla elever"
 
+msgid "Established students"
+msgstr "Etablerade elever"
+
+msgid "Developing students"
+msgstr "Utvecklande elever"
+
+msgid "Not established students"
+msgstr "Ej etablerade elever"
+
 msgid "Filter by date:"
 msgstr "Filtrera efter datum:"
 
@@ -1038,6 +1047,9 @@ msgstr "Denna skola"
 #: inc/admin/class-ham-assessment-manager.php
 msgid "All schools"
 msgstr "Alla skolor"
+
+msgid "Select which Assessment post acts as the Question Bank that powers the evaluation form and admin reporting. Choose Auto to use the newest available bank."
+msgstr "Välj vilken frågebank som ska användas för utvärderingsformuläret och administratörsrapporter. Välj Auto för att använda den senast tillgängliga frågebanken."
 
 #: inc/admin/class-ham-assessment-manager.php
 msgid "All schools (%d)"
