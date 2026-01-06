@@ -43,19 +43,19 @@ class HAM_Assessment_Templates_Admin
     public function register_assessment_template_post_type()
     {
         $labels = array(
-            'name'                  => _x('Assessment Templates', 'Post type general name', 'headless-access-manager'),
-            'singular_name'         => _x('Assessment Template', 'Post type singular name', 'headless-access-manager'),
-            'menu_name'             => _x('Assessment Templates', 'Admin Menu text', 'headless-access-manager'),
-            'name_admin_bar'        => _x('Assessment Template', 'Add New on Toolbar', 'headless-access-manager'),
+            'name'                  => _x('Question Bank', 'Post type general name', 'headless-access-manager'),
+            'singular_name'         => _x('Question Bank', 'Post type singular name', 'headless-access-manager'),
+            'menu_name'             => _x('Question Bank', 'Admin Menu text', 'headless-access-manager'),
+            'name_admin_bar'        => _x('Question Bank', 'Add New on Toolbar', 'headless-access-manager'),
             'add_new'               => __('Add New', 'headless-access-manager'),
-            'add_new_item'          => __('Add New Template', 'headless-access-manager'),
-            'new_item'              => __('New Template', 'headless-access-manager'),
-            'edit_item'             => __('Edit Template', 'headless-access-manager'),
-            'view_item'             => __('View Template', 'headless-access-manager'),
-            'all_items'             => __('All Templates', 'headless-access-manager'),
-            'search_items'          => __('Search Templates', 'headless-access-manager'),
-            'not_found'             => __('No templates found.', 'headless-access-manager'),
-            'not_found_in_trash'    => __('No templates found in Trash.', 'headless-access-manager'),
+            'add_new_item'          => __('Add New Question Bank', 'headless-access-manager'),
+            'new_item'              => __('New Question Bank', 'headless-access-manager'),
+            'edit_item'             => __('Edit Question Bank', 'headless-access-manager'),
+            'view_item'             => __('View Question Bank', 'headless-access-manager'),
+            'all_items'             => __('All Question Banks', 'headless-access-manager'),
+            'search_items'          => __('Search Question Banks', 'headless-access-manager'),
+            'not_found'             => __('No question banks found.', 'headless-access-manager'),
+            'not_found_in_trash'    => __('No question banks found in Trash.', 'headless-access-manager'),
         );
 
         $args = array(

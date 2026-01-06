@@ -184,11 +184,13 @@ class HAM_Meta_Boxes
             <label for="ham_assessment_date"><?php echo esc_html__('Assessment Date:', 'headless-access-manager'); ?></label>
             <input type="date" name="ham_assessment_date" id="ham_assessment_date" class="widefat" value="<?php echo esc_attr($assessment_date ? date('Y-m-d', strtotime($assessment_date)) : ''); ?>">
         </p>
-        <p>
-            <label for="ham_assessment_data"><?php echo esc_html__('Assessment Data (JSON):', 'headless-access-manager'); ?></label>
-            <textarea name="ham_assessment_data" id="ham_assessment_data" class="widefat" rows="10"><?php echo esc_textarea($assessment_data_json); ?></textarea>
-            <span class="description"><?php echo esc_html__('Enter assessment data in JSON format.', 'headless-access-manager'); ?></span>
-        </p>
+        <?php if (current_user_can('manage_options')) : ?>
+            <p>
+                <label for="ham_assessment_data"><?php echo esc_html__('Assessment Data (JSON):', 'headless-access-manager'); ?></label>
+                <textarea name="ham_assessment_data" id="ham_assessment_data" class="widefat" rows="10"><?php echo esc_textarea($assessment_data_json); ?></textarea>
+                <span class="description"><?php echo esc_html__('Enter assessment data in JSON format.', 'headless-access-manager'); ?></span>
+            </p>
+        <?php endif; ?>
         <?php
     }
 
@@ -283,7 +285,7 @@ class HAM_Meta_Boxes
                 }
             }
 
-            if (isset($_POST['ham_assessment_data'])) {
+            if (current_user_can('manage_options') && isset($_POST['ham_assessment_data'])) {
                 $assessment_data_json = wp_unslash($_POST['ham_assessment_data']);
                 if (!empty($assessment_data_json)) {
                     $assessment_data = json_decode($assessment_data_json, true);

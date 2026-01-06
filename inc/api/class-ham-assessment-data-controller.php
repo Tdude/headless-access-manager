@@ -490,9 +490,55 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
      */
     private function get_latest_questions_structure()
     {
-        // Get the most recent assessment that has question data
-        $assessments = get_posts(array(
-            'post_type'      => HAM_CPT_ASSESSMENT,
+        $bank_id = $this->get_active_question_bank_post_id();
+        if ($bank_id > 0) {
+            $bank = get_post_meta($bank_id, HAM_ASSESSMENT_META_DATA, true);
+            if (is_array($bank) && !empty($bank)) {
+                $structure = array();
+
+                if (isset($bank['anknytning']) && isset($bank['anknytning']['questions'])) {
+                    $structure['anknytning'] = array(
+                        'title' => 'Anknytningstecken',
+                        'questions' => $bank['anknytning']['questions'],
+                    );
+                }
+
+                if (isset($bank['ansvar']) && isset($bank['ansvar']['questions'])) {
+                    $structure['ansvar'] = array(
+                        'title' => 'Ansvarstecken',
+                        'questions' => $bank['ansvar']['questions'],
+                    );
+                }
+
+                if (!empty($structure)) {
+                    return $structure;
+                }
+            }
+        }
+
+        return $this->get_default_questions_structure();
+    }
+
+    /**
+     * Resolve the active Question Bank (ham_assessment_tpl) post ID.
+     *
+     * @return int
+     */
+    private function get_active_question_bank_post_id(): int
+    {
+        $configured = absint(get_option('ham_active_question_bank_id', 0));
+        if ($configured > 0) {
+            if (get_post_type($configured) === HAM_CPT_ASSESSMENT_TPL) {
+                $data = get_post_meta($configured, HAM_ASSESSMENT_META_DATA, true);
+                if (is_array($data) && !empty($data)) {
+                    return $configured;
+                }
+            }
+        }
+
+        $posts = get_posts(array(
+            'post_type'      => HAM_CPT_ASSESSMENT_TPL,
+            'post_status'    => 'publish',
             'posts_per_page' => 1,
             'orderby'        => 'date',
             'order'          => 'DESC',
@@ -504,34 +550,19 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
             ),
         ));
 
-        if (empty($assessments)) {
-            return $this->get_default_questions_structure();
+        if (empty($posts)) {
+            return 0;
         }
 
-        $assessment_data = get_post_meta($assessments[0]->ID, HAM_ASSESSMENT_META_DATA, true);
-
-        if (empty($assessment_data) || !is_array($assessment_data)) {
-            return $this->get_default_questions_structure();
+        $candidate = absint($posts[0]->ID);
+        if ($candidate > 0) {
+            $data = get_post_meta($candidate, HAM_ASSESSMENT_META_DATA, true);
+            if (is_array($data) && !empty($data)) {
+                return $candidate;
+            }
         }
 
-        // Return only the questions part of the structure
-        $structure = array();
-
-        if (isset($assessment_data['anknytning']) && isset($assessment_data['anknytning']['questions'])) {
-            $structure['anknytning'] = array(
-                'title' => 'Anknytningstecken',
-                'questions' => $assessment_data['anknytning']['questions']
-            );
-        }
-
-        if (isset($assessment_data['ansvar']) && isset($assessment_data['ansvar']['questions'])) {
-            $structure['ansvar'] = array(
-                'title' => 'Ansvarstecken',
-                'questions' => $assessment_data['ansvar']['questions']
-            );
-        }
-
-        return !empty($structure) ? $structure : $this->get_default_questions_structure();
+        return 0;
     }
 
     /**

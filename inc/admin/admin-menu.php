@@ -55,6 +55,15 @@ class HAM_Admin_Menu
             array( 'HAM_Assessment_Manager', 'render_assessments_page' )
         );
 
+        // Question Bank submenu
+        add_submenu_page(
+            'headless-access-manager',
+            __('Question Bank', 'headless-access-manager'), // Page title
+            __('Question Bank', 'headless-access-manager'), // Menu title
+            'manage_options',
+            'edit.php?post_type=' . HAM_CPT_ASSESSMENT_TPL
+        );
+
         // Statistics submenu
         add_submenu_page(
             'headless-access-manager',
