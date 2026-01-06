@@ -26,6 +26,72 @@
 
         // Initialize statistics charts (only runs on stats page)
         initStatsCharts();
+
+        // Enable WP-native collapsible/reorderable panels on stats page
+        initStatsPostboxes();
+    }
+
+    function initStatsPostboxes() {
+        if (typeof window.postboxes === 'undefined') {
+            return;
+        }
+
+        const holders = Array.from(document.querySelectorAll('.ham-stats-postboxes'));
+        if (holders.length === 0) {
+            return;
+        }
+
+        const page = holders[0].getAttribute('data-page')
+            ? String(holders[0].getAttribute('data-page'))
+            : 'ham-assessment-stats';
+
+        try {
+            window.postboxes.add_postbox_toggles(page);
+        } catch (e) {
+        }
+
+        function resizeCharts() {
+            if (!window.Chart) {
+                return;
+            }
+            const canvases = holders.flatMap((h) => Array.from(h.querySelectorAll('canvas')));
+            canvases.forEach((c) => {
+                const chart = window.Chart.getChart(c);
+                if (chart) {
+                    try {
+                        chart.resize();
+                        chart.update();
+                    } catch (e) {
+                    }
+                }
+            });
+        }
+
+        // Resize charts when a postbox is toggled.
+        $(document).on('postbox-toggled', () => {
+            setTimeout(resizeCharts, 50);
+        });
+
+        // Enable drag reorder within the container.
+        $('.ham-stats-postboxes .meta-box-sortables').sortable({
+            placeholder: 'sortable-placeholder',
+            connectWith: '.meta-box-sortables',
+            items: '.postbox',
+            handle: '.hndle, .handlediv, .postbox-header',
+            tolerance: 'pointer',
+            forcePlaceholderSize: true,
+            start: function() {
+                $('.meta-box-sortables').addClass('sorting');
+            },
+            stop: function() {
+                $('.meta-box-sortables').removeClass('sorting');
+                try {
+                    window.postboxes.save_order(page);
+                } catch (e) {
+                }
+                setTimeout(resizeCharts, 50);
+            },
+        });
     }
 
     function initSchoolAvatars() {

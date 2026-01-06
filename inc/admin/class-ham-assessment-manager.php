@@ -3046,6 +3046,9 @@ public function ajax_get_assessment_details()
         if (strpos($hook, 'ham-assessment-stats') !== false || strpos($hook, 'page_ham-assessment-stats') !== false) {
             //error_log('Loading Chart.js on hook: ' . $hook);
 
+            wp_enqueue_script('postbox');
+            wp_enqueue_script('jquery-ui-sortable');
+
             wp_enqueue_script(
                 'chart-js',
                 'https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js',

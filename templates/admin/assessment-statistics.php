@@ -73,6 +73,10 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
         <div class="ham-stats-panel" style="margin-top: 20px;">
             <h2><?php echo esc_html__('Evaluation Drilldown', 'headless-access-manager'); ?></h2>
 
+            <div id="ham-stats-postboxes-drilldown" class="metabox-holder ham-stats-postboxes" data-page="ham-assessment-stats">
+                <div class="postbox-container">
+                    <div class="meta-box-sortables ui-sortable">
+
             <?php if (!empty($drilldown['breadcrumb'])) : ?>
                 <div style="margin-bottom: 10px;">
                     <?php
@@ -181,54 +185,62 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <?php echo esc_html__('Select a school to drill down into classes, students, and per-question evaluation progress by semester.', 'headless-access-manager'); ?>
                 </p>
 
-                <table class="wp-list-table widefat fixed striped">
-                    <thead>
-                        <tr>
-                            <th><?php echo esc_html__('School', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('# Classes', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('# Students evaluated', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('# Evaluations', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('Status (students)', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('Progress (by semester)', 'headless-access-manager'); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($drilldown['schools'])) : ?>
-                            <?php foreach ($drilldown['schools'] as $school) : ?>
+                <div id="ham-postbox-schools" class="postbox">
+                    <div class="postbox-header">
+                        <h2 class="hndle"><?php echo esc_html__('Schools', 'headless-access-manager'); ?></h2>
+                    </div>
+                    <div class="inside">
+                        <table class="wp-list-table widefat fixed striped">
+                            <thead>
                                 <tr>
-                                    <td>
-                                        <a class="ham-pill-link" href="<?php echo esc_url($school['url']); ?>"><?php echo esc_html($school['name']); ?></a>
-                                    </td>
-                                    <td><?php echo esc_html((int) $school['class_count']); ?></td>
-                                    <td><?php echo esc_html((int) $school['student_count']); ?></td>
-                                    <td><?php echo esc_html((int) $school['evaluation_count']); ?></td>
-                                    <td>
-                                        <?php
-                                        $sc = isset($school['stage_counts']) && is_array($school['stage_counts']) ? $school['stage_counts'] : array();
-                                        $sc_not = isset($sc['not']) ? (int) $sc['not'] : 0;
-                                        $sc_trans = isset($sc['trans']) ? (int) $sc['trans'] : 0;
-                                        $sc_full = isset($sc['full']) ? (int) $sc['full'] : 0;
-                                        ?>
-                                        <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($sc_not); ?></span>
-                                        <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($sc_trans); ?></span>
-                                        <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($sc_full); ?></span>
-                                    </td>
-                                    <td style="min-width: 320px;">
-                                        <?php $render_semester_bars($school['series'], 100); ?>
-                                    </td>
+                                    <th><?php echo esc_html__('School', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('# Classes', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('# Students evaluated', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('# Evaluations', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Status (students)', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Progress (by semester)', 'headless-access-manager'); ?></th>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php else : ?>
-                            <tr><td colspan="6"><?php echo esc_html__('No schools found.', 'headless-access-manager'); ?></td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($drilldown['schools'])) : ?>
+                                    <?php foreach ($drilldown['schools'] as $school) : ?>
+                                        <tr>
+                                            <td>
+                                                <a class="ham-pill-link" href="<?php echo esc_url($school['url']); ?>"><?php echo esc_html($school['name']); ?></a>
+                                            </td>
+                                            <td><?php echo esc_html((int) $school['class_count']); ?></td>
+                                            <td><?php echo esc_html((int) $school['student_count']); ?></td>
+                                            <td><?php echo esc_html((int) $school['evaluation_count']); ?></td>
+                                            <td>
+                                                <?php
+                                                $sc = isset($school['stage_counts']) && is_array($school['stage_counts']) ? $school['stage_counts'] : array();
+                                                $sc_not = isset($sc['not']) ? (int) $sc['not'] : 0;
+                                                $sc_trans = isset($sc['trans']) ? (int) $sc['trans'] : 0;
+                                                $sc_full = isset($sc['full']) ? (int) $sc['full'] : 0;
+                                                ?>
+                                                <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($sc_not); ?></span>
+                                                <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($sc_trans); ?></span>
+                                                <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($sc_full); ?></span>
+                                            </td>
+                                            <td style="min-width: 320px;">
+                                                <?php $render_semester_bars($school['series'], 100); ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else : ?>
+                                    <tr><td colspan="6"><?php echo esc_html__('No schools found.', 'headless-access-manager'); ?></td></tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
             <?php elseif ($drilldown['level'] === 'school') : ?>
 
-                <h3 style="margin-top: 10px;">
-                    <?php echo esc_html__('Radar (avg per question)', 'headless-access-manager'); ?>
-                </h3>
+                <div id="ham-postbox-school-radar" class="postbox">
+                    <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Radar (avg per question)', 'headless-access-manager'); ?></h2></div>
+                    <div class="inside">
+
                 <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
@@ -255,10 +267,14 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-group-radar"></canvas></div>
                 <div id="ham-group-radar-table" class="ham-radar-values"></div>
 
+                    </div>
+                </div>
+
                 <?php if (!$hide_avg_progress_charts) : ?>
-                    <h3 style="margin-top: 10px;">
-                        <?php echo esc_html__('School average progress', 'headless-access-manager'); ?>
-                    </h3>
+
+                    <div id="ham-postbox-school-progress" class="postbox">
+                        <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('School average progress', 'headless-access-manager'); ?></h2></div>
+                        <div class="inside">
                     <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
@@ -288,57 +304,62 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <?php echo esc_html__('School Progress (by semester)', 'headless-access-manager'); ?>
                     </h3>
                     <?php $render_semester_bars($drilldown['series'], 100); ?>
+
+                        </div>
+                    </div>
                 <?php endif; ?>
 
-                <h3 style="margin-top: 20px;">
-                    <?php echo esc_html__('Classes', 'headless-access-manager'); ?>
-                </h3>
-                <table class="wp-list-table widefat fixed striped">
-                    <thead>
-                        <tr>
-                            <th><?php echo esc_html__('Class', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('# Evaluations', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('Status (students)', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('Progress (by semester)', 'headless-access-manager'); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($drilldown['classes'])) : ?>
-                            <?php foreach ($drilldown['classes'] as $class) : ?>
+                <div id="ham-postbox-classes" class="postbox">
+                    <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Classes', 'headless-access-manager'); ?></h2></div>
+                    <div class="inside">
+                        <table class="wp-list-table widefat fixed striped">
+                            <thead>
                                 <tr>
-                                    <td>
-                                        <a class="ham-pill-link" href="<?php echo esc_url($class['url']); ?>"><?php echo esc_html($class['name']); ?></a>
-                                    </td>
-                                    <td><?php echo esc_html((int) $class['student_count']); ?></td>
-                                    <td><?php echo esc_html((int) $class['evaluation_count']); ?></td>
-                                    <td>
-                                        <?php
-                                        $sc = isset($class['stage_counts']) && is_array($class['stage_counts']) ? $class['stage_counts'] : array();
-                                        $sc_not = isset($sc['not']) ? (int) $sc['not'] : 0;
-                                        $sc_trans = isset($sc['trans']) ? (int) $sc['trans'] : 0;
-                                        $sc_full = isset($sc['full']) ? (int) $sc['full'] : 0;
-                                        ?>
-                                        <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($sc_not); ?></span>
-                                        <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($sc_trans); ?></span>
-                                        <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($sc_full); ?></span>
-                                    </td>
-                                    <td style="min-width: 320px;">
-                                        <?php $render_semester_bars($class['series'], 100); ?>
-                                    </td>
+                                    <th><?php echo esc_html__('Class', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('# Evaluations', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Status (students)', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Progress (by semester)', 'headless-access-manager'); ?></th>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php else : ?>
-                            <tr><td colspan="5"><?php echo esc_html__('No classes found for this school.', 'headless-access-manager'); ?></td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($drilldown['classes'])) : ?>
+                                    <?php foreach ($drilldown['classes'] as $class) : ?>
+                                        <tr>
+                                            <td>
+                                                <a class="ham-pill-link" href="<?php echo esc_url($class['url']); ?>"><?php echo esc_html($class['name']); ?></a>
+                                            </td>
+                                            <td><?php echo esc_html((int) $class['student_count']); ?></td>
+                                            <td><?php echo esc_html((int) $class['evaluation_count']); ?></td>
+                                            <td>
+                                                <?php
+                                                $sc = isset($class['stage_counts']) && is_array($class['stage_counts']) ? $class['stage_counts'] : array();
+                                                $sc_not = isset($sc['not']) ? (int) $sc['not'] : 0;
+                                                $sc_trans = isset($sc['trans']) ? (int) $sc['trans'] : 0;
+                                                $sc_full = isset($sc['full']) ? (int) $sc['full'] : 0;
+                                                ?>
+                                                <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($sc_not); ?></span>
+                                                <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($sc_trans); ?></span>
+                                                <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($sc_full); ?></span>
+                                            </td>
+                                            <td style="min-width: 320px;">
+                                                <?php $render_semester_bars($class['series'], 100); ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else : ?>
+                                    <tr><td colspan="5"><?php echo esc_html__('No classes found for this school.', 'headless-access-manager'); ?></td></tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
             <?php elseif ($drilldown['level'] === 'class') : ?>
 
-                <h3 style="margin-top: 10px;">
-                    <?php echo esc_html__('Radar (avg per question)', 'headless-access-manager'); ?>
-                </h3>
+                <div id="ham-postbox-class-radar" class="postbox">
+                    <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Radar (avg per question)', 'headless-access-manager'); ?></h2></div>
+                    <div class="inside">
                 <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
@@ -365,10 +386,14 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-group-radar"></canvas></div>
                 <div id="ham-group-radar-table" class="ham-radar-values"></div>
 
+                    </div>
+                </div>
+
                 <?php if (!$hide_avg_progress_charts) : ?>
-                    <h3 style="margin-top: 10px;">
-                        <?php echo esc_html__('Class average progress', 'headless-access-manager'); ?>
-                    </h3>
+
+                    <div id="ham-postbox-class-progress" class="postbox">
+                        <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Class average progress', 'headless-access-manager'); ?></h2></div>
+                        <div class="inside">
                     <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
@@ -398,64 +423,73 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <?php echo esc_html__('Class Progress (by semester)', 'headless-access-manager'); ?>
                     </h3>
                     <?php $render_semester_bars($drilldown['series'], 100); ?>
+
+                        </div>
+                    </div>
                 <?php endif; ?>
 
-                <h3 style="margin-top: 20px;">
-                    <?php echo esc_html__('Students', 'headless-access-manager'); ?>
-                </h3>
-                <table class="wp-list-table widefat fixed striped">
-                    <thead>
-                        <tr>
-                            <th><?php echo esc_html__('Student', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('# Evaluations', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('Status', 'headless-access-manager'); ?></th>
-                            <th><?php echo esc_html__('Progress (by semester)', 'headless-access-manager'); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($drilldown['students'])) : ?>
-                            <?php foreach ($drilldown['students'] as $student) : ?>
+                <div id="ham-postbox-class-students" class="postbox">
+                    <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Students', 'headless-access-manager'); ?></h2></div>
+                    <div class="inside">
+                        <table class="wp-list-table widefat fixed striped">
+                            <thead>
                                 <tr>
-                                    <td>
-                                        <a class="ham-pill-link" href="<?php echo esc_url($student['url']); ?>"><?php echo esc_html($student['name']); ?></a>
-                                    </td>
-                                    <td><?php echo esc_html((int) $student['evaluation_count']); ?></td>
-                                    <td>
-                                        <?php
-                                        $stage = isset($student['stage']) ? (string) $student['stage'] : 'not';
-                                        if ($stage === 'full') {
-                                            $stage_class = 'ham-stage-full';
-                                            $stage_text = esc_html__('Established', 'headless-access-manager');
-                                        } elseif ($stage === 'trans') {
-                                            $stage_class = 'ham-stage-trans';
-                                            $stage_text = esc_html__('Developing', 'headless-access-manager');
-                                        } else {
-                                            $stage_class = 'ham-stage-not';
-                                            $stage_text = esc_html__('Not Established', 'headless-access-manager');
-                                        }
-                                        ?>
-                                        <span class="ham-stage-badge <?php echo esc_attr($stage_class); ?>"><?php echo $stage_text; ?></span>
-                                    </td>
-                                    <td style="min-width: 320px;">
-                                        <?php $render_semester_bars($student['series'], 100); ?>
-                                    </td>
+                                    <th><?php echo esc_html__('Student', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('# Evaluations', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Status', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Progress (by semester)', 'headless-access-manager'); ?></th>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php else : ?>
-                            <tr><td colspan="4"><?php echo esc_html__('No students found for this class.', 'headless-access-manager'); ?></td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($drilldown['students'])) : ?>
+                                    <?php foreach ($drilldown['students'] as $student) : ?>
+                                        <tr>
+                                            <td>
+                                                <a class="ham-pill-link" href="<?php echo esc_url($student['url']); ?>"><?php echo esc_html($student['name']); ?></a>
+                                            </td>
+                                            <td><?php echo esc_html((int) $student['evaluation_count']); ?></td>
+                                            <td>
+                                                <?php
+                                                $stage = isset($student['stage']) ? (string) $student['stage'] : 'not';
+                                                if ($stage === 'full') {
+                                                    $stage_class = 'ham-stage-full';
+                                                    $stage_text = esc_html__('Established', 'headless-access-manager');
+                                                } elseif ($stage === 'trans') {
+                                                    $stage_class = 'ham-stage-trans';
+                                                    $stage_text = esc_html__('Developing', 'headless-access-manager');
+                                                } else {
+                                                    $stage_class = 'ham-stage-not';
+                                                    $stage_text = esc_html__('Not Established', 'headless-access-manager');
+                                                }
+                                                ?>
+                                                <span class="ham-stage-badge <?php echo esc_attr($stage_class); ?>"><?php echo $stage_text; ?></span>
+                                            </td>
+                                            <td style="min-width: 320px;">
+                                                <?php $render_semester_bars($student['series'], 100); ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else : ?>
+                                    <tr><td colspan="4"><?php echo esc_html__('No students found for this class.', 'headless-access-manager'); ?></td></tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
             <?php elseif ($drilldown['level'] === 'student') : ?>
 
                 <?php if (!$hide_avg_progress_charts) : ?>
-                    <h3 style="margin-top: 10px;">
-                        <?php echo esc_html__('Student average progress', 'headless-access-manager'); ?>
-                        <?php if (!empty($drilldown['student']['name'])) : ?>
-                            <span style="color: #646970; font-weight: normal;">— <?php echo esc_html($drilldown['student']['name']); ?></span>
-                        <?php endif; ?>
-                    </h3>
+                    <div id="ham-postbox-student-progress" class="postbox">
+                        <div class="postbox-header">
+                            <h2 class="hndle">
+                                <?php echo esc_html__('Student average progress', 'headless-access-manager'); ?>
+                                <?php if (!empty($drilldown['student']['name'])) : ?>
+                                    <span style="color: #646970; font-weight: normal;">— <?php echo esc_html($drilldown['student']['name']); ?></span>
+                                <?php endif; ?>
+                            </h2>
+                        </div>
+                        <div class="inside">
                     <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
@@ -480,11 +514,13 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         </div>
                     </details>
                     <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-student"></canvas></div>
+                        </div>
+                    </div>
                 <?php endif; ?>
 
-                <h3 style="margin-top: 20px;">
-                    <?php echo esc_html__('Radar (per evaluation within bucket)', 'headless-access-manager'); ?>
-                </h3>
+                <div id="ham-postbox-student-radar" class="postbox">
+                    <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Radar (per evaluation within bucket)', 'headless-access-manager'); ?></h2></div>
+                    <div class="inside">
                 <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                     <button type="button" class="button ham-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
@@ -511,9 +547,12 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-student-radar"></canvas></div>
                 <div id="ham-student-radar-table" class="ham-radar-values"></div>
 
-                <h3 style="margin-top: 20px;">
-                    <?php echo esc_html__('Questions and answer alternatives', 'headless-access-manager'); ?>
-                </h3>
+                    </div>
+                </div>
+
+                <div id="ham-postbox-student-answers" class="postbox">
+                    <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Questions and answer alternatives', 'headless-access-manager'); ?></h2></div>
+                    <div class="inside">
                 <?php if (current_user_can('manage_options') && isset($drilldown['radar_questions_source']) && $drilldown['radar_questions_source'] === 'fallback') : ?>
                     <div style="margin-top: -10px; margin-bottom: 10px; color: #b32d2e; font-weight: 600;">
                         <?php echo esc_html__('Fallback questions', 'headless-access-manager'); ?>
@@ -544,7 +583,14 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 </details>
                 <div id="ham-answer-alternatives" class="ham-answer-alternatives"></div>
 
+                    </div>
+                </div>
+
             <?php endif; ?>
+
+                    </div>
+                </div>
+            </div>
         </div>
     <?php endif; ?>
 
@@ -604,18 +650,25 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
     
     <div class="ham-stats-row">
         <div class="ham-stats-column">
-            <div class="ham-stats-panel">
-                <h2>
-                    <?php
-                    if ($time_bucket === 'month') {
-                        echo esc_html__('Monthly Evaluations', 'headless-access-manager');
-                    } elseif ($time_bucket === 'school_year') {
-                        echo esc_html__('School Year Evaluations', 'headless-access-manager');
-                    } else {
-                        echo esc_html__('Term Evaluations', 'headless-access-manager');
-                    }
-                    ?>
-                </h2>
+            <div id="ham-stats-postboxes-overview" class="metabox-holder ham-stats-postboxes" data-page="ham-assessment-stats">
+                <div class="postbox-container">
+                    <div class="meta-box-sortables ui-sortable">
+
+                        <div id="ham-postbox-overview-timeline" class="postbox">
+                            <div class="postbox-header">
+                                <h2 class="hndle">
+                                    <?php
+                                    if ($time_bucket === 'month') {
+                                        echo esc_html__('Monthly Evaluations', 'headless-access-manager');
+                                    } elseif ($time_bucket === 'school_year') {
+                                        echo esc_html__('School Year Evaluations', 'headless-access-manager');
+                                    } else {
+                                        echo esc_html__('Term Evaluations', 'headless-access-manager');
+                                    }
+                                    ?>
+                                </h2>
+                            </div>
+                            <div class="inside">
 
                 <div style="margin-bottom: 12px;">
                     <?php
@@ -736,13 +789,23 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     }
                     ?>
                 </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
         <div class="ham-stats-column">
-            <div class="ham-stats-panel">
-                <h2><?php echo esc_html__('Status Distribution', 'headless-access-manager'); ?></h2>
-                <div id="stageChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
+            <div id="ham-stats-postboxes-overview-right" class="metabox-holder ham-stats-postboxes" data-page="ham-assessment-stats">
+                <div class="postbox-container">
+                    <div class="meta-box-sortables ui-sortable">
+
+                        <div id="ham-postbox-overview-status" class="postbox">
+                            <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Status Distribution', 'headless-access-manager'); ?></h2></div>
+                            <div class="inside">
+                                <div id="stageChartSimple" class="ham-chart-container" style="padding: 20px; text-align: center;">
                     <?php
                     $stageData = array(
                         array(
@@ -771,6 +834,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     }
                     echo '</div>';
                     ?>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
