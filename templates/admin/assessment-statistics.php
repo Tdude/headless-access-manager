@@ -255,11 +255,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                         <label style="display: inline-flex; gap: 6px; align-items: center;">
                             <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
-                            <input type="month" class="ham-date-from" />
+                            <input type="month" class="ham-date-from" lang="sv-SE" />
                         </label>
                         <label style="display: inline-flex; gap: 6px; align-items: center;">
                             <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
-                            <input type="month" class="ham-date-to" />
+                            <input type="month" class="ham-date-to" lang="sv-SE" />
                         </label>
                         <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                     </div>
@@ -289,11 +289,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                             <label style="display: inline-flex; gap: 6px; align-items: center;">
                                 <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
-                                <input type="month" class="ham-date-from" />
+                                <input type="month" class="ham-date-from" lang="sv-SE" />
                             </label>
                             <label style="display: inline-flex; gap: 6px; align-items: center;">
                                 <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
-                                <input type="month" class="ham-date-to" />
+                                <input type="month" class="ham-date-to" lang="sv-SE" />
                             </label>
                             <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                         </div>
@@ -374,11 +374,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                         <label style="display: inline-flex; gap: 6px; align-items: center;">
                             <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
-                            <input type="month" class="ham-date-from" />
+                            <input type="month" class="ham-date-from" lang="sv-SE" />
                         </label>
                         <label style="display: inline-flex; gap: 6px; align-items: center;">
                             <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
-                            <input type="month" class="ham-date-to" />
+                            <input type="month" class="ham-date-to" lang="sv-SE" />
                         </label>
                         <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                     </div>
@@ -408,11 +408,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                             <label style="display: inline-flex; gap: 6px; align-items: center;">
                                 <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
-                                <input type="month" class="ham-date-from" />
+                                <input type="month" class="ham-date-from" lang="sv-SE" />
                             </label>
                             <label style="display: inline-flex; gap: 6px; align-items: center;">
                                 <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
-                                <input type="month" class="ham-date-to" />
+                                <input type="month" class="ham-date-to" lang="sv-SE" />
                             </label>
                             <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                         </div>
@@ -504,11 +504,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                             <label style="display: inline-flex; gap: 6px; align-items: center;">
                                 <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
-                                <input type="month" class="ham-date-from" />
+                                <input type="month" class="ham-date-from" lang="sv-SE" />
                             </label>
                             <label style="display: inline-flex; gap: 6px; align-items: center;">
                                 <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
-                                <input type="month" class="ham-date-to" />
+                                <input type="month" class="ham-date-to" lang="sv-SE" />
                             </label>
                             <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                         </div>
@@ -535,11 +535,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                         <label style="display: inline-flex; gap: 6px; align-items: center;">
                             <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
-                            <input type="month" class="ham-date-from" />
+                            <input type="month" class="ham-date-from" lang="sv-SE" />
                         </label>
                         <label style="display: inline-flex; gap: 6px; align-items: center;">
                             <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
-                            <input type="month" class="ham-date-to" />
+                            <input type="month" class="ham-date-to" lang="sv-SE" />
                         </label>
                         <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                     </div>

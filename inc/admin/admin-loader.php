@@ -20,6 +20,35 @@ if (! defined('ABSPATH')) {
  */
 class HAM_Admin_Loader
 {
+    public static function fix_admin_bar_logo_link($wp_admin_bar)
+    {
+        if (!is_admin() || !is_admin_bar_showing()) {
+            return;
+        }
+
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        $target = admin_url('admin.php?page=ham-assessments');
+
+        if (is_object($wp_admin_bar) && method_exists($wp_admin_bar, 'add_node')) {
+            $wp_admin_bar->add_node(
+                array(
+                    'id'   => 'wp-logo',
+                    'href' => $target,
+                )
+            );
+
+            $wp_admin_bar->add_node(
+                array(
+                    'id'   => 'site-name',
+                    'href' => $target,
+                )
+            );
+        }
+    }
+
     /**
      * Enqueue Select2 for class CPT edit screens.
      */
@@ -88,6 +117,8 @@ class HAM_Admin_Loader
     {
         // Enqueue CPT Theming Styles
         add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue_cpt_theming_styles'));
+
+        add_action('admin_bar_menu', array(__CLASS__, 'fix_admin_bar_logo_link'), 1);
 
         // Class CPT Meta Boxes (already refactored)
         add_action('add_meta_boxes_' . HAM_CPT_CLASS, ['HAM_Class_Meta_Boxes', 'register_meta_boxes']);

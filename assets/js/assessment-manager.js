@@ -143,6 +143,11 @@
             toMonth: null,
         };
 
+        const fullDateRange = {
+            minMonth: null,
+            maxMonth: null,
+        };
+
         const dateRangeListeners = [];
 
         function registerDateRangeListener(fn) {
@@ -192,6 +197,70 @@
 
         if (!overview && !stats) {
             return;
+        }
+
+        function isMonthKey(val) {
+            return typeof val === 'string' && /^\d{4}-\d{2}$/.test(val);
+        }
+
+        function scanForMonthKeys(root) {
+            const found = [];
+            const stack = [root];
+            const seen = new Set();
+
+            while (stack.length > 0) {
+                const cur = stack.pop();
+                if (!cur || (typeof cur !== 'object' && !Array.isArray(cur))) {
+                    continue;
+                }
+                if (seen.has(cur)) {
+                    continue;
+                }
+                seen.add(cur);
+
+                if (Array.isArray(cur)) {
+                    cur.forEach((v) => stack.push(v));
+                    continue;
+                }
+
+                Object.keys(cur).forEach((k) => {
+                    const v = cur[k];
+                    if (k === 'key' && isMonthKey(v)) {
+                        found.push(v);
+                    } else if (isMonthKey(v)) {
+                        found.push(v);
+                    } else if (v && (typeof v === 'object' || Array.isArray(v))) {
+                        stack.push(v);
+                    }
+                });
+            }
+
+            return found;
+        }
+
+        function initFullDateRange() {
+            const months = [];
+            if (overview) {
+                months.push(...scanForMonthKeys(overview));
+            }
+            if (stats) {
+                months.push(...scanForMonthKeys(stats));
+            }
+
+            const uniq = Array.from(new Set(months.filter((m) => isMonthKey(m)))).sort();
+            if (uniq.length === 0) {
+                return;
+            }
+
+            fullDateRange.minMonth = uniq[0];
+            fullDateRange.maxMonth = uniq[uniq.length - 1];
+        }
+
+        initFullDateRange();
+
+        if (fullDateRange.minMonth && fullDateRange.maxMonth) {
+            dateRange.fromMonth = fullDateRange.minMonth;
+            dateRange.toMonth = fullDateRange.maxMonth;
         }
 
         function monthToTimestampStart(month) {
@@ -286,6 +355,14 @@
         }
 
         function getEffectiveRange() {
+            if (
+                fullDateRange.minMonth &&
+                fullDateRange.maxMonth &&
+                dateRange.fromMonth === fullDateRange.minMonth &&
+                dateRange.toMonth === fullDateRange.maxMonth
+            ) {
+                return { fromTs: null, toTs: null };
+            }
             const fromTs = monthToTimestampStart(dateRange.fromMonth);
             const toTs = monthToTimestampEnd(dateRange.toMonth);
             if (fromTs != null && toTs != null && fromTs > toTs) {
@@ -413,6 +490,14 @@
                 if (!from && !to) {
                     return allDatesLabel;
                 }
+                if (
+                    fullDateRange.minMonth &&
+                    fullDateRange.maxMonth &&
+                    from === fullDateRange.minMonth &&
+                    to === fullDateRange.maxMonth
+                ) {
+                    return allDatesLabel;
+                }
                 if (from && to) {
                     return `${formatMonthLabel(from)} – ${formatMonthLabel(to)}`;
                 }
@@ -461,8 +546,13 @@
 
             clearBtns.forEach((btn) => {
                 btn.addEventListener('click', () => {
-                    dateRange.fromMonth = null;
-                    dateRange.toMonth = null;
+                    if (fullDateRange.minMonth && fullDateRange.maxMonth) {
+                        dateRange.fromMonth = fullDateRange.minMonth;
+                        dateRange.toMonth = fullDateRange.maxMonth;
+                    } else {
+                        dateRange.fromMonth = null;
+                        dateRange.toMonth = null;
+                    }
                     sync();
                     notify();
                 });
