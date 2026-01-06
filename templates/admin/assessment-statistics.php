@@ -117,10 +117,12 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 }
 
                 $max_count = 1;
-                $min_val = 0.0;
-                $max_val = 0.0;
+                $min_val = null;
+                $max_val = null;
                 $points = array();
                 $labels = array();
+
+                $carry_score = null;
                 foreach ($series as $bucket) {
                     $count = isset($bucket['count']) ? (int) $bucket['count'] : 0;
                     if ($count > $max_count) {
@@ -129,12 +131,19 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
                     $val = $count;
                     if ($has_delta) {
-                        $val = isset($bucket['delta_avg']) && $bucket['delta_avg'] !== null ? (float) $bucket['delta_avg'] : 0.0;
-                        if ($val < $min_val) {
-                            $min_val = $val;
+                        $overall = isset($bucket['overall_avg']) && $bucket['overall_avg'] !== null ? (float) $bucket['overall_avg'] : null;
+                        $delta = isset($bucket['delta_avg']) && $bucket['delta_avg'] !== null ? (float) $bucket['delta_avg'] : null;
+
+                        if ($carry_score === null) {
+                            $carry_score = $overall;
+                        } elseif ($delta !== null) {
+                            $carry_score = (float) $carry_score + (float) $delta;
                         }
-                        if ($val > $max_val) {
-                            $max_val = $val;
+
+                        $val = $carry_score;
+                        if ($val !== null) {
+                            $min_val = ($min_val === null) ? (float) $val : min((float) $min_val, (float) $val);
+                            $max_val = ($max_val === null) ? (float) $val : max((float) $max_val, (float) $val);
                         }
                     }
                     $label = isset($bucket['semester_label']) ? (string) $bucket['semester_label'] : (isset($bucket['semester_key']) ? (string) $bucket['semester_key'] : '');
@@ -155,15 +164,6 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 $pad_y = 9;
 
                 $baseline_y = $h - $pad_y;
-                if ($has_delta) {
-                    $range = $max_val - $min_val;
-                    if ($range <= 0) {
-                        $range = 1.0;
-                    }
-                    $baseline_ratio = (0.0 - $min_val) / $range;
-                    $baseline_ratio = max(0.0, min(1.0, $baseline_ratio));
-                    $baseline_y = ($h - $pad_y) - ($baseline_ratio * ($h - 2 * $pad_y));
-                }
 
                 $svg_points = array();
                 $circle_nodes = array();
@@ -174,11 +174,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
                     $raw_val = $points[$i];
                     if ($has_delta) {
-                        $range = $max_val - $min_val;
+                        $range = (($max_val ?? 0.0) - ($min_val ?? 0.0));
                         if ($range <= 0) {
                             $range = 1.0;
                         }
-                        $ratio = (((float) $raw_val) - $min_val) / $range;
+                        $ratio = ($raw_val === null || $min_val === null) ? 0.0 : ((((float) $raw_val) - (float) $min_val) / $range);
                         $ratio = max(0.0, min(1.0, $ratio));
                         $y = ($h - $pad_y) - ($ratio * ($h - 2 * $pad_y));
                     } else {
@@ -190,9 +190,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
                     $value_label = '';
                     if ($has_delta) {
-                        $delta = (float) $raw_val;
-                        $sign = $delta > 0 ? '+' : '';
-                        $value_label = $sign . number_format($delta, 1);
+                        $value_label = $raw_val === null ? '—' : number_format((float) $raw_val, 1);
                     } else {
                         $value_label = (string) ((int) $raw_val);
                     }
@@ -213,12 +211,12 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
                 // Connecting line (only if > 1 point)
                 if ($n > 1) {
-                    echo '<polyline fill="none" stroke="#0073aa" stroke-width="2.5" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
+                    echo '<polyline fill="none" stroke="#0073aa" stroke-width="2" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
                 }
 
                 // Ring markers + counts
                 foreach ($circle_nodes as $node) {
-                    echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="9" fill="#ffffff" stroke="#0073aa" stroke-width="2.5" />';
+                    echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="9" fill="#ffffff" stroke="#0073aa" stroke-width="2" />';
                     echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr($node['y']) . '" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
                 }
                 echo '</svg>';
@@ -827,7 +825,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                 echo '<polyline fill="none" stroke="#0073aa" stroke-width="2.5" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
                             }
                             foreach ($circle_nodes as $node) {
-                                echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="9" fill="#ffffff" stroke="#0073aa" stroke-width="2.5" />';
+                                echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="9" fill="#ffffff" stroke="#0073aa" stroke-width="2" />';
                                 echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr($node['y']) . '" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
                             }
                             echo '</svg>';
