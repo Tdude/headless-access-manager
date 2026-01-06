@@ -25,10 +25,10 @@ class HAM_Assessment_Meta_Boxes
     public function __construct()
     {
         // Add meta boxes
-        add_action('add_meta_boxes_' . HAM_CPT_ASSESSMENT, array( $this, 'add_meta_boxes' ));
+        add_action('add_meta_boxes_' . HAM_CPT_ASSESSMENT_TPL, array( $this, 'add_meta_boxes' ));
 
         // Save post handler
-        add_action('save_post_' . HAM_CPT_ASSESSMENT, array( $this, 'save_post' ), 10, 2);
+        add_action('save_post_' . HAM_CPT_ASSESSMENT_TPL, array( $this, 'save_post' ), 10, 2);
 
         // AJAX handlers
         add_action('wp_ajax_ham_save_assessment_data', array( $this, 'ajax_save_assessment_data' ));
@@ -46,7 +46,7 @@ class HAM_Assessment_Meta_Boxes
             'ham_assessment_questions',
             __('Assessment Questions', 'headless-access-manager'),
             array( $this, 'render_questions_meta_box' ),
-            HAM_CPT_ASSESSMENT,
+            HAM_CPT_ASSESSMENT_TPL,
             'normal',
             'high'
         );
@@ -174,9 +174,9 @@ class HAM_Assessment_Meta_Boxes
         $current_post_type = $typenow ? $typenow : ($post ? get_post_type($post->ID) : '');
         
         // Debug: Log what we're checking
-        error_log("HAM Enqueue Check - Hook: $hook, Typenow: $typenow, Post Type: $current_post_type, Expected: " . HAM_CPT_ASSESSMENT);
+        error_log("HAM Enqueue Check - Hook: $hook, Typenow: $typenow, Post Type: $current_post_type, Expected: " . HAM_CPT_ASSESSMENT_TPL);
         
-        if (($hook == 'post.php' || $hook == 'post-new.php') && $current_post_type === HAM_CPT_ASSESSMENT) {
+        if (($hook == 'post.php' || $hook == 'post-new.php') && $current_post_type === HAM_CPT_ASSESSMENT_TPL) {
             error_log("HAM: Enqueuing assessment editor assets");
             // Enqueue JS
             wp_enqueue_script(
@@ -243,6 +243,11 @@ class HAM_Assessment_Meta_Boxes
         if (!$post_id || !current_user_can('edit_post', $post_id)) {
             error_log('HAM Debug - Invalid post ID or permissions');
             wp_send_json_error('Invalid post ID or permissions');
+            return;
+        }
+
+        if (get_post_type($post_id) !== HAM_CPT_ASSESSMENT_TPL) {
+            wp_send_json_error('Invalid post type');
             return;
         }
 

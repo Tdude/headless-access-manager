@@ -391,7 +391,7 @@ class HAM_Admin_Menu
         $active_id = absint(get_option('ham_active_question_bank_id', 0));
 
         $posts = get_posts(array(
-            'post_type'      => HAM_CPT_ASSESSMENT,
+            'post_type'      => HAM_CPT_ASSESSMENT_TPL,
             'post_status'    => 'publish',
             'posts_per_page' => -1,
             'orderby'        => 'date',

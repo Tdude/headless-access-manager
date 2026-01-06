@@ -412,6 +412,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <h3 style="margin-top: 20px;">
                     <?php echo esc_html__('Questions and answer alternatives', 'headless-access-manager'); ?>
                 </h3>
+                <?php if (current_user_can('manage_options') && isset($drilldown['radar_questions_source']) && $drilldown['radar_questions_source'] === 'fallback') : ?>
+                    <div style="margin-top: -10px; margin-bottom: 10px; color: #b32d2e; font-weight: 600;">
+                        <?php echo esc_html__('Fallback questions', 'headless-access-manager'); ?>
+                    </div>
+                <?php endif; ?>
                 <div class="ham-radar-toggle ham-answer-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                     <button type="button" class="button ham-answer-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-answer-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>

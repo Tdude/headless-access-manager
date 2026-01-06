@@ -80,8 +80,22 @@ class HAM_Assessment_Templates_Admin
     /**
      * Add meta boxes for template structure.
      */
-    public function add_template_meta_boxes()
+    public function add_template_meta_boxes($post)
     {
+        if (!($post instanceof WP_Post)) {
+            return;
+        }
+
+        $has_bank = get_post_meta($post->ID, '_ham_assessment_data', true);
+        if (is_array($has_bank) && !empty($has_bank)) {
+            return;
+        }
+
+        $tpl_structure = get_post_meta($post->ID, '_ham_template_structure', true);
+        if (empty($tpl_structure)) {
+            return;
+        }
+
         add_meta_box(
             'ham_template_structure',
             __('Template Structure', 'headless-access-manager'),

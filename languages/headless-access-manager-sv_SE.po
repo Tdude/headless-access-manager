@@ -583,6 +583,14 @@ msgid "Questions and answer alternatives"
 msgstr "Frågor och svarsalternativ"
 
 #: templates/admin/assessment-statistics.php
+msgid "Fallback questions"
+msgstr "Reservfrågor"
+
+#: templates/admin/assessment-statistics.php
+msgid "Time bucket"
+msgstr "Tidsintervall"
+
+#: templates/admin/assessment-statistics.php
 msgid "Option 1"
 msgstr "Alternativ 1"
 

@@ -64,7 +64,7 @@ define('HAM_ASSESSMENT_DEFAULT_STRUCTURE', array(
                     array('value' => '1', 'label' => 'Försvinner från skolan vid konflikt', 'stage' => 'ej'),
                     array('value' => '2', 'label' => 'Stannar kvar på skolan', 'stage' => 'ej'),
                     array('value' => '3', 'label' => 'Kommer tillbaka till mig', 'stage' => 'trans'),
-                    array('value' => '4', 'label' => 'Förklarar för mig efter konikt', 'stage' => 'trans'),
+                    array('value' => '4', 'label' => 'Förklarar för mig efter konflikt', 'stage' => 'trans'),
                     array('value' => '5', 'label' => 'Kommer tillbaka till andra vuxna', 'stage' => 'full'),
                 ),
             ),
@@ -137,7 +137,7 @@ define('HAM_ASSESSMENT_DEFAULT_STRUCTURE', array(
             'b6' => array(
                 'text' => 'Arbeta själv',
                 'options' => array(
-                    array('value' => '1', 'label' => 'Klara inte', 'stage' => 'ej'),
+                    array('value' => '1', 'label' => 'Klarar inte', 'stage' => 'ej'),
                     array('value' => '2', 'label' => 'Löser en uppgift med stöd', 'stage' => 'ej'),
                     array('value' => '3', 'label' => 'Kan klara uppgifter självständigt i klassrummet', 'stage' => 'trans'),
                     array('value' => '4', 'label' => 'Gör ofta läxor och pratar om dem', 'stage' => 'trans'),

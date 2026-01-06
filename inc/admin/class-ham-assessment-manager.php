@@ -22,6 +22,7 @@ class HAM_Assessment_Manager
 {
     private const ACTIVE_QUESTION_BANK_OPTION = 'ham_active_question_bank_id';
     private const QUESTION_BANK_META_KEY = '_ham_assessment_data';
+    private const QUESTION_BANK_MIGRATION_OPTION = 'ham_question_bank_migrated_to_tpl';
 
     private static function calculate_stage_from_assessment_data($assessment_data, $threshold = 3, $majority_factor = 0.7)
     {
@@ -134,6 +135,9 @@ class HAM_Assessment_Manager
      */
     public function __construct()
     {
+        // One-time migration: move Question Bank posts out of ham_assessment into ham_assessment_tpl.
+        add_action('admin_init', array($this, 'migrate_question_banks_to_templates'));
+
         // Fix metadata on existing assessments (one-time operation)
         add_action('admin_init', array($this, 'fix_assessment_metadata'));
 
@@ -343,11 +347,17 @@ class HAM_Assessment_Manager
     {
         $configured = absint(get_option(self::ACTIVE_QUESTION_BANK_OPTION, 0));
         if ($configured > 0) {
-            return $configured;
+            $pt = get_post_type($configured);
+            if ($pt === HAM_CPT_ASSESSMENT_TPL) {
+                $has = get_post_meta($configured, self::QUESTION_BANK_META_KEY, true);
+                if (is_array($has) && !empty($has)) {
+                    return $configured;
+                }
+            }
         }
 
         $posts = get_posts(array(
-            'post_type'      => HAM_CPT_ASSESSMENT,
+            'post_type'      => HAM_CPT_ASSESSMENT_TPL,
             'post_status'    => 'publish',
             'posts_per_page' => 1,
             'orderby'        => 'date',
@@ -377,6 +387,67 @@ class HAM_Assessment_Manager
         }
 
         return absint($posts[0]->ID);
+    }
+
+    public function migrate_question_banks_to_templates()
+    {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        $already = get_option(self::QUESTION_BANK_MIGRATION_OPTION, false);
+        if ($already) {
+            return;
+        }
+
+        $ids = get_posts(array(
+            'post_type'      => HAM_CPT_ASSESSMENT,
+            'post_status'    => 'any',
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
+            'meta_query'     => array(
+                array(
+                    'key'     => self::QUESTION_BANK_META_KEY,
+                    'compare' => 'EXISTS',
+                ),
+                array(
+                    'relation' => 'OR',
+                    array(
+                        'key'     => HAM_ASSESSMENT_META_STUDENT_ID,
+                        'compare' => 'NOT EXISTS',
+                    ),
+                    array(
+                        'key'     => HAM_ASSESSMENT_META_STUDENT_ID,
+                        'value'   => '',
+                        'compare' => '=',
+                    ),
+                ),
+            ),
+        ));
+
+        if (empty($ids)) {
+            update_option(self::QUESTION_BANK_MIGRATION_OPTION, 1, false);
+            return;
+        }
+
+        global $wpdb;
+        foreach ($ids as $id) {
+            $id = absint($id);
+            if ($id <= 0) {
+                continue;
+            }
+
+            $wpdb->update(
+                $wpdb->posts,
+                array('post_type' => HAM_CPT_ASSESSMENT_TPL),
+                array('ID' => $id),
+                array('%s'),
+                array('%d')
+            );
+            clean_post_cache($id);
+        }
+
+        update_option(self::QUESTION_BANK_MIGRATION_OPTION, 1, false);
     }
 
     private static function get_question_bank_structure_from_db(int $post_id): array
@@ -1006,12 +1077,19 @@ class HAM_Assessment_Manager
 
     private static function get_radar_question_labels_and_options()
     {
-        $structure = self::get_canonical_questions_structure();
+        $source = 'db';
+        $structure = self::get_question_bank_structure();
+        if (empty($structure) || !is_array($structure)) {
+            $source = 'fallback';
+            $structure = self::get_canonical_questions_structure();
+        }
+
         if (empty($structure) || !is_array($structure)) {
             return array(
                 'order' => array(),
                 'labels' => array(),
                 'questions' => array(),
+                'source' => $source,
             );
         }
 
@@ -1051,6 +1129,7 @@ class HAM_Assessment_Manager
             'order' => $order,
             'labels' => $labels,
             'questions' => $questions,
+            'source' => $source,
         );
     }
 
@@ -1184,6 +1263,7 @@ class HAM_Assessment_Manager
 
         $radar_meta = self::get_radar_question_labels_and_options();
         $view['radar_questions'] = isset($radar_meta['questions']) ? $radar_meta['questions'] : array();
+        $view['radar_questions_source'] = isset($radar_meta['source']) ? $radar_meta['source'] : 'unknown';
 
         if ($student_id > 0) {
             $view['level'] = 'student';
