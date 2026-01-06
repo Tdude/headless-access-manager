@@ -57,11 +57,11 @@ msgstr "Ansvarig pedagog"
 
 #: templates/admin/assessments-list.php:108
 msgid "Assessment Details"
-msgstr "Bedömningsdetaljer"
+msgstr "Detaljer för elevobservation"
 
 #: templates/admin/assessments-list.php:113
 msgid "Error loading assessment data."
-msgstr "Fel vid laddning av bedömningsdata."
+msgstr "Fel vid laddning av observationsdata."
 
 #: templates/admin/assessments-list.php:135
 msgid "Ansvar"
@@ -124,7 +124,7 @@ msgid "No assessments match your search criteria."
 msgstr "Inga observationer matchar dina sökkriterier."
 
 msgid "Parent Assessment:"
-msgstr "Överordnad bedömning:"
+msgstr "Överordnad observation:"
 
 # Media/Image Related
 msgid "Featured Image"
@@ -140,66 +140,66 @@ msgid "Use as featured image"
 msgstr "Använd som huvudbild"
 
 msgid "Insert into assessment"
-msgstr "Infoga i bedömning"
+msgstr "Infoga i observation"
 
 msgid "Uploaded to this assessment"
-msgstr "Uppladdad till denna bedömning"
+msgstr "Uppladdad till denna observation"
 
 # Assessment Lists
 msgid "Assessments list"
-msgstr "Bedömningslista"
+msgstr "Observationslista"
 
 msgid "Assessments list navigation"
-msgstr "Navigering för bedömningslista"
+msgstr "Navigering för observationslista"
 
 msgid "Filter assessments list"
-msgstr "Filtrera bedömningslista"
+msgstr "Filtrera observationslista"
 
 # Assessment Status Messages
 msgid "Assessment published"
-msgstr "Bedömning publicerad"
+msgstr "Observation publicerad"
 
 msgid "Assessment published privately"
-msgstr "Bedömning publicerad privat"
+msgstr "Observation publicerad privat"
 
 msgid "Assessment reverted to draft"
-msgstr "Bedömning återställd till utkast"
+msgstr "Observation återställd till utkast"
 
 msgid "Assessment scheduled"
-msgstr "Bedömning schemalagd"
+msgstr "Observation schemalagd"
 
 msgid "Assessment updated"
-msgstr "Bedömning uppdaterad"
+msgstr "Observation uppdaterad"
 
 msgid "Assessment submitted"
-msgstr "Bedömning inlämnad"
+msgstr "Observation inlämnad"
 
 msgid "Assessment draft updated"
-msgstr "Bedömningsutkast uppdaterat"
+msgstr "Observationsutkast uppdaterat"
 
 msgid "Assessment draft saved"
-msgstr "Bedömningsutkast sparat"
+msgstr "Observationsutkast sparat"
 
 msgid "Assessment saved"
-msgstr "Bedömning sparad"
+msgstr "Observation sparad"
 
 msgid "Assessment preview"
-msgstr "Förhandsgranskning av bedömning"
+msgstr "Förhandsgranskning av observation"
 
 msgid "Assessment deleted"
-msgstr "Bedömning borttagen"
+msgstr "Observation borttagen"
 
 msgid "Assessment restored"
-msgstr "Bedömning återställd"
+msgstr "Observation återställd"
 
 msgid "Assessment permanently deleted"
-msgstr "Bedömning permanent borttagen"
+msgstr "Observation permanent borttagen"
 
 msgid "Assessment moved to trash"
-msgstr "Bedömning flyttad till papperskorgen"
+msgstr "Observation flyttad till papperskorgen"
 
 msgid "Assessment removed from trash"
-msgstr "Bedömning borttagen från papperskorgen"
+msgstr "Observation borttagen från papperskorgen"
 
 # Short Status Messages
 
@@ -287,7 +287,7 @@ msgstr "Ingen data per fråga tillgänglig."
 
 #: templates/admin/assessment-statistics.php:236
 msgid "No evaluation data available for this student."
-msgstr "Ingen bedömningsdata tillgänglig för denna elev."
+msgstr "Ingen observationsdata tillgänglig för denna elev."
 
 # Semester labels
 #: inc/admin/class-ham-assessment-manager.php:228
@@ -298,32 +298,32 @@ msgstr "Vår"
 msgid "Fall"
 msgstr "Höst"
 msgid "Assessment updated."
-msgstr "Bedömning uppdaterad."
+msgstr "Observation uppdaterad."
 
 msgid "Assessment created."
-msgstr "Bedömning skapad."
+msgstr "Observation skapad."
 
 msgid "Assessment deleted."
-msgstr "Bedömning borttagen."
+msgstr "Observation borttagen."
 
 msgid "Assessment restored."
-msgstr "Bedömning återställd."
+msgstr "Observation återställd."
 
 msgid "Assessment saved."
-msgstr "Bedömning sparad."
+msgstr "Observation sparad."
 
 msgid "Assessment submitted."
-msgstr "Bedömning inlämnad."
+msgstr "Observation inlämnad."
 
 msgid "Assessment scheduled."
-msgstr "Bedömning schemalagd."
+msgstr "Observation schemalagd."
 
 msgid "Assessment draft updated."
-msgstr "Bedömningsutkast uppdaterat."
+msgstr "Observationsutkast uppdaterat."
 
 # Assessment Questions Post Type
 msgid "Assessment Questions"
-msgstr "Bedömningsfrågor"
+msgstr "Observationsfrågor"
 
 msgid "All Questions"
 msgstr "Frågebank"
@@ -332,40 +332,40 @@ msgid "Question Bank"
 msgstr "Frågebank"
 
 msgid "Assessment Question"
-msgstr "Bedömningsfråga"
+msgstr "Observationsfråga"
 
 msgid "Add New Assessment Question"
-msgstr "Lägg till ny bedömningsfråga"
+msgstr "Lägg till ny observationsfråga"
 
 msgid "New Assessment Question"
-msgstr "Ny bedömningsfråga"
+msgstr "Ny observationsfråga"
 
 msgid "Edit Assessment Question"
-msgstr "Redigera bedömningsfråga"
+msgstr "Redigera observationsfråga"
 
 msgid "View Assessment Question"
-msgstr "Visa bedömningsfråga"
+msgstr "Visa observationsfråga"
 
 msgid "All Assessment Questions"
-msgstr "Skapa bedömningsfrågor"
+msgstr "Skapa observationsfrågor"
 
 msgid "Search Assessment Questions"
-msgstr "Sök bedömningsfrågor"
+msgstr "Sök observationsfrågor"
 
 msgid "No assessment questions found."
-msgstr "Inga bedömningsfrågor hittades."
+msgstr "Inga observationsfrågor hittades."
 
 msgid "No assessment questions found in Trash."
-msgstr "Inga bedömningsfrågor hittades i papperskorgen."
+msgstr "Inga observationsfrågor hittades i papperskorgen."
 
 msgid "Filter assessment questions list"
-msgstr "Filtrera bedömningsfrågorna"
+msgstr "Filtrera observationsfrågorna"
 
 msgid "Assessment questions list navigation"
-msgstr "Navigering för bedömningsfrågorna"
+msgstr "Navigering för observationsfrågorna"
 
 msgid "Assessment questions list"
-msgstr "Lista över bedömningsfrågor"
+msgstr "Lista över observationsfrågorna"
 
 # Assessment Fields and Values
 msgid "Attachment"
@@ -381,7 +381,7 @@ msgid "Connection"
 msgstr "Anknytning"
 
 msgid "Connection Points"
-msgstr "Anknytningsbedömning"
+msgstr "Anknytningsobservation"
 
 msgid "Comment"
 msgid_plural "Comments"
@@ -431,13 +431,13 @@ msgstr "Etablerad"
 
 # Confirmation Messages
 msgid "Are you sure you want to delete this assessment?"
-msgstr "Är du säker på att du vill ta bort denna bedömning?"
+msgstr "Är du säker på att du vill ta bort denna observation?"
 
 msgid "Assessment deleted successfully."
-msgstr "Bedömningen har tagits bort."
+msgstr "Observationen har tagits bort."
 
 msgid "Error deleting assessment."
-msgstr "Fel vid borttagning av bedömning."
+msgstr "Fel vid borttagning av observation."
 
 # Filter Options
 msgid "Filter by status:"
@@ -1286,7 +1286,7 @@ msgid "Instructions:"
 msgstr "Instruktioner:"
 
 msgid "Use the Wordpress editor above to add explanatory text that will be visible publicly. Use the tabs below to configure the assessment questions (admin only)."
-msgstr "Använd WordPress-editorn ovan för att lägga till förklarande text som kommer att synas publikt. Använd flikarna nedan för att konfigurera bedömningsfrågorna (endast admin)."
+msgstr "Använd WordPress-editorn ovan för att lägga till förklarande text som kommer att synas publikt. Använd flikarna nedan för att konfigurera observationsfrågorna (endast admin)."
 
 msgid "Option"
 msgstr "Alternativ"

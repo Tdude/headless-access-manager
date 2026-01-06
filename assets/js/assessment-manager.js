@@ -1994,7 +1994,7 @@
                 return;
             }
 
-            if (!confirm('Är du säker på att du vill ta bort denna bedömning? Detta går inte att ångra.')) {
+            if (!confirm('Är du säker på att du vill ta bort denna elevobservation? Detta går inte att ångra.')) {
                 return;
             }
 
@@ -2015,12 +2015,12 @@
                             $(this).remove();
                         });
                     } else {
-                        alert(response.data.message || 'Ett fel uppstod när bedömningen skulle tas bort.');
+                        alert(response.data.message || 'Ett fel uppstod när observationen skulle tas bort.');
                         $button.prop('disabled', false);
                     }
                 },
                 error: function() {
-                    alert('Ett fel uppstod när bedömningen skulle tas bort.');
+                    alert('Ett fel uppstod när observationen skulle tas bort.');
                     $button.prop('disabled', false);
                 }
             });
