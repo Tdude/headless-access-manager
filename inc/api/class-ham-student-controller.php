@@ -92,91 +92,92 @@ class HAM_Student_Controller extends HAM_Base_Controller
             return new WP_Error('ham_not_logged_in', __('You must be logged in to search students.', 'headless-access-manager'), ['status' => 401]);
         }
         
-        // Look up teacher CPT associated with this WordPress user
+        // Look up teacher CPT associated with this WordPress user (if any)
         $teacher_cpt_id = HAM_Teacher_Controller::get_teacher_by_user_id($current_user_id);
         
-        // Check if user is teacher/admin (or higher HAM roles)
         $is_admin = current_user_can('administrator');
         $user = get_user_by('id', $current_user_id);
         $user_roles = $user ? (array) $user->roles : [];
-        $is_ham_staff = in_array(HAM_ROLE_TEACHER, $user_roles, true)
-            || in_array(HAM_ROLE_PRINCIPAL, $user_roles, true)
-            || in_array(HAM_ROLE_SCHOOL_HEAD, $user_roles, true);
+        $is_teacher = in_array(HAM_ROLE_TEACHER, $user_roles, true);
+        $is_principal = in_array(HAM_ROLE_PRINCIPAL, $user_roles, true);
 
-        if (!$teacher_cpt_id && !$is_admin && !$is_ham_staff) {
+        if (!$is_admin && !$is_teacher && !$is_principal) {
             // Only log actual security issues
-            error_log("HAM Student Search - Error: User is not a teacher/admin/HAM staff");
-            return new WP_Error('ham_not_teacher', __('You must be a teacher or administrator to search students.', 'headless-access-manager'), ['status' => 403]);
+            error_log("HAM Student Search - Error: User is not a teacher/principal/admin");
+            return new WP_Error('ham_not_allowed', __('You do not have permission to search students.', 'headless-access-manager'), ['status' => 403]);
         }
         
         // Initialize accessible student IDs
         $accessible_student_ids = [];
         $assigned_class_ids = [];
         $assigned_school_id = null;
-        
-        // Get teacher's assigned classes and school (if not admin)
-        if (!$is_admin) {
-            if ($teacher_cpt_id) {
-                $assigned_class_ids = get_post_meta($teacher_cpt_id, '_ham_class_ids', true);
-                $assigned_class_ids = is_array($assigned_class_ids) ? array_filter(array_map('intval', $assigned_class_ids)) : [];
-                //error_log("HAM Student Search - Teacher assigned class IDs: " . json_encode($assigned_class_ids));
 
-                $assigned_school_id = get_post_meta($teacher_cpt_id, '_ham_school_id', true);
-                $assigned_school_id = !empty($assigned_school_id) ? intval($assigned_school_id) : null;
-                //error_log("HAM Student Search - Teacher assigned school ID: " . ($assigned_school_id ? $assigned_school_id : 'none'));
+        if ($is_admin) {
+            // Admin can see all students; optional class_id will narrow results below.
+        } elseif ($is_teacher) {
+            // Teachers may be linked to a Teacher CPT, but also support user-meta assignment.
+            if ($teacher_cpt_id) {
+                $assigned_class_ids = get_post_meta($teacher_cpt_id, HAM_USER_META_CLASS_IDS, true);
+                $assigned_class_ids = is_array($assigned_class_ids) ? array_filter(array_map('intval', $assigned_class_ids)) : [];
             } else {
-                // Fallback: teachers (and other HAM staff roles) may not have a linked Teacher CPT.
-                // Use user meta assignments to determine access scope.
                 $assigned_class_ids = get_user_meta($current_user_id, HAM_USER_META_CLASS_IDS, true);
                 $assigned_class_ids = is_array($assigned_class_ids) ? array_filter(array_map('intval', $assigned_class_ids)) : [];
-
-                $assigned_school_id = get_user_meta($current_user_id, HAM_USER_META_SCHOOL_ID, true);
-                $assigned_school_id = !empty($assigned_school_id) ? intval($assigned_school_id) : null;
             }
 
-            // Teachers should only see students within their assigned school
-            if (empty($assigned_school_id)) {
-                //error_log("HAM Student Search - No assigned school found for non-admin user");
+            // Teachers must be assigned to at least one class to search.
+            if (empty($assigned_class_ids)) {
                 return new WP_REST_Response([], 200);
             }
 
-            // If specific class filter is provided, ensure it's within the assigned school
+            // If a class filter is provided, it must be one of the teacher's classes.
+            if ($class_id && !in_array($class_id, $assigned_class_ids, true)) {
+                return new WP_Error('ham_unauthorized_class', __('You do not have permission to access this class.', 'headless-access-manager'), ['status' => 403]);
+            }
+        } elseif ($is_principal) {
+            // Principals can search within their assigned school.
+            $assigned_school_id = get_user_meta($current_user_id, HAM_USER_META_SCHOOL_ID, true);
+            $assigned_school_id = !empty($assigned_school_id) ? intval($assigned_school_id) : null;
+
+            if (empty($assigned_school_id)) {
+                return new WP_REST_Response([], 200);
+            }
+
             if ($class_id) {
-                $class_school_id = get_post_meta($class_id, '_ham_school_id', true);
+                $class_school_id = get_post_meta($class_id, HAM_USER_META_SCHOOL_ID, true);
                 $class_school_id = !empty($class_school_id) ? intval($class_school_id) : null;
 
                 if (!$class_school_id || $class_school_id !== $assigned_school_id) {
-                    // Only log actual security issues
-                    error_log("HAM Student Search - Error: User does not have access to specified class ID: {$class_id}");
                     return new WP_Error('ham_unauthorized_class', __('You do not have permission to access this class.', 'headless-access-manager'), ['status' => 403]);
                 }
             }
-        } else {
-            // Admin can see all students, no filter needed
-            //error_log("HAM Student Search - Admin user, no class filters needed");
         }
         
-        // Get student IDs based on class filter or school assignment
+        // Resolve the accessible student IDs.
+        // - Admin: no restriction.
+        // - Teacher: only students in assigned classes.
+        // - Principal: students in selected class OR in principal's school.
         if ($class_id) {
-            // If specific class filter is used
-            //error_log("HAM Student Search - Using specific class filter: {$class_id}");
             $students_in_class = get_post_meta($class_id, '_ham_student_ids', true);
             if (is_array($students_in_class) && !empty($students_in_class)) {
                 $accessible_student_ids = $students_in_class;
-                //error_log("HAM Student Search - Students in filtered class: " . json_encode($accessible_student_ids));
             } else {
-                //error_log("HAM Student Search - No students found in filtered class or invalid meta");
-                return new WP_REST_Response([], 200); // No students in this class
+                return new WP_REST_Response([], 200);
             }
-        } else if (!$is_admin && $assigned_school_id) {
-            // Teachers (and other HAM roles) can see students in their school
+        } elseif (!$is_admin && $is_teacher) {
+            foreach ($assigned_class_ids as $cid) {
+                $students_in_class = get_post_meta($cid, '_ham_student_ids', true);
+                if (is_array($students_in_class) && !empty($students_in_class)) {
+                    $accessible_student_ids = array_merge($accessible_student_ids, $students_in_class);
+                }
+            }
+        } elseif (!$is_admin && $is_principal && $assigned_school_id) {
             $school_students_query = new WP_Query([
                 'post_type' => HAM_CPT_STUDENT,
                 'posts_per_page' => -1,
                 'fields' => 'ids',
                 'meta_query' => [
                     [
-                        'key' => '_ham_school_id',
+                        'key' => HAM_USER_META_SCHOOL_ID,
                         'value' => $assigned_school_id,
                         'compare' => '=',
                     ],
@@ -185,7 +186,6 @@ class HAM_Student_Controller extends HAM_Base_Controller
 
             if ($school_students_query->have_posts()) {
                 $accessible_student_ids = $school_students_query->posts;
-                //error_log("HAM Student Search - Found students by school: " . json_encode($accessible_student_ids));
             }
             wp_reset_postdata();
         }
@@ -220,8 +220,14 @@ class HAM_Student_Controller extends HAM_Base_Controller
         add_filter('posts_where', $post_type_where_cb, 5, 2);
         
         // Add student ID restriction if needed
-        if (!empty($accessible_student_ids) && !$is_admin) {
-            $query_args['post__in'] = $accessible_student_ids;
+        if (!$is_admin) {
+            $accessible_student_ids = array_unique(array_filter(array_map('intval', $accessible_student_ids)));
+            if (empty($accessible_student_ids)) {
+                // Avoid returning all students when the user has no scope.
+                $query_args['post__in'] = [0];
+            } else {
+                $query_args['post__in'] = $accessible_student_ids;
+            }
         }
         
         // Add title search if we have a search term

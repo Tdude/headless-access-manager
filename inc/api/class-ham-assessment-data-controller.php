@@ -278,9 +278,65 @@ class HAM_Assessment_Data_Controller extends HAM_Base_Controller
             //error_log('DEBUG MODE: Bypassing authentication for evaluation save');
             return true;
         }
-        
-        // Check if user is logged in
-        return current_user_can('read');
+
+        $jwt_valid = $this->validate_jwt($request);
+        if (is_wp_error($jwt_valid)) {
+            return $jwt_valid;
+        }
+
+        $current_user_id = get_current_user_id();
+        if (!$current_user_id) {
+            return new WP_Error('ham_not_logged_in', __('You must be logged in to save an evaluation.', 'headless-access-manager'), ['status' => 401]);
+        }
+
+        $user = get_user_by('id', $current_user_id);
+        $roles = $user ? (array) $user->roles : [];
+
+        $is_admin = in_array('administrator', $roles, true) || current_user_can('manage_options');
+        $is_teacher = in_array(HAM_ROLE_TEACHER, $roles, true);
+        $is_principal = in_array(HAM_ROLE_PRINCIPAL, $roles, true);
+
+        if (!$is_admin && !$is_teacher && !$is_principal) {
+            return new WP_Error('ham_forbidden', __('You do not have permission to save evaluations.', 'headless-access-manager'), ['status' => 403]);
+        }
+
+        $student_post_id = absint($request->get_param('student_id'));
+        if ($student_post_id <= 0 || get_post_type($student_post_id) !== HAM_CPT_STUDENT) {
+            return new WP_Error('ham_invalid_student', __('Invalid student.', 'headless-access-manager'), ['status' => 400]);
+        }
+
+        // Admin can save for any student.
+        if ($is_admin) {
+            return true;
+        }
+
+        // Principal can save for students in their school.
+        if ($is_principal) {
+            $principal_school_id = get_user_meta($current_user_id, HAM_USER_META_SCHOOL_ID, true);
+            $principal_school_id = !empty($principal_school_id) ? absint($principal_school_id) : 0;
+
+            $student_school_id = get_post_meta($student_post_id, HAM_USER_META_SCHOOL_ID, true);
+            $student_school_id = !empty($student_school_id) ? absint($student_school_id) : 0;
+
+            return $principal_school_id > 0 && $principal_school_id === $student_school_id;
+        }
+
+        // Teacher can save only for students in their assigned classes.
+        if ($is_teacher) {
+            $teacher_class_ids = get_user_meta($current_user_id, HAM_USER_META_CLASS_IDS, true);
+            $teacher_class_ids = is_array($teacher_class_ids) ? array_filter(array_map('absint', $teacher_class_ids)) : [];
+
+            $student_class_ids = get_post_meta($student_post_id, HAM_USER_META_CLASS_IDS, true);
+            $student_class_ids = is_array($student_class_ids) ? array_filter(array_map('absint', $student_class_ids)) : [];
+
+            if (empty($teacher_class_ids) || empty($student_class_ids)) {
+                return false;
+            }
+
+            return !empty(array_intersect($teacher_class_ids, $student_class_ids));
+        }
+
+        return false;
     }
 
     /**
