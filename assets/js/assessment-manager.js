@@ -315,9 +315,45 @@
             const fromInputs = Array.from(document.querySelectorAll('input.ham-date-from'));
             const toInputs = Array.from(document.querySelectorAll('input.ham-date-to'));
             const clearBtns = Array.from(document.querySelectorAll('.ham-date-clear'));
+            const summaryEls = Array.from(document.querySelectorAll('.ham-date-summary'));
 
             if (fromInputs.length === 0 && toInputs.length === 0 && clearBtns.length === 0) {
                 return;
+            }
+
+            function formatMonthLabel(month) {
+                const start = monthToTimestampStart(month);
+                if (start == null) {
+                    return '';
+                }
+                try {
+                    return new Date(start).toLocaleDateString('sv-SE', { year: 'numeric', month: 'short' });
+                } catch (e) {
+                    return String(month);
+                }
+            }
+
+            function summaryText() {
+                const from = dateRange.fromMonth;
+                const to = dateRange.toMonth;
+                const allDatesLabel = (function() {
+                    const first = summaryEls.length > 0 ? summaryEls[0] : null;
+                    if (!first) return 'All Dates';
+                    const attr = first.getAttribute('data-all-dates');
+                    if (attr) return String(attr);
+                    const txt = (first.textContent || '').trim();
+                    return txt || 'All Dates';
+                })();
+                if (!from && !to) {
+                    return allDatesLabel;
+                }
+                if (from && to) {
+                    return `${formatMonthLabel(from)} – ${formatMonthLabel(to)}`;
+                }
+                if (from) {
+                    return `${formatMonthLabel(from)} –`;
+                }
+                return `– ${formatMonthLabel(to)}`;
             }
 
             function sync() {
@@ -326,6 +362,9 @@
                 });
                 toInputs.forEach((el) => {
                     el.value = dateRange.toMonth || '';
+                });
+                summaryEls.forEach((el) => {
+                    el.textContent = summaryText();
                 });
             }
 

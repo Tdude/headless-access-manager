@@ -462,6 +462,15 @@ msgstr "Filtrera efter datum:"
 msgid "All Dates"
 msgstr "Alla datum"
 
+msgid "From"
+msgstr "Från"
+
+msgid "To"
+msgstr "Till"
+
+msgid "Clear"
+msgstr "Rensa"
+
 msgid "Today"
 msgstr "Idag"
 
