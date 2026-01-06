@@ -551,8 +551,8 @@ msgid "School year"
 msgstr "Skolår"
 
 #: inc/admin/class-ham-assessment-manager.php
-msgid "Högstadium"
-msgstr "Högstadium"
+msgid "Låg-/Mellan-/Högstadiu"
+msgstr "Låg-/Mellan-/Högstadiu"
 
 #: inc/admin/class-ham-assessment-manager.php
 msgid "Radar"

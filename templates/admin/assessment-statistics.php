@@ -233,7 +233,18 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
+                </div>
+                <div class="ham-date-range" style="margin: 8px 0 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <label style="display: inline-flex; gap: 6px; align-items: center;">
+                        <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
+                        <input type="month" class="ham-date-from" />
+                    </label>
+                    <label style="display: inline-flex; gap: 6px; align-items: center;">
+                        <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
+                        <input type="month" class="ham-date-to" />
+                    </label>
+                    <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                 </div>
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-group-radar"></canvas></div>
                 <div id="ham-group-radar-table" class="ham-radar-values"></div>
@@ -246,7 +257,18 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
+                    </div>
+                    <div class="ham-date-range" style="margin: 8px 0 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <label style="display: inline-flex; gap: 6px; align-items: center;">
+                            <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
+                            <input type="month" class="ham-date-from" />
+                        </label>
+                        <label style="display: inline-flex; gap: 6px; align-items: center;">
+                            <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
+                            <input type="month" class="ham-date-to" />
+                        </label>
+                        <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                     </div>
                     <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-drilldown"></canvas></div>
 
@@ -309,7 +331,18 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
+                </div>
+                <div class="ham-date-range" style="margin: 8px 0 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <label style="display: inline-flex; gap: 6px; align-items: center;">
+                        <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
+                        <input type="month" class="ham-date-from" />
+                    </label>
+                    <label style="display: inline-flex; gap: 6px; align-items: center;">
+                        <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
+                        <input type="month" class="ham-date-to" />
+                    </label>
+                    <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                 </div>
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-group-radar"></canvas></div>
                 <div id="ham-group-radar-table" class="ham-radar-values"></div>
@@ -322,7 +355,18 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
+                    </div>
+                    <div class="ham-date-range" style="margin: 8px 0 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <label style="display: inline-flex; gap: 6px; align-items: center;">
+                            <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
+                            <input type="month" class="ham-date-from" />
+                        </label>
+                        <label style="display: inline-flex; gap: 6px; align-items: center;">
+                            <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
+                            <input type="month" class="ham-date-to" />
+                        </label>
+                        <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                     </div>
                     <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-drilldown"></canvas></div>
 
@@ -392,7 +436,18 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
+                    </div>
+                    <div class="ham-date-range" style="margin: 8px 0 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <label style="display: inline-flex; gap: 6px; align-items: center;">
+                            <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
+                            <input type="month" class="ham-date-from" />
+                        </label>
+                        <label style="display: inline-flex; gap: 6px; align-items: center;">
+                            <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
+                            <input type="month" class="ham-date-to" />
+                        </label>
+                        <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                     </div>
                     <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-student"></canvas></div>
                 <?php endif; ?>
@@ -404,7 +459,18 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <button type="button" class="button ham-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
+                </div>
+                <div class="ham-date-range" style="margin: 8px 0 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <label style="display: inline-flex; gap: 6px; align-items: center;">
+                        <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
+                        <input type="month" class="ham-date-from" />
+                    </label>
+                    <label style="display: inline-flex; gap: 6px; align-items: center;">
+                        <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
+                        <input type="month" class="ham-date-to" />
+                    </label>
+                    <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                 </div>
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-student-radar"></canvas></div>
                 <div id="ham-student-radar-table" class="ham-radar-values"></div>
@@ -421,7 +487,18 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <button type="button" class="button ham-answer-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-answer-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-answer-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-answer-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Högstadium', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-answer-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
+                </div>
+                <div class="ham-date-range" style="margin: 8px 0 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <label style="display: inline-flex; gap: 6px; align-items: center;">
+                        <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
+                        <input type="month" class="ham-date-from" />
+                    </label>
+                    <label style="display: inline-flex; gap: 6px; align-items: center;">
+                        <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
+                        <input type="month" class="ham-date-to" />
+                    </label>
+                    <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                 </div>
                 <div id="ham-answer-alternatives" class="ham-answer-alternatives"></div>
 

@@ -72,6 +72,20 @@
         const overview = window.hamAssessmentOverview || null;
         const stats = window.hamAssessmentStats || null;
 
+        const dateRange = {
+            fromMonth: null,
+            toMonth: null,
+        };
+
+        const dateRangeListeners = [];
+
+        function registerDateRangeListener(fn) {
+            if (typeof fn !== 'function') {
+                return;
+            }
+            dateRangeListeners.push(fn);
+        }
+
         const CHART_ANIMATION_DURATION_MS = 300;
         const CHART_ANIMATION_EASING = 'easeInOutQuad';
         const CHART_BASE_HUE = 205;
@@ -102,7 +116,7 @@
         const labelMonth = t.month || 'Month';
         const labelTerm = t.term || 'Term';
         const labelSchoolYear = t.schoolYear || 'School year';
-        const labelHogstadium = t.hogstadium || 'Högstadium';
+        const labelHogstadium = t.hogstadium || 'Låg-/Mellan-/Högstadium';
         const labelRadar = t.radar || 'Radar';
         const labelOption1 = t.option1 || 'Option 1';
         const labelOption2 = t.option2 || 'Option 2';
@@ -112,6 +126,244 @@
 
         if (!overview && !stats) {
             return;
+        }
+
+        function monthToTimestampStart(month) {
+            if (!month || typeof month !== 'string' || !/^\d{4}-\d{2}$/.test(month)) {
+                return null;
+            }
+            const y = parseInt(month.slice(0, 4), 10);
+            const m = parseInt(month.slice(5, 7), 10);
+            if (!Number.isFinite(y) || !Number.isFinite(m) || m < 1 || m > 12) {
+                return null;
+            }
+            return Date.UTC(y, m - 1, 1, 0, 0, 0, 0);
+        }
+
+        function monthToTimestampEnd(month) {
+            if (!month || typeof month !== 'string' || !/^\d{4}-\d{2}$/.test(month)) {
+                return null;
+            }
+            const y = parseInt(month.slice(0, 4), 10);
+            const m = parseInt(month.slice(5, 7), 10);
+            if (!Number.isFinite(y) || !Number.isFinite(m) || m < 1 || m > 12) {
+                return null;
+            }
+            return Date.UTC(y, m, 0, 23, 59, 59, 999);
+        }
+
+        function getSchoolYearStartFromTimestamp(ts) {
+            const d = new Date(ts);
+            const monthNum = d.getUTCMonth() + 1;
+            const yearNum = d.getUTCFullYear();
+            if (monthNum >= 8) {
+                return yearNum;
+            }
+            if (monthNum <= 6) {
+                return yearNum - 1;
+            }
+            return yearNum;
+        }
+
+        function bucketKeyToRange(bucketType, bucketKey) {
+            const key = bucketKey == null ? '' : String(bucketKey);
+            if (bucketType === 'month') {
+                const start = monthToTimestampStart(key);
+                const end = monthToTimestampEnd(key);
+                return start != null && end != null ? { start, end } : null;
+            }
+
+            if (bucketType === 'school_year') {
+                const y = parseInt(key, 10);
+                if (!Number.isFinite(y)) {
+                    return null;
+                }
+                const start = Date.UTC(y, 7, 1, 0, 0, 0, 0);
+                const end = Date.UTC(y + 1, 6, 30, 23, 59, 59, 999);
+                return { start, end };
+            }
+
+            if (bucketType === 'term') {
+                if (!key.includes('-')) {
+                    return null;
+                }
+                const parts = key.split('-');
+                const y = parseInt(parts[0], 10);
+                const term = String(parts[1] || '').toUpperCase();
+                if (!Number.isFinite(y) || (term !== 'VT' && term !== 'HT')) {
+                    return null;
+                }
+                if (term === 'VT') {
+                    return {
+                        start: Date.UTC(y + 1, 0, 1, 0, 0, 0, 0),
+                        end: Date.UTC(y + 1, 5, 30, 23, 59, 59, 999),
+                    };
+                }
+                return {
+                    start: Date.UTC(y, 7, 1, 0, 0, 0, 0),
+                    end: Date.UTC(y, 11, 31, 23, 59, 59, 999),
+                };
+            }
+
+            if (bucketType === 'hogstadium') {
+                const base = parseInt(key, 10);
+                if (!Number.isFinite(base)) {
+                    return null;
+                }
+                return {
+                    start: Date.UTC(base, 7, 1, 0, 0, 0, 0),
+                    end: Date.UTC(base + 3, 6, 30, 23, 59, 59, 999),
+                };
+            }
+
+            return null;
+        }
+
+        function getEffectiveRange() {
+            const fromTs = monthToTimestampStart(dateRange.fromMonth);
+            const toTs = monthToTimestampEnd(dateRange.toMonth);
+            if (fromTs != null && toTs != null && fromTs > toTs) {
+                return { fromTs: toTs, toTs: fromTs };
+            }
+            return { fromTs, toTs };
+        }
+
+        function bucketIntersectsRange(bucketType, bucketKey) {
+            const r = getEffectiveRange();
+            if (r.fromTs == null && r.toTs == null) {
+                return true;
+            }
+            const br = bucketKeyToRange(bucketType, bucketKey);
+            if (!br) {
+                return true;
+            }
+
+            if (r.fromTs != null && br.end < r.fromTs) {
+                return false;
+            }
+            if (r.toTs != null && br.start > r.toTs) {
+                return false;
+            }
+            return true;
+        }
+
+        function filterBuckets(bucketType, buckets) {
+            const arr = Array.isArray(buckets) ? buckets : [];
+            return arr.filter((b) => b && bucketIntersectsRange(bucketType, b.key));
+        }
+
+        function filterSeries(bucketType, series) {
+            const arr = Array.isArray(series) ? series : [];
+            return arr.filter((b) => {
+                if (!b) {
+                    return false;
+                }
+                if (bucketType === 'month') {
+                    return bucketIntersectsRange('month', b.key);
+                }
+
+                if (bucketType === 'school_year') {
+                    return bucketIntersectsRange('school_year', b.key);
+                }
+
+                if (bucketType === 'term') {
+                    return bucketIntersectsRange('term', b.key);
+                }
+
+                if (bucketType === 'hogstadium') {
+                    return bucketIntersectsRange('hogstadium', b.key);
+                }
+
+                return true;
+            });
+        }
+
+        function getSemesterKeyFromTimestamp(ts) {
+            const d = new Date(ts);
+            const year = d.getUTCFullYear();
+            const month = d.getUTCMonth() + 1;
+            const semester = month <= 6 ? 'spring' : 'fall';
+            return `${year}-${semester}`;
+        }
+
+        function filterSemesterSeries(series) {
+            const arr = Array.isArray(series) ? series : [];
+            const r = getEffectiveRange();
+            if (r.fromTs == null && r.toTs == null) {
+                return arr;
+            }
+
+            const fromKey = r.fromTs != null ? getSemesterKeyFromTimestamp(r.fromTs) : null;
+            const toKey = r.toTs != null ? getSemesterKeyFromTimestamp(r.toTs) : null;
+
+            return arr.filter((b) => {
+                const k = b && (b.semester_key || b.key) ? String(b.semester_key || b.key) : '';
+                if (!k) {
+                    return false;
+                }
+                if (fromKey && k < fromKey) {
+                    return false;
+                }
+                if (toKey && k > toKey) {
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        function initDateRangeControls() {
+            const fromInputs = Array.from(document.querySelectorAll('input.ham-date-from'));
+            const toInputs = Array.from(document.querySelectorAll('input.ham-date-to'));
+            const clearBtns = Array.from(document.querySelectorAll('.ham-date-clear'));
+
+            if (fromInputs.length === 0 && toInputs.length === 0 && clearBtns.length === 0) {
+                return;
+            }
+
+            function sync() {
+                fromInputs.forEach((el) => {
+                    el.value = dateRange.fromMonth || '';
+                });
+                toInputs.forEach((el) => {
+                    el.value = dateRange.toMonth || '';
+                });
+            }
+
+            function notify() {
+                dateRangeListeners.forEach((fn) => {
+                    try {
+                        fn();
+                    } catch (e) {
+                    }
+                });
+            }
+
+            fromInputs.forEach((el) => {
+                el.addEventListener('change', () => {
+                    dateRange.fromMonth = el.value ? String(el.value) : null;
+                    sync();
+                    notify();
+                });
+            });
+
+            toInputs.forEach((el) => {
+                el.addEventListener('change', () => {
+                    dateRange.toMonth = el.value ? String(el.value) : null;
+                    sync();
+                    notify();
+                });
+            });
+
+            clearBtns.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    dateRange.fromMonth = null;
+                    dateRange.toMonth = null;
+                    sync();
+                    notify();
+                });
+            });
+
+            sync();
         }
 
         function clampNumber(val, min, max) {
@@ -334,7 +586,8 @@
             }
 
             function buildDatasetsForBucket(bucketKey) {
-                const buckets = bucketsByKey && Array.isArray(bucketsByKey[bucketKey]) ? bucketsByKey[bucketKey] : [];
+                const rawBuckets = bucketsByKey && Array.isArray(bucketsByKey[bucketKey]) ? bucketsByKey[bucketKey] : [];
+                const buckets = filterBuckets(bucketKey, rawBuckets);
                 const bucket = pickLatestBucket(buckets);
                 if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
                     return { title: titleByKey[bucketKey] || labelRadar, datasets: [], max: 1, bucketGroup: { labels, buckets: [] } };
@@ -449,6 +702,12 @@
             if (controller) {
                 updateChart(controller.getActiveKey());
             }
+
+            registerDateRangeListener(() => {
+                if (controller) {
+                    updateChart(controller.getActiveKey());
+                }
+            });
         }
 
         function initBucketToggle(options) {
@@ -596,7 +855,8 @@
             };
 
             function buildDataForBucket(bucketKey) {
-                const series = seriesByKey && Array.isArray(seriesByKey[bucketKey]) ? seriesByKey[bucketKey] : [];
+                const raw = seriesByKey && Array.isArray(seriesByKey[bucketKey]) ? seriesByKey[bucketKey] : [];
+                const series = filterSeries(bucketKey, raw);
                 const labels = series.map((p) => p.label);
                 const data = series.map((p) => clampNumber(p.overall_avg, 1, 5));
                 return { labels, data, title: titleByKey[bucketKey] || labelRadar };
@@ -659,6 +919,12 @@
 
             registerStudentBucketHandler(updateChart);
 
+            registerDateRangeListener(() => {
+                if (studentBucketController) {
+                    updateChart(studentBucketController.getActiveKey());
+                }
+            });
+
             ensureStudentBucketController(
                 allBtns,
                 'month',
@@ -688,7 +954,8 @@
             };
 
             function buildDataForBucket(bucketKey) {
-                const series = seriesByKey && Array.isArray(seriesByKey[bucketKey]) ? seriesByKey[bucketKey] : [];
+                const raw = seriesByKey && Array.isArray(seriesByKey[bucketKey]) ? seriesByKey[bucketKey] : [];
+                const series = filterSeries(bucketKey, raw);
                 const labels = series.map((p) => p.label);
                 const data = series.map((p) => clampNumber(p.overall_avg, 1, 5));
                 return { labels, data, title: titleByKey[bucketKey] || labelRadar };
@@ -749,11 +1016,17 @@
                 chart.update();
             }
 
-            initBucketToggle({
+            const controller = initBucketToggle({
                 buttons: btns,
                 defaultKey: 'month',
                 isKeyAvailable: (key) => Array.isArray(seriesByKey[key]) && seriesByKey[key].length > 0,
                 onChange: updateChart,
+            });
+
+            registerDateRangeListener(() => {
+                if (controller) {
+                    updateChart(controller.getActiveKey());
+                }
             });
         }
 
@@ -1065,10 +1338,11 @@
             };
 
             function buildDatasetsForBucket(bucketKey) {
-                const buckets = bucketsByKey && bucketsByKey[bucketKey] ? bucketsByKey[bucketKey] : [];
+                const rawBuckets = bucketsByKey && Array.isArray(bucketsByKey[bucketKey]) ? bucketsByKey[bucketKey] : [];
+                const buckets = filterBuckets(bucketKey, rawBuckets);
                 const bucket = pickLatestBucket(buckets);
                 if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
-                    return { title: titleByKey[bucketKey] || labelRadar, datasets: [] };
+                    return { title: titleByKey[bucketKey] || labelRadar, datasets: [], bucketGroup: { labels, buckets: [] } };
                 }
 
                 const datasets = bucket.datasets.map((ds, idx) => {
@@ -1089,14 +1363,16 @@
             }
 
             function renderTableForBucket(bucketKey) {
+                const rawBuckets = bucketsByKey && Array.isArray(bucketsByKey[bucketKey]) ? bucketsByKey[bucketKey] : [];
+                const buckets = filterBuckets(bucketKey, rawBuckets);
                 renderRadarValuesTable('ham-student-radar-table', {
                     labels,
-                    buckets: bucketsByKey[bucketKey] || [],
+                    buckets,
                 });
 
                 renderAnswerAlternativesTable('ham-answer-alternatives', stats.radar_questions || [], {
                     labels,
-                    buckets: bucketsByKey[bucketKey] || [],
+                    buckets,
                 });
             }
 
@@ -1169,11 +1445,19 @@
                 allBtns,
                 'month',
                 (key) => {
-                    const radarOk = Array.isArray(bucketsByKey[key]) && bucketsByKey[key].length > 0;
-                    const progressOk = stats.avg_progress && Array.isArray(stats.avg_progress[key]) && stats.avg_progress[key].length > 0;
+                    const rawRadar = Array.isArray(bucketsByKey[key]) ? bucketsByKey[key] : [];
+                    const radarOk = filterBuckets(key, rawRadar).length > 0;
+                    const rawProgress = stats.avg_progress && Array.isArray(stats.avg_progress[key]) ? stats.avg_progress[key] : [];
+                    const progressOk = filterSeries(key, rawProgress).length > 0;
                     return radarOk || progressOk;
                 }
             );
+
+            registerDateRangeListener(() => {
+                if (studentBucketController) {
+                    updateChart(studentBucketController.getActiveKey());
+                }
+            });
         }
 
         function buildOverviewRadarChart(canvasId, radar) {
@@ -1259,6 +1543,12 @@
         // School/class drilldown avg progress toggle
         if (stats && (stats.level === 'school' || stats.level === 'class') && stats.avg_progress) {
             buildDrilldownAvgProgressToggle();
+        }
+
+        initDateRangeControls();
+
+        if (stats && Array.isArray(stats.series)) {
+            stats.series = filterSemesterSeries(stats.series);
         }
 
         // Overview radar chart
