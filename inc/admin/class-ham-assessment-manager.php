@@ -1533,14 +1533,14 @@ class HAM_Assessment_Manager
                         'datasets' => array(
                             array(
                                 'label' => $class_n > 0
-                                    ? sprintf(_n('%d class', '%d classes', $class_n, 'headless-access-manager'), $class_n)
+                                    ? sprintf(_n('Class: %d student', 'Class: %d students', $class_n, 'headless-access-manager'), $class_n)
                                     : __('Class', 'headless-access-manager'),
                                 'values' => $class_values,
                                 'student_count' => $class_n,
                             ),
                             array(
                                 'label' => $school_n > 0
-                                    ? sprintf(_n('%d school', '%d schools', $school_n, 'headless-access-manager'), $school_n)
+                                    ? sprintf(_n('School: %d student', 'School: %d students', $school_n, 'headless-access-manager'), $school_n)
                                     : __('School', 'headless-access-manager'),
                                 'values' => $school_values,
                                 'student_count' => $school_n,

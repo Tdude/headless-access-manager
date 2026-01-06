@@ -1003,16 +1003,16 @@ msgid "School"
 msgstr "Skola"
 
 #: inc/admin/class-ham-assessment-manager.php
-msgid "%d school"
-msgid_plural "%d schools"
-msgstr[0] "%d skola"
-msgstr[1] "%d skolor"
+msgid "Class: %d student"
+msgid_plural "Class: %d students"
+msgstr[0] "Klass: %d elev"
+msgstr[1] "Klass: %d elever"
 
 #: inc/admin/class-ham-assessment-manager.php
-msgid "%d class"
-msgid_plural "%d classes"
-msgstr[0] "%d klass"
-msgstr[1] "%d klasser"
+msgid "School: %d student"
+msgid_plural "School: %d students"
+msgstr[0] "Skolan: %d elev"
+msgstr[1] "Skolan: %d elever"
 
 #: inc/admin/class-ham-assessment-manager.php
 msgid "This school"
