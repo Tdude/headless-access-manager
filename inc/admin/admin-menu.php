@@ -31,15 +31,15 @@ class HAM_Admin_Menu
             'manage_options',
             'headless-access-manager',
             array( __CLASS__, 'render_dashboard_page' ),
-            'dashicons-lock',
+            'dashicons-dashboard',
             30
         );
 
         // Overview submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Overview', 'headless-access-manager'), // Page title
-            __('Overview', 'headless-access-manager'), // Menu title
+            __('Översikt', 'headless-access-manager'), // Page title
+            __('Översikt', 'headless-access-manager'), // Menu title
             'manage_options',
             'headless-access-manager',
             array( __CLASS__, 'render_dashboard_page' )
@@ -48,8 +48,8 @@ class HAM_Admin_Menu
         // Evaluations submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Evaluations', 'headless-access-manager'), // Page title
-            __('Evaluations', 'headless-access-manager'), // Menu title
+            __('Observationer', 'headless-access-manager'), // Page title
+            __('Observationer', 'headless-access-manager'), // Menu title
             'manage_options',
             'ham-assessments',
             array( 'HAM_Assessment_Manager', 'render_assessments_page' )
@@ -58,8 +58,8 @@ class HAM_Admin_Menu
         // Question Bank submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Question Bank', 'headless-access-manager'), // Page title
-            __('Question Bank', 'headless-access-manager'), // Menu title
+            __('Frågebank', 'headless-access-manager'), // Page title
+            __('Frågebank', 'headless-access-manager'), // Menu title
             'manage_options',
             'edit.php?post_type=' . HAM_CPT_ASSESSMENT_TPL
         );
@@ -67,8 +67,8 @@ class HAM_Admin_Menu
         // Statistics submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Statistics', 'headless-access-manager'), // Page title
-            __('Statistics', 'headless-access-manager'), // Menu title
+            __('Statistik', 'headless-access-manager'), // Page title
+            __('Statistik', 'headless-access-manager'), // Menu title
             'manage_options',
             'ham-assessment-stats',
             array( 'HAM_Assessment_Manager', 'render_statistics_page' )
@@ -77,14 +77,208 @@ class HAM_Admin_Menu
         // Settings submenu
         add_submenu_page(
             'headless-access-manager',
-            __('Settings', 'headless-access-manager'), // Page title
-            __('Settings', 'headless-access-manager'), // Menu title
+            __('Inställningar', 'headless-access-manager'), // Page title
+            __('Inställningar', 'headless-access-manager'), // Menu title
             'manage_options',
             'ham-settings',
             array( __CLASS__, 'render_settings_page' )
         );
+
+        add_action('admin_menu', array(__CLASS__, 'reorder_submenu'), 999);
+        add_action('admin_head', array(__CLASS__, 'output_submenu_icons_css'));
+        add_action('admin_footer', array(__CLASS__, 'output_submenu_groups_js'));
         // Register settings
         add_action('admin_init', array( __CLASS__, 'register_settings' ));
+    }
+
+    public static function reorder_submenu()
+    {
+        global $submenu;
+
+        $parent = 'headless-access-manager';
+        if (!isset($submenu[$parent]) || !is_array($submenu[$parent])) {
+            return;
+        }
+
+        $items = $submenu[$parent];
+        $by_slug = array();
+        foreach ($items as $it) {
+            if (!is_array($it) || !isset($it[2])) {
+                continue;
+            }
+            $by_slug[(string) $it[2]] = $it;
+        }
+
+        $get = function($slug) use ($by_slug) {
+            return isset($by_slug[$slug]) ? $by_slug[$slug] : null;
+        };
+
+        $out = array();
+
+        // Översikt
+        $overview = $get('headless-access-manager');
+        if ($overview) {
+            $overview[0] = __('Översikt', 'headless-access-manager');
+            $overview[3] = __('Översikt', 'headless-access-manager');
+            $out[] = $overview;
+        }
+
+        // Observationer
+        $assessments = $get('ham-assessments');
+        if ($assessments) {
+            $assessments[0] = __('Observationer', 'headless-access-manager');
+            $assessments[3] = __('Observationer', 'headless-access-manager');
+            $out[] = $assessments;
+        }
+
+        // Statistik
+        $stats = $get('ham-assessment-stats');
+        if ($stats) {
+            $stats[0] = __('Statistik', 'headless-access-manager');
+            $stats[3] = __('Statistik', 'headless-access-manager');
+            $out[] = $stats;
+        }
+
+        // Organisation group
+        $out[] = array(
+            __('Organisation', 'headless-access-manager'),
+            'manage_options',
+            '#ham-group-organisation',
+            __('Organisation', 'headless-access-manager'),
+        );
+
+        $school = $get('edit.php?post_type=' . HAM_CPT_SCHOOL);
+        if ($school) {
+            $school[0] = __('Skolor', 'headless-access-manager');
+            $school[3] = __('Skolor', 'headless-access-manager');
+            $out[] = $school;
+        }
+        $class = $get('edit.php?post_type=' . HAM_CPT_CLASS);
+        if ($class) {
+            $class[0] = __('Klasser', 'headless-access-manager');
+            $class[3] = __('Klasser', 'headless-access-manager');
+            $out[] = $class;
+        }
+
+        // Personer group
+        $out[] = array(
+            __('Personer', 'headless-access-manager'),
+            'manage_options',
+            '#ham-group-people',
+            __('Personer', 'headless-access-manager'),
+        );
+
+        $student = $get('edit.php?post_type=' . HAM_CPT_STUDENT);
+        if ($student) {
+            $student[0] = __('Elever', 'headless-access-manager');
+            $student[3] = __('Elever', 'headless-access-manager');
+            $out[] = $student;
+        }
+        $teacher = $get('edit.php?post_type=' . HAM_CPT_TEACHER);
+        if ($teacher) {
+            $teacher[0] = __('Lärare', 'headless-access-manager');
+            $teacher[3] = __('Lärare', 'headless-access-manager');
+            $out[] = $teacher;
+        }
+        $principal = $get('edit.php?post_type=' . HAM_CPT_PRINCIPAL);
+        if ($principal) {
+            $principal[0] = __('Rektorer', 'headless-access-manager');
+            $principal[3] = __('Rektorer', 'headless-access-manager');
+            $out[] = $principal;
+        }
+        $school_head = $get('edit.php?post_type=' . HAM_CPT_SCHOOL_HEAD);
+        if ($school_head) {
+            $school_head[0] = __('Skolledare', 'headless-access-manager');
+            $school_head[3] = __('Skolledare', 'headless-access-manager');
+            $out[] = $school_head;
+        }
+
+        // Frågebank
+        $qb = $get('edit.php?post_type=' . HAM_CPT_ASSESSMENT_TPL);
+        if ($qb) {
+            $qb[0] = __('Frågebank', 'headless-access-manager');
+            $qb[3] = __('Frågebank', 'headless-access-manager');
+            $out[] = $qb;
+        }
+
+        // Inställningar
+        $settings = $get('ham-settings');
+        if ($settings) {
+            $settings[0] = __('Inställningar', 'headless-access-manager');
+            $settings[3] = __('Inställningar', 'headless-access-manager');
+            $out[] = $settings;
+        }
+
+        $submenu[$parent] = $out;
+    }
+
+    public static function output_submenu_icons_css()
+    {
+        if (!is_admin()) {
+            return;
+        }
+
+        echo '<style>';
+        echo '#toplevel_page_headless-access-manager .wp-submenu a{display:flex;align-items:center;gap:8px;}';
+        echo '#toplevel_page_headless-access-manager .wp-submenu a .dashicons{font-size:18px;line-height:18px;width:18px;height:18px;color:#646970;margin-top:-1px;}';
+        echo '#toplevel_page_headless-access-manager .wp-submenu a[href="#ham-group-organisation"],#toplevel_page_headless-access-manager .wp-submenu a[href="#ham-group-people"]{font-weight:600;}';
+        echo '</style>';
+    }
+
+    public static function output_submenu_groups_js()
+    {
+        if (!is_admin()) {
+            return;
+        }
+
+        echo '<script>';
+        echo '(function(){';
+        echo 'var root=document.getElementById("toplevel_page_headless-access-manager");if(!root){return;}';
+        echo 'var menu=root.querySelector(".wp-submenu");if(!menu){return;}';
+        echo 'var links=Array.prototype.slice.call(menu.querySelectorAll("a"));';
+        echo 'function findLi(a){while(a&&a.tagName&&a.tagName.toLowerCase()!=="li"){a=a.parentNode;}return a;}';
+        echo 'function setCollapsed(key,collapsed){try{localStorage.setItem(key,collapsed?"1":"0");}catch(e){}}';
+        echo 'function getCollapsed(key,def){try{var v=localStorage.getItem(key);if(v===null){return def;}return v==="1";}catch(e){return def;}}';
+
+        echo 'function ensureIcon(link,iconClass){';
+        echo 'if(!link||!iconClass){return;}';
+        echo 'if(link.querySelector(".dashicons")){return;}';
+        echo 'var s=document.createElement("span");s.className="dashicons "+iconClass;';
+        echo 'link.insertBefore(s,link.firstChild);';
+        echo '}';
+
+        echo 'function applyGroup(groupHref,key){';
+        echo 'var groupLink=menu.querySelector("a[href=\""+groupHref+"\"]");if(!groupLink){return;}';
+        echo 'var li=findLi(groupLink);if(!li){return;}';
+        echo 'var next=li.nextElementSibling;var members=[];';
+        echo 'while(next){var a=next.querySelector("a");if(a&&(a.getAttribute("href")==="#ham-group-organisation"||a.getAttribute("href")==="#ham-group-people")){break;}members.push(next);next=next.nextElementSibling;}';
+        echo 'var collapsed=getCollapsed(key,false);';
+        echo 'var iconSpan=groupLink.querySelector(".dashicons");';
+        echo 'if(!iconSpan){iconSpan=document.createElement("span");iconSpan.className="dashicons";groupLink.insertBefore(iconSpan,groupLink.firstChild);}';
+        echo 'function render(){iconSpan.className="dashicons "+(collapsed?"dashicons-arrow-right":"dashicons-arrow-down");members.forEach(function(m){m.style.display=collapsed?"none":"";});}';
+        echo 'groupLink.addEventListener("click",function(ev){ev.preventDefault();collapsed=!collapsed;setCollapsed(key,collapsed);render();});';
+        echo 'render();';
+        echo '}';
+
+        echo 'links.forEach(function(a){';
+        echo 'var href=(a.getAttribute("href")||"");';
+        echo 'if(href==="admin.php?page=headless-access-manager"){ensureIcon(a,"dashicons-dashboard");}';
+        echo 'else if(href==="admin.php?page=ham-assessments"){ensureIcon(a,"dashicons-visibility");}';
+        echo 'else if(href==="admin.php?page=ham-assessment-stats"){ensureIcon(a,"dashicons-chart-bar");}';
+        echo 'else if(href.indexOf("edit.php?post_type=ham_school")==0){ensureIcon(a,"dashicons-building");}';
+        echo 'else if(href.indexOf("edit.php?post_type=ham_class")==0){ensureIcon(a,"dashicons-groups");}';
+        echo 'else if(href.indexOf("edit.php?post_type=ham_student")==0){ensureIcon(a,"dashicons-id");}';
+        echo 'else if(href.indexOf("edit.php?post_type=ham_teacher")==0){ensureIcon(a,"dashicons-welcome-learn-more");}';
+        echo 'else if(href.indexOf("edit.php?post_type=ham_principal")==0){ensureIcon(a,"dashicons-businessperson");}';
+        echo 'else if(href.indexOf("edit.php?post_type=ham_school_head")==0){ensureIcon(a,"dashicons-admin-users");}';
+        echo 'else if(href.indexOf("edit.php?post_type=ham_assessment_tpl")==0){ensureIcon(a,"dashicons-editor-help");}';
+        echo 'else if(href==="admin.php?page=ham-settings"){ensureIcon(a,"dashicons-admin-generic");}';
+        echo '});';
+
+        echo 'applyGroup("#ham-group-organisation","ham_menu_org_collapsed");';
+        echo 'applyGroup("#ham-group-people","ham_menu_people_collapsed");';
+        echo '})();';
+        echo '</script>';
     }
 
     /**
