@@ -666,6 +666,9 @@ class HAM_Assessment_Manager
     {
         $buckets = array();
 
+        $student_semester_sum = array();
+        $student_semester_count = array();
+
         foreach ($posts as $post) {
             $student_id = (int) get_post_meta($post->ID, HAM_ASSESSMENT_META_STUDENT_ID, true);
             if ($student_id <= 0) {
@@ -687,6 +690,9 @@ class HAM_Assessment_Manager
                     'overall_sum' => 0.0,
                     'overall_count' => 0,
                     'questions' => array(),
+                    'delta_sum' => 0.0,
+                    'delta_count' => 0,
+                    'delta_students' => array(),
                 );
             }
 
@@ -696,6 +702,17 @@ class HAM_Assessment_Manager
             if ($scores['overall_avg'] !== null) {
                 $buckets[$semester_key]['overall_sum'] += (float) $scores['overall_avg'];
                 $buckets[$semester_key]['overall_count']++;
+
+                if (!isset($student_semester_sum[$student_id])) {
+                    $student_semester_sum[$student_id] = array();
+                    $student_semester_count[$student_id] = array();
+                }
+                if (!isset($student_semester_sum[$student_id][$semester_key])) {
+                    $student_semester_sum[$student_id][$semester_key] = 0.0;
+                    $student_semester_count[$student_id][$semester_key] = 0;
+                }
+                $student_semester_sum[$student_id][$semester_key] += (float) $scores['overall_avg'];
+                $student_semester_count[$student_id][$semester_key]++;
             }
 
             foreach ($scores['question_values'] as $question_key => $values) {
@@ -712,11 +729,42 @@ class HAM_Assessment_Manager
 
         uksort($buckets, array(__CLASS__, 'sort_semester_keys_asc'));
 
+        // Compute per-student deltas across semesters.
+        foreach ($student_semester_sum as $student_id => $by_semester) {
+            $semester_keys = array_keys($by_semester);
+            usort($semester_keys, array(__CLASS__, 'sort_semester_keys_asc'));
+
+            $prev_avg = null;
+            foreach ($semester_keys as $semester_key) {
+                $cnt = isset($student_semester_count[$student_id][$semester_key])
+                    ? (int) $student_semester_count[$student_id][$semester_key]
+                    : 0;
+                if ($cnt <= 0) {
+                    continue;
+                }
+                $avg = (float) $student_semester_sum[$student_id][$semester_key] / $cnt;
+
+                if ($prev_avg !== null && isset($buckets[$semester_key])) {
+                    $delta = $avg - (float) $prev_avg;
+                    $buckets[$semester_key]['delta_sum'] += $delta;
+                    $buckets[$semester_key]['delta_count']++;
+                    $buckets[$semester_key]['delta_students'][(int) $student_id] = true;
+                }
+
+                $prev_avg = $avg;
+            }
+        }
+
         $out = array();
         foreach ($buckets as $bucket) {
             $avg = null;
             if ($bucket['overall_count'] > 0) {
                 $avg = $bucket['overall_sum'] / $bucket['overall_count'];
+            }
+
+            $delta_avg = null;
+            if (!empty($bucket['delta_count'])) {
+                $delta_avg = (float) $bucket['delta_sum'] / (int) $bucket['delta_count'];
             }
 
             $questions = array();
@@ -733,6 +781,10 @@ class HAM_Assessment_Manager
                 'count' => $bucket['count'],
                 'student_count' => count($bucket['students']),
                 'overall_avg' => $avg,
+                'delta_avg' => $delta_avg,
+                'delta_student_count' => isset($bucket['delta_students']) && is_array($bucket['delta_students'])
+                    ? count($bucket['delta_students'])
+                    : 0,
                 'question_avgs' => $questions,
             );
         }

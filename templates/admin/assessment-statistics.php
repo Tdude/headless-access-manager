@@ -108,7 +108,17 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     return;
                 }
 
+                $has_delta = false;
+                foreach ($series as $bucket) {
+                    if (isset($bucket['delta_avg']) && $bucket['delta_avg'] !== null) {
+                        $has_delta = true;
+                        break;
+                    }
+                }
+
                 $max_count = 1;
+                $min_val = 0.0;
+                $max_val = 0.0;
                 $points = array();
                 $labels = array();
                 foreach ($series as $bucket) {
@@ -116,9 +126,20 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     if ($count > $max_count) {
                         $max_count = $count;
                     }
+
+                    $val = $count;
+                    if ($has_delta) {
+                        $val = isset($bucket['delta_avg']) && $bucket['delta_avg'] !== null ? (float) $bucket['delta_avg'] : 0.0;
+                        if ($val < $min_val) {
+                            $min_val = $val;
+                        }
+                        if ($val > $max_val) {
+                            $max_val = $val;
+                        }
+                    }
                     $label = isset($bucket['semester_label']) ? (string) $bucket['semester_label'] : (isset($bucket['semester_key']) ? (string) $bucket['semester_key'] : '');
                     $labels[] = $label;
-                    $points[] = $count;
+                    $points[] = $val;
                 }
 
                 $n = count($points);
@@ -133,20 +154,53 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 $pad_x = 6;
                 $pad_y = 9;
 
+                $baseline_y = $h - $pad_y;
+                if ($has_delta) {
+                    $range = $max_val - $min_val;
+                    if ($range <= 0) {
+                        $range = 1.0;
+                    }
+                    $baseline_ratio = (0.0 - $min_val) / $range;
+                    $baseline_ratio = max(0.0, min(1.0, $baseline_ratio));
+                    $baseline_y = ($h - $pad_y) - ($baseline_ratio * ($h - 2 * $pad_y));
+                }
+
                 $svg_points = array();
                 $circle_nodes = array();
                 for ($i = 0; $i < $n; $i++) {
                     $x = ($n === 1)
                         ? ($w / 2)
                         : ($pad_x + ($i * (($w - 2 * $pad_x) / ($n - 1))));
-                    $count = (int) $points[$i];
-                    $ratio = $max_count > 0 ? ($count / $max_count) : 0;
-                    $y = ($h - $pad_y) - ($ratio * ($h - 2 * $pad_y));
+
+                    $raw_val = $points[$i];
+                    if ($has_delta) {
+                        $range = $max_val - $min_val;
+                        if ($range <= 0) {
+                            $range = 1.0;
+                        }
+                        $ratio = (((float) $raw_val) - $min_val) / $range;
+                        $ratio = max(0.0, min(1.0, $ratio));
+                        $y = ($h - $pad_y) - ($ratio * ($h - 2 * $pad_y));
+                    } else {
+                        $count = (int) $raw_val;
+                        $ratio = $max_count > 0 ? ($count / $max_count) : 0;
+                        $y = ($h - $pad_y) - ($ratio * ($h - 2 * $pad_y));
+                    }
                     $svg_points[] = $x . ',' . $y;
+
+                    $value_label = '';
+                    if ($has_delta) {
+                        $delta = (float) $raw_val;
+                        $sign = $delta > 0 ? '+' : '';
+                        $value_label = $sign . number_format($delta, 1);
+                    } else {
+                        $value_label = (string) ((int) $raw_val);
+                    }
+
                     $circle_nodes[] = array(
                         'x' => $x,
                         'y' => $y,
-                        'count' => $count,
+                        'count' => $value_label,
                         'label' => $labels[$i],
                     );
                 }
@@ -155,7 +209,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; aspect-ratio: ' . esc_attr($w) . ' / ' . esc_attr($h) . '; max-height: 54px; overflow: visible;">';
 
                 // Baseline
-                echo '<line x1="' . esc_attr($pad_x) . '" y1="' . esc_attr($h - $pad_y) . '" x2="' . esc_attr($w - $pad_x) . '" y2="' . esc_attr($h - $pad_y) . '" stroke="#dcdcde" stroke-width="1" />';
+                echo '<line x1="' . esc_attr($pad_x) . '" y1="' . esc_attr($baseline_y) . '" x2="' . esc_attr($w - $pad_x) . '" y2="' . esc_attr($baseline_y) . '" stroke="#dcdcde" stroke-width="1" />';
 
                 // Connecting line (only if > 1 point)
                 if ($n > 1) {
