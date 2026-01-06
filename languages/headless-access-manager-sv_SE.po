@@ -1005,8 +1005,8 @@ msgstr "Skola"
 #: inc/admin/class-ham-assessment-manager.php
 msgid "Class: %d student"
 msgid_plural "Class: %d students"
-msgstr[0] "Klass: %d elev"
-msgstr[1] "Klass: %d elever"
+msgstr[0] "Klassen: %d elev"
+msgstr[1] "Klassen: %d elever"
 
 #: inc/admin/class-ham-assessment-manager.php
 msgid "School: %d student"
