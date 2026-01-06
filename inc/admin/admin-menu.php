@@ -592,31 +592,23 @@ class HAM_Admin_Menu
                     <div class="inside">
                         <div class="ham-chart-container" style="padding: 20px; text-align: center;">
                             <?php
-                            $stageData = array(
-                                array(
-                                    'label' => esc_html__('Not Established', 'headless-access-manager'),
-                                    'value' => $ssc_not,
-                                    'color' => 'hsl(11, 97.00%, 87.10%)'
-                                ),
-                                array(
-                                    'label' => esc_html__('Developing', 'headless-access-manager'),
-                                    'value' => $ssc_trans,
-                                    'color' => 'hsl(40, 97%, 87%)'
-                                ),
-                                array(
-                                    'label' => esc_html__('Established', 'headless-access-manager'),
-                                    'value' => $ssc_full,
-                                    'color' => 'hsl(105, 97%, 87%)'
-                                )
-                            );
+                            echo '<div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 12px;">';
 
-                            echo '<div class="ham-simple-pie" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap;">';
-                            foreach ($stageData as $item) {
-                                echo '<div style="margin: 10px; text-align: center; width: 120px;">';
-                                echo '<div style="height: 80px; width: 80px; margin: 0 auto; background-color: ' . esc_attr($item['color']) . '; border-radius: 50%;"></div>';
-                                echo '<div style="margin-top: 10px;"><strong>' . esc_html($item['label']) . '</strong>: ' . esc_html($item['value']) . '</div>';
-                                echo '</div>';
-                            }
+                            echo '<div style="display: inline-flex; align-items: center; gap: 10px;">';
+                            echo '<span class="ham-stage-badge ham-stage-not ham-stage-badge--lg">' . esc_html__('Not established', 'headless-access-manager') . '</span>';
+                            echo '<span style="font-weight: 700; font-size: 16px;">' . esc_html($ssc_not) . '</span>';
+                            echo '</div>';
+
+                            echo '<div style="display: inline-flex; align-items: center; gap: 10px;">';
+                            echo '<span class="ham-stage-badge ham-stage-trans ham-stage-badge--lg">' . esc_html__('Developing', 'headless-access-manager') . '</span>';
+                            echo '<span style="font-weight: 700; font-size: 16px;">' . esc_html($ssc_trans) . '</span>';
+                            echo '</div>';
+
+                            echo '<div style="display: inline-flex; align-items: center; gap: 10px;">';
+                            echo '<span class="ham-stage-badge ham-stage-full ham-stage-badge--lg">' . esc_html__('Established', 'headless-access-manager') . '</span>';
+                            echo '<span style="font-weight: 700; font-size: 16px;">' . esc_html($ssc_full) . '</span>';
+                            echo '</div>';
+
                             echo '</div>';
                             ?>
                         </div>
@@ -687,6 +679,10 @@ class HAM_Admin_Menu
     box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
 }
 
+.ham-dashboard-assessment-overview .postbox {
+    border: 0;
+}
+
 .ham-stats-overview {
     display: flex;
     flex-wrap: wrap;
@@ -726,6 +722,14 @@ class HAM_Admin_Menu
 .ham-stats-label {
     font-size: 14px;
     color: #646970;
+}
+
+.ham-stage-badge--lg {
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    text-transform: none;
 }
 
 .ham-stats-row {
