@@ -1257,44 +1257,48 @@
             const datasets = bucket.datasets;
 
             // Fade older datasets in the answer alternatives table. We assume datasets
-            // are ordered newest -> oldest (idx 0 is most recent).
-            function datasetRecencyAlpha(datasetIndex) {
+            // Datasets are ordered oldest -> newest in PHP, so newest is the last index.
+            function datasetRecencyAlpha(datasetIndex, totalDatasets) {
                 const idx = Math.max(0, Number.isFinite(datasetIndex) ? datasetIndex : 0);
+                const total = Math.max(1, Number.isFinite(totalDatasets) ? totalDatasets : 1);
+                const ageIdx = Math.max(0, (total - 1) - idx);
                 const latestAlpha = 0.70;
                 const decay = 0.65;
                 const minAlpha = 0.10;
-                const a = latestAlpha * Math.pow(decay, idx);
+                const a = latestAlpha * Math.pow(decay, ageIdx);
                 return Math.max(minAlpha, a);
             }
 
-            function datasetRecencyStrength(datasetIndex) {
+            function datasetRecencyStrength(datasetIndex, totalDatasets) {
                 const idx = Math.max(0, Number.isFinite(datasetIndex) ? datasetIndex : 0);
+                const total = Math.max(1, Number.isFinite(totalDatasets) ? totalDatasets : 1);
+                const ageIdx = Math.max(0, (total - 1) - idx);
                 const decay = 0.65;
                 const minStrength = 0.12;
-                const s = Math.pow(decay, idx);
+                const s = Math.pow(decay, ageIdx);
                 return Math.max(minStrength, Math.min(1, s));
             }
 
-            function selectionAlpha(selectedDatasetIndexes) {
+            function selectionAlpha(selectedDatasetIndexes, totalDatasets) {
                 if (!Array.isArray(selectedDatasetIndexes) || selectedDatasetIndexes.length === 0) {
                     return 0;
                 }
                 let maxA = 0;
                 selectedDatasetIndexes.forEach((di) => {
-                    maxA = Math.max(maxA, datasetRecencyAlpha(di));
+                    maxA = Math.max(maxA, datasetRecencyAlpha(di, totalDatasets));
                 });
                 // If multiple datasets share the same choice, bump slightly, but cap.
                 const bump = Math.min(0.10, Math.max(0, selectedDatasetIndexes.length - 1) * 0.03);
                 return Math.min(0.80, maxA + bump);
             }
 
-            function selectionStrength(selectedDatasetIndexes) {
+            function selectionStrength(selectedDatasetIndexes, totalDatasets) {
                 if (!Array.isArray(selectedDatasetIndexes) || selectedDatasetIndexes.length === 0) {
                     return 0;
                 }
-                // Newest dataset is idx 0, so the selection "age" is the smallest index.
-                const newestIdx = Math.min.apply(null, selectedDatasetIndexes.map((di) => (Number.isFinite(di) ? di : 0)));
-                return datasetRecencyStrength(newestIdx);
+                // Newest dataset is the largest index (datasets oldest -> newest).
+                const newestIdx = Math.max.apply(null, selectedDatasetIndexes.map((di) => (Number.isFinite(di) ? di : 0)));
+                return datasetRecencyStrength(newestIdx, totalDatasets);
             }
 
             function optionBgColor(optionIndex, alpha, strength) {
@@ -1362,8 +1366,8 @@
 
                     if (sel.length > 0) {
                         cls += ' ham-answer-choice--selected';
-                        const alpha = selectionAlpha(sel);
-                        const strength = selectionStrength(sel);
+                        const alpha = selectionAlpha(sel, datasets.length);
+                        const strength = selectionStrength(sel, datasets.length);
                         style = ` style="background-color: ${optionBgColor(oi, alpha, strength)};"`;
                     }
 

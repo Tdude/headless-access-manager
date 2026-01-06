@@ -218,8 +218,8 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
                 // Ring markers + counts
                 foreach ($circle_nodes as $node) {
-                    echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="4.5" fill="#ffffff" stroke="#0073aa" stroke-width="2.5" />';
-                    echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr(max(10, $node['y'] - 8)) . '" text-anchor="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
+                    echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="9" fill="#ffffff" stroke="#0073aa" stroke-width="2.5" />';
+                    echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr($node['y']) . '" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
                 }
                 echo '</svg>';
 
@@ -827,8 +827,8 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                 echo '<polyline fill="none" stroke="#0073aa" stroke-width="2.5" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
                             }
                             foreach ($circle_nodes as $node) {
-                                echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="4.5" fill="#ffffff" stroke="#0073aa" stroke-width="2.5" />';
-                                echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr(max(11, $node['y'] - 8)) . '" text-anchor="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
+                                echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="9" fill="#ffffff" stroke="#0073aa" stroke-width="2.5" />';
+                                echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr($node['y']) . '" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
                             }
                             echo '</svg>';
 
