@@ -907,11 +907,17 @@
                     },
                     scales: {
                         r: {
-                            min: mode === 'avg' ? 1 : 0,
+                            min: 0,
                             max: initial.max,
                             ticks: {
                                 stepSize: mode === 'avg' ? 1 : Math.max(1, Math.ceil(initial.max / 5)),
                                 showLabelBackdrop: false,
+                                callback: function(value) {
+                                    if (mode === 'avg' && value === 0) {
+                                        return '';
+                                    }
+                                    return value;
+                                },
                                 font: { size: CHART_FONT_SIZE_TICKS },
                             },
                             pointLabels: {
@@ -954,107 +960,6 @@
                     updateChart(controller.getActiveKey());
                 }
             });
-        }
-
-        function initBucketToggle(options) {
-            const {
-                buttons,
-                defaultKey,
-                isKeyAvailable,
-                onChange,
-            } = options || {};
-
-            const initialButtons = Array.isArray(buttons) ? buttons : [];
-            let btns = [];
-            const btnSet = new Set();
-
-            if (initialButtons.length === 0 || typeof onChange !== 'function') {
-                return null;
-            }
-
-            function setActive(key) {
-                btns.forEach((b) => {
-                    const isActive = b.getAttribute('data-bucket') === key;
-                    b.classList.toggle('button-primary', isActive);
-                    b.classList.toggle('button-secondary', !isActive);
-                    b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-                });
-            }
-
-            let activeKey = defaultKey;
-            if (typeof isKeyAvailable === 'function' && !isKeyAvailable(activeKey)) {
-                activeKey = initialButtons[0].getAttribute('data-bucket') || defaultKey;
-            }
-
-            function setBucket(bucketKey) {
-                if (!bucketKey) {
-                    return;
-                }
-                activeKey = bucketKey;
-                setActive(bucketKey);
-                onChange(bucketKey);
-            }
-
-            function wireButtons(newButtons) {
-                const incoming = Array.isArray(newButtons) ? newButtons : [];
-                incoming.forEach((b) => {
-                    if (!b || btnSet.has(b)) {
-                        return;
-                    }
-                    btnSet.add(b);
-                    btns.push(b);
-                    b.addEventListener('click', () => {
-                        setBucket(b.getAttribute('data-bucket'));
-                    });
-                });
-                // Keep UI consistent for any newly added buttons.
-                setActive(activeKey);
-            }
-
-            wireButtons(initialButtons);
-
-            setBucket(activeKey);
-
-            return {
-                getActiveKey: () => activeKey,
-                setBucket,
-                addButtons: wireButtons,
-            };
-        }
-
-        // Student drilldown: we want multiple button groups (progress/radar/answers)
-        // to share one bucket state and stay in sync.
-        let studentBucketController = null;
-        const studentBucketHandlers = [];
-
-        function registerStudentBucketHandler(handler) {
-            if (typeof handler !== 'function') {
-                return;
-            }
-            studentBucketHandlers.push(handler);
-            if (studentBucketController) {
-                handler(studentBucketController.getActiveKey());
-            }
-        }
-
-        function ensureStudentBucketController(buttons, defaultKey, isKeyAvailable) {
-            if (studentBucketController) {
-                if (typeof studentBucketController.addButtons === 'function') {
-                    studentBucketController.addButtons(buttons);
-                }
-                return studentBucketController;
-            }
-
-            studentBucketController = initBucketToggle({
-                buttons,
-                defaultKey,
-                isKeyAvailable,
-                onChange: (bucketKey) => {
-                    studentBucketHandlers.forEach((h) => h(bucketKey));
-                },
-            });
-
-            return studentBucketController;
         }
 
         function buildStudentAvgProgressToggle() {
@@ -1531,238 +1436,26 @@
                     },
                     plugins: {
                         legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: { size: CHART_FONT_SIZE_LEGEND },
-                            },
+                            display: false,
                         },
                         title: {
-                            display: Boolean(bucket.label || title),
-                            text: bucket.label || title,
+                            display: Boolean(title),
+                            text: title,
                             font: { size: CHART_FONT_SIZE_TITLE },
                         },
                     },
                     scales: {
                         r: {
-                            min: 1,
+                            min: 0,
                             max: 5,
                             ticks: {
                                 stepSize: 1,
-                                showLabelBackdrop: false,
-                                font: { size: CHART_FONT_SIZE_TICKS },
-                            },
-                            pointLabels: {
-                                font: { size: CHART_FONT_SIZE_POINT_LABELS },
-                            },
-                            grid: {
-                                circular: false,
-                            },
-                            angleLines: {
-                                color: CHART_RADAR_ANGLE_LINE_COLOR,
-                            },
-                        },
-                    },
-                },
-            });
-        }
-
-        function buildStudentRadarToggle() {
-            const canvas = document.getElementById('ham-student-radar');
-            const btns = Array.from(document.querySelectorAll('.ham-radar-toggle-btn'));
-            const answerBtns = Array.from(document.querySelectorAll('.ham-answer-toggle-btn'));
-            const progressBtns = Array.from(document.querySelectorAll('.ham-progress-toggle-btn'));
-            const allBtns = btns.concat(answerBtns).concat(progressBtns);
-
-            if (!canvas || allBtns.length === 0 || !stats || stats.level !== 'student' || !stats.student_radar || !stats.student_radar.buckets) {
-                return;
-            }
-
-            const labels = Array.isArray(stats.student_radar.labels) ? stats.student_radar.labels : [];
-            const bucketsByKey = stats.student_radar.buckets;
-
-            const titleByKey = {
-                month: labelMonth,
-                term: labelTerm,
-                school_year: labelSchoolYear,
-                hogstadium: labelHogstadium,
-            };
-
-            function buildDatasetsForBucket(bucketKey) {
-                const rawBuckets = bucketsByKey && Array.isArray(bucketsByKey[bucketKey]) ? bucketsByKey[bucketKey] : [];
-                const buckets = filterBuckets(bucketKey, rawBuckets);
-                const bucket = pickLatestBucket(buckets);
-                if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
-                    return { title: titleByKey[bucketKey] || labelRadar, datasets: [], bucketGroup: { labels, buckets: [] } };
-                }
-
-                const datasets = bucket.datasets.map((ds, idx) => {
-                    const c = stableDatasetColor(ds, idx);
-                    return {
-                        label: ds.label,
-                        data: Array.isArray(ds.values) ? ds.values.map((v) => clampNumber(v, 1, 5)) : [],
-                        borderColor: c.border,
-                        backgroundColor: c.fill,
-                        borderWidth: CHART_BORDER_WIDTH,
-                        pointRadius: CHART_POINT_RADIUS,
-                        fill: true,
-                        borderDash: idx === 0 ? [] : CHART_OVERLAY_DASH,
-                    };
-                });
-
-                datasets.unshift(buildTargetDataset(labels.length));
-
-                return { title: bucket.label || (titleByKey[bucketKey] || labelRadar), datasets };
-            }
-
-            function renderTableForBucket(bucketKey) {
-                const rawBuckets = bucketsByKey && Array.isArray(bucketsByKey[bucketKey]) ? bucketsByKey[bucketKey] : [];
-                const buckets = filterBuckets(bucketKey, rawBuckets);
-                renderRadarValuesTable('ham-student-radar-table', {
-                    labels,
-                    buckets,
-                });
-
-                renderAnswerAlternativesTable('ham-answer-alternatives', stats.radar_questions || [], {
-                    labels,
-                    buckets,
-                });
-            }
-
-            const existing = Chart.getChart(canvas);
-            if (existing) {
-                existing.destroy();
-            }
-
-            const initial = buildDatasetsForBucket('term');
-            const chart = new Chart(canvas.getContext('2d'), {
-                type: 'radar',
-                data: {
-                    labels,
-                    datasets: initial.datasets,
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: {
-                        duration: CHART_ANIMATION_DURATION_MS,
-                        easing: CHART_ANIMATION_EASING,
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: { size: CHART_FONT_SIZE_LEGEND },
-                            },
-                        },
-                        title: {
-                            display: true,
-                            text: initial.title,
-                            font: { size: CHART_FONT_SIZE_TITLE },
-                        },
-                    },
-                    scales: {
-                        r: {
-                            min: 1,
-                            max: 5,
-                            ticks: {
-                                stepSize: 1,
-                                showLabelBackdrop: false,
-                                font: { size: CHART_FONT_SIZE_TICKS },
-                            },
-                            pointLabels: {
-                                font: { size: CHART_FONT_SIZE_POINT_LABELS },
-                            },
-                            grid: {
-                                circular: false,
-                            },
-                            angleLines: {
-                                color: CHART_RADAR_ANGLE_LINE_COLOR,
-                            },
-                        },
-                    },
-                },
-            });
-
-            function updateChart(bucketKey) {
-                const next = buildDatasetsForBucket(bucketKey);
-                chart.data.datasets = next.datasets;
-                chart.options.plugins.title.text = next.title;
-                chart.update();
-                renderTableForBucket(bucketKey);
-            }
-
-            registerStudentBucketHandler(updateChart);
-
-            ensureStudentBucketController(
-                allBtns,
-                'month',
-                (key) => {
-                    const rawRadar = Array.isArray(bucketsByKey[key]) ? bucketsByKey[key] : [];
-                    const radarOk = filterBuckets(key, rawRadar).length > 0;
-                    const rawProgress = stats.avg_progress && Array.isArray(stats.avg_progress[key]) ? stats.avg_progress[key] : [];
-                    const progressOk = filterSeries(key, rawProgress).length > 0;
-                    return radarOk || progressOk;
-                }
-            );
-
-            registerDateRangeListener(() => {
-                if (studentBucketController) {
-                    updateChart(studentBucketController.getActiveKey());
-                }
-            });
-        }
-
-        function buildOverviewRadarChart(canvasId, radar) {
-            const el = document.getElementById(canvasId);
-            if (!el || !radar || !Array.isArray(radar.labels) || !Array.isArray(radar.values) || radar.labels.length === 0) {
-                return;
-            }
-
-            const existing = Chart.getChart(el);
-            if (existing) {
-                existing.destroy();
-            }
-
-            const c = datasetColor(0);
-            new Chart(el.getContext('2d'), {
-                type: 'radar',
-                data: {
-                    labels: radar.labels,
-                    datasets: [
-                        buildTargetDataset(radar.labels.length),
-                        {
-                        label: radar.title || labelRadar,
-                        data: radar.values.map((v) => clampNumber(v, 1, 5)),
-                        borderColor: c.border,
-                        backgroundColor: c.fill,
-                        borderWidth: CHART_BORDER_WIDTH,
-                        pointRadius: CHART_POINT_RADIUS,
-                        fill: true,
-                        },
-                    ],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: {
-                        duration: CHART_ANIMATION_DURATION_MS,
-                        easing: CHART_ANIMATION_EASING,
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        title: {
-                            display: Boolean(radar.title),
-                            text: radar.title,
-                            font: { size: CHART_FONT_SIZE_TITLE },
-                        },
-                    },
-                    scales: {
-                        r: {
-                            min: 1,
-                            max: 5,
-                            ticks: {
-                                stepSize: 1,
-                                showLabelBackdrop: false,
+                                callback: function(value) {
+                                    if (value === 0) {
+                                        return '';
+                                    }
+                                    return value;
+                                },
                                 font: { size: CHART_FONT_SIZE_TICKS },
                             },
                             pointLabels: {
