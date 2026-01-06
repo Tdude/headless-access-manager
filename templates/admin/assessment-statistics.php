@@ -216,7 +216,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
                 // Ring markers + counts
                 foreach ($circle_nodes as $node) {
-                    echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="9" fill="#ffffff" stroke="#0073aa" stroke-width="2" />';
+                    echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="11" fill="#ffffff" stroke="#0073aa" stroke-width="2" />';
                     echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr($node['y']) . '" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
                 }
                 echo '</svg>';
@@ -822,7 +822,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                             echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; aspect-ratio: ' . esc_attr($w) . ' / ' . esc_attr($h) . '; max-height: 62px; overflow: visible;">';
                             echo '<line x1="' . esc_attr($pad_x) . '" y1="' . esc_attr($h - $pad_y) . '" x2="' . esc_attr($w - $pad_x) . '" y2="' . esc_attr($h - $pad_y) . '" stroke="#dcdcde" stroke-width="1" />';
                             if ($n > 1) {
-                                echo '<polyline fill="none" stroke="#0073aa" stroke-width="2.5" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
+                                echo '<polyline fill="none" stroke="#0073aa" stroke-width="2" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
                             }
                             foreach ($circle_nodes as $node) {
                                 echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="9" fill="#ffffff" stroke="#0073aa" stroke-width="2" />';
