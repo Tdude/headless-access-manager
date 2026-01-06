@@ -655,6 +655,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     </div>
                 </div>
             </div>
+            <div class="clear"></div>
         </div>
     <?php endif; ?>
 
@@ -663,7 +664,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
     if (!$is_deep_drilldown) :
     ?>
 
-    <div class="ham-stats-overview">
+    <div class="ham-stats-overview" style="clear: both;">
         <div class="ham-stats-card">
             <div class="ham-stats-icon">
                 <span class="dashicons dashicons-clipboard"></span>
