@@ -597,6 +597,18 @@ msgid "Student average progress"
 msgstr "Elevens genomsnittliga utveckling"
 
 #: templates/admin/assessment-statistics.php
+msgid "All schools average progress"
+msgstr "Alla skolors genomsnittliga utveckling"
+
+#: templates/admin/assessment-statistics.php
+msgid "Radar (avg per question)"
+msgstr "Radar (genomsnitt per fråga)"
+
+#: templates/admin/assessment-statistics.php
+msgid "Radar values"
+msgstr "Radarvärden"
+
+#: templates/admin/assessment-statistics.php
 msgid "Radar (per evaluation within bucket)"
 msgstr "Radar (per utvärdering inom tidsintervall)"
 
