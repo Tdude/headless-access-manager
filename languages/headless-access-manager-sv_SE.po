@@ -235,7 +235,7 @@ msgstr "Status (elever)"
 #: templates/admin/assessment-statistics.php:117
 #: templates/admin/assessment-statistics.php:155
 msgid "# Evaluations"
-msgstr "Antal observationer"
+msgstr "Observationer"
 
 #: templates/admin/assessment-statistics.php:78
 #: templates/admin/assessment-statistics.php:118

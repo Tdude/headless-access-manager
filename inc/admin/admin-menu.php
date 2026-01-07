@@ -537,9 +537,9 @@ class HAM_Admin_Menu
                                     echo '<p>' . esc_html__('No data to display', 'headless-access-manager') . '</p>';
                                 } else {
                                     $w = 100;
-                                    $h = 48;
+                                    $h = 30;
                                     $pad_x = 6;
-                                    $pad_y = 10;
+                                    $pad_y = 6;
 
                                     $svg_points = array();
                                     $circle_nodes = array();
