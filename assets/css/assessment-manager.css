@@ -569,8 +569,8 @@
     padding: .4em 1.5em;
     border-radius: 999px;
     background: #fff;
-    border: 1px solid #dcdcde;
-    color: #1d2327;
+    border: 1px solid #0a4b78;
+    color: #0a4b78;
     text-decoration: none;
     font-size: 1.1em;
     line-height: 1.6;
@@ -578,8 +578,8 @@
 }
 .ham-pill-link:hover {
     background: #f0f0f1;
-    border-color: #195687;
-    color: #195687;
+    border-color: #1d2327;
+    color: #1d2327;
 }
 .ham-pill-group {
     display: flex;
