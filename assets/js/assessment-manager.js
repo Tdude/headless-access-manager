@@ -336,7 +336,7 @@
 
         const t = (window.hamAssessment && window.hamAssessment.texts) ? window.hamAssessment.texts : {};
         const labelMonth = t.month || 'Month';
-        const labelTerm = t.term || 'Term';
+        const labelTerm = t.term || 'Förra terminen';
         const labelSchoolYear = t.schoolYear || 'School year';
         const labelHogstadium = t.hogstadium || 'Låg-/Mellan-/Högstadium';
         const labelRadar = t.radar || 'Radar';
