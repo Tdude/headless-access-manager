@@ -1472,22 +1472,43 @@ class HAM_Assessment_Manager
             $build_overview_group_bucket = function($bucket_type) use ($all_evals) {
                 $series = self::build_group_radar_bucket_avgs($all_evals, $bucket_type);
                 $out = array();
-                foreach ($series as $b) {
+
+                $count = is_array($series) ? count($series) : 0;
+                for ($i = 0; $i < $count; $i++) {
+                    $b = $series[$i];
+                    $prev = ($i > 0) ? $series[$i - 1] : null;
+
                     $n = isset($b['student_count']) ? (int) $b['student_count'] : 0;
+
+                    $datasets = array(
+                        array(
+                            'label' => $n > 0
+                                ? sprintf(__('%1$s (%2$d)', 'headless-access-manager'), __('All schools', 'headless-access-manager'), $n)
+                                : __('All schools', 'headless-access-manager'),
+                            'values' => isset($b['values']) ? $b['values'] : array(),
+                            'student_count' => $n,
+                        ),
+                    );
+
+                    if (is_array($prev)) {
+                        $prev_n = isset($prev['student_count']) ? (int) $prev['student_count'] : 0;
+                        $prev_label = isset($prev['label']) ? (string) $prev['label'] : '';
+                        $datasets[] = array(
+                            'label' => $prev_n > 0
+                                ? sprintf(__('%1$s (%2$d)', 'headless-access-manager'), $prev_label ? sprintf(__('Previous: %s', 'headless-access-manager'), $prev_label) : __('Previous', 'headless-access-manager'), $prev_n)
+                                : ($prev_label ? sprintf(__('Previous: %s', 'headless-access-manager'), $prev_label) : __('Previous', 'headless-access-manager')),
+                            'values' => isset($prev['values']) ? $prev['values'] : array(),
+                            'student_count' => $prev_n,
+                        );
+                    }
+
                     $out[] = array(
                         'key' => isset($b['key']) ? (string) $b['key'] : '',
                         'label' => isset($b['label']) ? $b['label'] : (isset($b['key']) ? (string) $b['key'] : ''),
-                        'datasets' => array(
-                            array(
-                                'label' => $n > 0
-                                    ? sprintf(__('%1$s (%2$d)', 'headless-access-manager'), __('All schools', 'headless-access-manager'), $n)
-                                    : __('All schools', 'headless-access-manager'),
-                                'values' => isset($b['values']) ? $b['values'] : array(),
-                                'student_count' => $n,
-                            ),
-                        ),
+                        'datasets' => $datasets,
                     );
                 }
+
                 return $out;
             };
 
