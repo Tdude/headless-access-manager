@@ -3237,7 +3237,7 @@ public function ajax_get_assessment_details()
                 'month' => esc_html__('Month', 'headless-access-manager'),
                 'term' => esc_html__('Previous term', 'headless-access-manager'),
                 'schoolYear' => esc_html__('School year', 'headless-access-manager'),
-                'hogstadium' => esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'),
+                'hogstadium' => esc_html__('L/M/H-stadium', 'headless-access-manager'),
                 'radar' => esc_html__('Radar', 'headless-access-manager'),
                 'confirmDelete' => esc_html__('Are you sure you want to delete this assessment?', 'headless-access-manager'),
             )

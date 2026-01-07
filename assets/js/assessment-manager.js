@@ -337,8 +337,8 @@
         const t = (window.hamAssessment && window.hamAssessment.texts) ? window.hamAssessment.texts : {};
         const labelMonth = t.month || 'Month';
         const labelTerm = t.term || 'Förra terminen';
-        const labelSchoolYear = t.schoolYear || 'School year';
-        const labelHogstadium = t.hogstadium || 'Låg-/Mellan-/Högstadium';
+        const labelSchoolYear = t.schoolYear || 'Skolår';
+        const labelHogstadium = t.hogstadium || 'L/M/H-stadium';
         const labelRadar = t.radar || 'Radar';
         const labelOption1 = t.option1 || 'Option 1';
         const labelOption2 = t.option2 || 'Option 2';
