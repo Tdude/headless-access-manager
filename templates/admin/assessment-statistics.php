@@ -102,7 +102,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
             <?php endif; ?>
 
             <?php
-            $render_semester_bars = function ($series, $max_height_pct = 100) {
+            $render_semester_bars = function ($series, $max_height_pct = 100, $variant = 'detailed') {
                 if (empty($series) || !is_array($series)) {
                     echo '<p>' . esc_html__('No evaluation data available.', 'headless-access-manager') . '</p>';
                     return;
@@ -157,11 +157,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     return;
                 }
 
-                // Compact inline line chart with ring markers
+                // Compact inline line chart
                 $w = 100;
-                $h = 44;
+                $h = ($variant === 'sparkline') ? 34 : 44;
                 $pad_x = 6;
-                $pad_y = 9;
+                $pad_y = ($variant === 'sparkline') ? 8 : 9;
 
                 $baseline_y = $h - $pad_y;
 
@@ -188,45 +188,61 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     }
                     $svg_points[] = $x . ',' . $y;
 
-                    $value_label = '';
-                    if ($has_delta) {
-                        $value_label = $raw_val === null ? '—' : number_format((float) $raw_val, 1);
-                    } else {
-                        $value_label = (string) ((int) $raw_val);
-                    }
+                    if ($variant !== 'sparkline') {
+                        $value_label = '';
+                        if ($has_delta) {
+                            $value_label = $raw_val === null ? '—' : number_format((float) $raw_val, 1);
+                        } else {
+                            $value_label = (string) ((int) $raw_val);
+                        }
 
-                    $circle_nodes[] = array(
-                        'x' => $x,
-                        'y' => $y,
-                        'count' => $value_label,
-                        'label' => $labels[$i],
-                    );
+                        $circle_nodes[] = array(
+                            'x' => $x,
+                            'y' => $y,
+                            'count' => $value_label,
+                            'label' => $labels[$i],
+                        );
+                    }
                 }
 
                 echo '<div class="ham-mini-line" style="display: inline-block; width: 100%;">';
-                echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; aspect-ratio: ' . esc_attr($w) . ' / ' . esc_attr($h) . '; max-height: 54px; overflow: visible;">';
+                $max_h = ($variant === 'sparkline') ? 40 : 54;
+                echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; aspect-ratio: ' . esc_attr($w) . ' / ' . esc_attr($h) . '; max-height: ' . esc_attr($max_h) . 'px; overflow: visible;">';
 
-                // Baseline
-                echo '<line x1="' . esc_attr($pad_x) . '" y1="' . esc_attr($baseline_y) . '" x2="' . esc_attr($w - $pad_x) . '" y2="' . esc_attr($baseline_y) . '" stroke="#dcdcde" stroke-width="1" />';
+                if ($variant !== 'sparkline') {
+                    // Baseline
+                    echo '<line x1="' . esc_attr($pad_x) . '" y1="' . esc_attr($baseline_y) . '" x2="' . esc_attr($w - $pad_x) . '" y2="' . esc_attr($baseline_y) . '" stroke="#dcdcde" stroke-width="1" />';
+                }
+
+                if ($variant === 'sparkline' && $n > 1) {
+                    $area_points = $svg_points;
+                    $area_points[] = ($w - $pad_x) . ',' . $baseline_y;
+                    $area_points[] = $pad_x . ',' . $baseline_y;
+                    echo '<polygon fill="rgba(0, 115, 170, 0.18)" points="' . esc_attr(implode(' ', $area_points)) . '" />';
+                }
 
                 // Connecting line (only if > 1 point)
                 if ($n > 1) {
                     echo '<polyline fill="none" stroke="#0073aa" stroke-width="1" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
                 }
 
-                // Ring markers + counts
-                foreach ($circle_nodes as $node) {
-                    echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="11" fill="#ffffff" stroke="#0073aa" stroke-width="1" />';
-                    echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr($node['y']) . '" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
+                if ($variant !== 'sparkline') {
+                    // Ring markers + counts
+                    foreach ($circle_nodes as $node) {
+                        echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="11" fill="#ffffff" stroke="#0073aa" stroke-width="1" />';
+                        echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr($node['y']) . '" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
+                    }
                 }
                 echo '</svg>';
 
-                // Labels row
-                echo '<div style="display: grid; grid-template-columns: repeat(' . esc_attr($n) . ', 1fr); gap: 6px; margin-top: 2px;">';
-                for ($i = 0; $i < $n; $i++) {
-                    echo '<div style="text-align: center; font-size: 11px; color: #646970; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' . esc_html($labels[$i]) . '</div>';
+                if ($variant !== 'sparkline') {
+                    // Labels row
+                    echo '<div style="display: grid; grid-template-columns: repeat(' . esc_attr($n) . ', 1fr); gap: 6px; margin-top: 2px;">';
+                    for ($i = 0; $i < $n; $i++) {
+                        echo '<div style="text-align: center; font-size: 11px; color: #646970; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' . esc_html($labels[$i]) . '</div>';
+                    }
+                    echo '</div>';
                 }
-                echo '</div>';
 
                 echo '</div>';
             };
@@ -568,7 +584,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                                 <span class="ham-stage-badge <?php echo esc_attr($stage_class); ?>"><?php echo $stage_text; ?></span>
                                             </td>
                                             <td style="min-width: 320px;">
-                                                <?php $render_semester_bars($student['series'], 100); ?>
+                                                <?php $render_semester_bars($student['series'], 100, 'sparkline'); ?>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
