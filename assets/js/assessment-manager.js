@@ -1028,17 +1028,23 @@
             const row = 22;
             const padY = 12;
             const h = padY * 2 + Math.max(0, (n - 1)) * row;
-            const xLeft = 32;
-            const xRight = 68;
+            const padX = 14;
+            const xMin = padX;
+            const xMax = w - padX;
+            const minVal = 1;
+            const maxVal = 5;
 
             const points = [];
             const nodes = [];
             for (let i = 0; i < n; i++) {
-                const x = i % 2 === 0 ? xLeft : xRight;
                 const y = padY + i * row;
 
                 const raw = Number(values[i]);
                 const v = Number.isFinite(raw) ? raw : null;
+                const clamped = v == null ? null : Math.max(minVal, Math.min(maxVal, v));
+                const ratio = clamped == null ? 0.5 : ((clamped - minVal) / (maxVal - minVal));
+                const x = xMin + ratio * (xMax - xMin);
+
                 const text = v == null ? '' : (Number.isInteger(v) ? String(v) : v.toFixed(1));
 
                 points.push(`${x},${y}`);
@@ -1064,6 +1070,8 @@
 
             html += `<div style="flex: 0 1 260px; max-width: 100%;">`;
             html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMin meet" style="display:block; width: 100%; height: auto; overflow: visible;">`;
+            html += `<line x1="${xMin}" y1="${padY}" x2="${xMin}" y2="${h - padY}" stroke="#dcdcde" stroke-width="1" />`;
+            html += `<line x1="${xMax}" y1="${padY}" x2="${xMax}" y2="${h - padY}" stroke="#dcdcde" stroke-width="1" />`;
             html += `<polyline fill="none" stroke="#0073aa" stroke-width="2" points="${points.join(' ')}" />`;
 
             nodes.forEach((node) => {
