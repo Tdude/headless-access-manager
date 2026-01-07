@@ -817,11 +817,11 @@
 
             const rows = [];
             datasets.forEach((ds, idx) => {
-                if (!ds || !ds.label) {
+                if (!ds) {
                     return;
                 }
                 // Don't include the target ring in the legend.
-                if (String(ds.label) === String(t.targetScore || 'Målnivå 3')) {
+                if (ds.label && String(ds.label) === String(t.targetScore || 'Målnivå 3')) {
                     return;
                 }
 
@@ -829,7 +829,8 @@
                 const hidden = Boolean(datasetHiddenByKey.get(key));
                 const c = stableDatasetColor(ds, idx);
 
-                const safeLabel = escapeHtml(ds.label);
+                const displayLabel = ds.label ? String(ds.label) : `${t.evaluation || 'Evaluation'} ${idx + 1}`;
+                const safeLabel = escapeHtml(displayLabel);
                 const ariaPressed = hidden ? 'false' : 'true';
                 const opacity = hidden ? '0.35' : '1';
 
@@ -841,7 +842,7 @@
                 );
             });
 
-            el.innerHTML = rows.join('');
+            el.innerHTML = rows.length > 0 ? rows.join('') : '';
 
             el.querySelectorAll('.ham-legend-item').forEach((btn) => {
                 btn.addEventListener('click', () => {
