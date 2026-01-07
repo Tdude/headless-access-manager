@@ -1090,6 +1090,8 @@
                 if (!Number.isFinite(raw)) {
                     stageClass = 'ham-stage-full';
                 } else if (raw < 1) {
+                    stageClass = '';
+                } else if (raw < 2) {
                     stageClass = 'ham-stage-not';
                 } else if (raw < 3) {
                     stageClass = 'ham-stage-trans';
