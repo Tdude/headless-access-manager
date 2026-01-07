@@ -1061,15 +1061,15 @@
             html += '<div class="ham-radar-values-scroll" style="overflow: visible;">';
             html += '<div style="display:flex; gap: 10px; align-items: flex-start;">';
             html += `<div style="flex: 1 1 auto; min-width: 180px;">`;
-            html += `<svg viewBox="0 0 100 ${h}" preserveAspectRatio="none" style="display:block; width: 100%; height: ${h}px;">`;
+            html += `<div style="display:flex; flex-direction:column; gap: 0;">`;
             nodes.forEach((node) => {
-                html += `<text x="0" y="${node.y}" text-anchor="start" dominant-baseline="middle" font-size="12" fill="#1d2327">${escapeHtml(node.label)}</text>`;
+                html += `<div style="height:${row}px; display:flex; align-items:center; font-size:12px; color:#1d2327;">${escapeHtml(node.label)}</div>`;
             });
-            html += '</svg>';
+            html += `</div>`;
             html += '</div>';
 
             html += `<div style="flex: 0 1 260px; max-width: 100%;">`;
-            html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMin meet" style="display:block; width: 100%; height: auto; overflow: visible;">`;
+            html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMin meet" style="display:block; height: ${h}px; width: auto; max-width: 100%; overflow: visible;">`;
             html += `<line x1="${xMin}" y1="${padY}" x2="${xMin}" y2="${h - padY}" stroke="#dcdcde" stroke-width="1" />`;
             html += `<line x1="${xMax}" y1="${padY}" x2="${xMax}" y2="${h - padY}" stroke="#dcdcde" stroke-width="1" />`;
             html += `<polyline fill="none" stroke="#0073aa" stroke-width="2" points="${points.join(' ')}" />`;
@@ -1078,7 +1078,6 @@
                 html += `<g>`;
                 html += `<title>${escapeHtml(node.label)}${node.value ? ': ' + escapeHtml(node.value) : ''}</title>`;
                 html += `<circle cx="${node.x}" cy="${node.y}" r="11" fill="#ffffff" stroke="#0073aa" stroke-width="1" />`;
-                html += `<text x="${node.x}" y="${node.y}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">${escapeHtml(node.value)}</text>`;
                 html += `</g>`;
             });
 
