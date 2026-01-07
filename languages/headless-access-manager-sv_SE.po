@@ -417,6 +417,9 @@ msgstr "Fullt etablerat"
 msgid "Not Established"
 msgstr "Ej etablerad"
 
+msgid "Not established"
+msgstr "Ej etablerad"
+
 msgid "In Transition"
 msgstr "Utvecklas"
 
