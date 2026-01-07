@@ -565,8 +565,12 @@ msgid "Term"
 msgstr "Termin"
 
 #: templates/admin/assessment-statistics.php
+msgid "Previous term"
+msgstr "Förra terminen"
+
+#: templates/admin/assessment-statistics.php
 msgid "School year"
-msgstr "Skolår"
+msgstr "Läsår"
 
 #: inc/admin/class-ham-assessment-manager.php
 msgid "Låg-/Mellan-/Högstadiu"
