@@ -265,6 +265,11 @@
     color: #f57f17;
 }
 
+.ham-stage-mid {
+    background-color: hsl(90, 70%, 92%);
+    color: #558b2f;
+}
+
 .ham-stage-full {
     background-color: hsl(130, 70%, 92%);
     color: #2e7d32;

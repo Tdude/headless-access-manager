@@ -1053,6 +1053,7 @@
                     y,
                     label: String(labels[i] || ''),
                     value: text,
+                    num: v,
                 });
             }
 
@@ -1073,7 +1074,7 @@
             // SVG (no text) + HTML overlay numbers.
             html += `<div style="position: relative; width: 100%; height: ${h}px;">`;
             html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="position:absolute; inset:0; width:100%; height:100%; overflow: visible;">`;
-            html += `<polyline fill="none" stroke="#0073aa" stroke-width="2" points="${points.join(' ')}" />`;
+            html += `<polyline fill="none" stroke="#0073aa" stroke-width="1" points="${points.join(' ')}" />`;
 
             html += `</svg>`;
 
@@ -1081,7 +1082,20 @@
             nodes.forEach((node) => {
                 const left = (node.x / w) * 100;
                 const top = (node.y / h) * 100;
-                html += `<div style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%,-50%); width:22px; height:22px; border-radius:999px; background:#ffffff; border:1px solid #0073aa; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#1d2327; line-height:1;">${escapeHtml(node.value)}</div>`;
+
+                const raw = Number(node.num);
+                let stageClass = 'ham-stage-full';
+                if (!Number.isFinite(raw)) {
+                    stageClass = 'ham-stage-full';
+                } else if (raw < 2) {
+                    stageClass = 'ham-stage-not';
+                } else if (raw < 3) {
+                    stageClass = 'ham-stage-trans';
+                } else if (raw < 4) {
+                    stageClass = 'ham-stage-mid';
+                }
+
+                html += `<div class="ham-stage-badge ${stageClass}" style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%,-50%); width:22px; height:22px; padding:0; border-radius:999px; border:1px solid currentColor; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; line-height:1;">${escapeHtml(node.value)}</div>`;
             });
             html += `</div>`;
 
