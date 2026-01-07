@@ -1090,12 +1090,12 @@
                 if (!Number.isFinite(raw)) {
                     stageClass = 'ham-stage-full';
                 } else if (raw < 1) {
-                    stageClass = '';
-                } else if (raw < 2) {
-                    stageClass = 'ham-stage-not';
+                    stageClass = 'ham-pill-link';
                 } else if (raw < 3) {
-                    stageClass = 'ham-stage-trans';
+                    stageClass = 'ham-stage-not';
                 } else if (raw < 4) {
+                    stageClass = 'ham-stage-trans';
+                } else if (raw < 5) {
                     stageClass = 'ham-stage-mid';
                 }
 
