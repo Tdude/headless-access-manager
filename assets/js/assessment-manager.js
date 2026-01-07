@@ -1063,11 +1063,12 @@
 
                     const raw = Number(values[i]);
                     const v = Number.isFinite(raw) ? raw : null;
+                    const vForLabel = v === 0 ? null : v;
                     const clamped = v == null ? null : Math.max(minVal, Math.min(maxVal, v));
                     const ratio = clamped == null ? 0.5 : ((clamped - minVal) / (maxVal - minVal));
                     const x = xMin + ratio * (xMax - xMin);
 
-                    const text = v == null ? '' : (Number.isInteger(v) ? String(v) : v.toFixed(1));
+                    const text = vForLabel == null ? '-' : (Number.isInteger(vForLabel) ? String(vForLabel) : vForLabel.toFixed(1));
 
                     points.push(`${x},${y}`);
                     nodes.push({
@@ -1075,7 +1076,7 @@
                         y,
                         label: String(labels[i] || ''),
                         value: text,
-                        num: v,
+                        num: vForLabel,
                         color: c,
                     });
                 }
