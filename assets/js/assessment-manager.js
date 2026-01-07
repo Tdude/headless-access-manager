@@ -1089,7 +1089,7 @@
                 let stageClass = 'ham-stage-full';
                 if (!Number.isFinite(raw)) {
                     stageClass = 'ham-stage-full';
-                } else if (raw < 2) {
+                } else if (raw < 1) {
                     stageClass = 'ham-stage-not';
                 } else if (raw < 3) {
                     stageClass = 'ham-stage-trans';
