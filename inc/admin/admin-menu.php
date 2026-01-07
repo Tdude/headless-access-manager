@@ -87,8 +87,27 @@ class HAM_Admin_Menu
         add_action('admin_menu', array(__CLASS__, 'reorder_submenu'), 999);
         add_action('admin_head', array(__CLASS__, 'output_submenu_icons_css'));
         add_action('admin_footer', array(__CLASS__, 'output_submenu_groups_js'));
+        add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue_dashboard_assets'));
         // Register settings
         add_action('admin_init', array( __CLASS__, 'register_settings' ));
+    }
+
+    public static function enqueue_dashboard_assets($hook)
+    {
+        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
+        if ($page !== 'headless-access-manager') {
+            return;
+        }
+
+        $ham_assessment_manager_css_path = HAM_PLUGIN_DIR . 'assets/css/assessment-manager.css';
+        $ham_assessment_manager_css_ver = file_exists($ham_assessment_manager_css_path) ? filemtime($ham_assessment_manager_css_path) : HAM_VERSION;
+
+        wp_enqueue_style(
+            'ham-assessment-manager',
+            plugins_url('assets/css/assessment-manager.css', HAM_PLUGIN_FILE),
+            array(),
+            $ham_assessment_manager_css_ver
+        );
     }
 
     public static function reorder_submenu()
@@ -292,7 +311,7 @@ class HAM_Admin_Menu
         $assessments_count = wp_count_posts(HAM_CPT_ASSESSMENT)->publish;
 
         $teachers_count = count(get_users(array( 'role' => HAM_ROLE_TEACHER )));
-        $students_count = count(get_users(array( 'role' => HAM_ROLE_STUDENT )));
+        $students_count = wp_count_posts(HAM_CPT_STUDENT)->publish;
         $principals_count = count(get_users(array( 'role' => HAM_ROLE_PRINCIPAL )));
         $school_heads_count = count(get_users(array( 'role' => HAM_ROLE_SCHOOL_HEAD )));
 
@@ -537,7 +556,7 @@ class HAM_Admin_Menu
                                     echo '<p>' . esc_html__('No data to display', 'headless-access-manager') . '</p>';
                                 } else {
                                     $w = 100;
-                                    $h = 30;
+                                    $h = 40;
                                     $pad_x = 6;
                                     $pad_y = 6;
 
@@ -560,7 +579,7 @@ class HAM_Admin_Menu
                                     }
 
                                     echo '<div class="ham-mini-line" style="width: 100%;">';
-                                    echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; aspect-ratio: ' . esc_attr($w) . ' / ' . esc_attr($h) . '; max-height: 62px; overflow: visible;">';
+                                    echo '<svg viewBox="0 0 100 40" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; aspect-ratio: 100 / 40; max-height: 40px; overflow: hidden;">';
                                     echo '<line x1="' . esc_attr($pad_x) . '" y1="' . esc_attr($h - $pad_y) . '" x2="' . esc_attr($w - $pad_x) . '" y2="' . esc_attr($h - $pad_y) . '" stroke="#dcdcde" stroke-width="1" />';
                                     if ($n > 1) {
                                         echo '<polyline fill="none" stroke="#0073aa" stroke-width="2" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
