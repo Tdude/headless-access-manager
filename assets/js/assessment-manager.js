@@ -1206,6 +1206,56 @@
             );
         }
 
+        function buildStudentRadarToggle() {
+            const canvas = document.getElementById('ham-student-radar');
+            const btns = Array.from(document.querySelectorAll('.ham-radar-toggle-btn'));
+
+            if (!canvas || btns.length === 0 || !stats || stats.level !== 'student' || !stats.student_radar || !stats.student_radar.buckets) {
+                return;
+            }
+
+            const labels = Array.isArray(stats.student_radar.labels) ? stats.student_radar.labels : [];
+            const bucketsByKey = stats.student_radar.buckets;
+
+            const titleByKey = {
+                month: labelMonth,
+                term: labelTerm,
+                school_year: labelSchoolYear,
+                hogstadium: labelHogstadium,
+            };
+
+            function buildBucketGroup(bucketKey) {
+                const rawBuckets = bucketsByKey && Array.isArray(bucketsByKey[bucketKey]) ? bucketsByKey[bucketKey] : [];
+                const buckets = filterBuckets(bucketKey, rawBuckets);
+                return { labels, buckets };
+            }
+
+            function updateChart(bucketKey) {
+                const bucketGroup = buildBucketGroup(bucketKey);
+                buildRadarChart('ham-student-radar', bucketGroup, titleByKey[bucketKey] || labelRadar);
+                renderRadarValuesTable('ham-student-radar-table', bucketGroup);
+                renderAnswerAlternativesTable('ham-answer-alternatives', stats.radar_questions, bucketGroup);
+            }
+
+            registerStudentBucketHandler(updateChart);
+
+            registerDateRangeListener(() => {
+                if (studentBucketController) {
+                    updateChart(studentBucketController.getActiveKey());
+                }
+            });
+
+            const controller = ensureStudentBucketController(
+                btns,
+                'month',
+                (key) => Array.isArray(bucketsByKey[key]) && bucketsByKey[key].length > 0
+            );
+
+            if (controller) {
+                updateChart(controller.getActiveKey());
+            }
+        }
+
         function buildDrilldownAvgProgressToggle() {
             const canvas = document.getElementById('ham-avg-progress-drilldown');
             const btnRoot = canvas ? canvas.closest('.ham-stats-panel') : null;
