@@ -1468,6 +1468,8 @@ class HAM_Assessment_Manager
                 );
             }
 
+            $school_count = is_array($schools) ? count($schools) : 0;
+
             // Overview radar (root view): overall average score per question (1-5) across all schools.
             $latest_term_bucket = null;
             $term_series_for_overlay = self::build_group_radar_bucket_avgs($all_evals, 'term');
@@ -1475,7 +1477,7 @@ class HAM_Assessment_Manager
                 $latest_term_bucket = $term_series_for_overlay[count($term_series_for_overlay) - 1];
             }
 
-            $build_overview_group_bucket = function($bucket_type) use ($all_evals, $latest_term_bucket) {
+            $build_overview_group_bucket = function($bucket_type) use ($all_evals, $latest_term_bucket, $school_count) {
                 $series = self::build_group_radar_bucket_avgs($all_evals, $bucket_type);
                 $out = array();
 
@@ -1489,11 +1491,12 @@ class HAM_Assessment_Manager
 
                     $datasets = array(
                         array(
-                            'label' => $n > 0
-                                ? sprintf(__('%1$s (%2$d)', 'headless-access-manager'), __('All schools', 'headless-access-manager'), $n)
+                            'label' => $school_count > 0
+                                ? sprintf(__('%1$s (%2$d)', 'headless-access-manager'), __('All schools', 'headless-access-manager'), $school_count)
                                 : __('All schools', 'headless-access-manager'),
                             'values' => isset($b['values']) ? $b['values'] : array(),
                             'student_count' => $n,
+                            'school_count' => $school_count,
                         ),
                     );
 
@@ -1515,6 +1518,7 @@ class HAM_Assessment_Manager
                                 : $overlay_label,
                             'values' => isset($overlay['values']) ? $overlay['values'] : array(),
                             'student_count' => $prev_n,
+                            'school_count' => $school_count,
                         );
                     }
 
@@ -1585,7 +1589,14 @@ class HAM_Assessment_Manager
 
             // Group radar: School vs All (baseline), average score per question (1-5) based on latest assessment per student per bucket.
             $all_posts = self::fetch_evaluation_posts();
-            $build_group_bucket = function($bucket_type) use ($school_posts, $all_posts) {
+            $school_count = count(get_posts(array(
+                'post_type'      => HAM_CPT_SCHOOL,
+                'posts_per_page' => -1,
+                'post_status'    => 'publish',
+                'fields'         => 'ids',
+            )));
+
+            $build_group_bucket = function($bucket_type) use ($school_posts, $all_posts, $school_count) {
                 $school_series = self::build_group_radar_bucket_avgs($school_posts, $bucket_type);
                 $all_series = self::build_group_radar_bucket_avgs($all_posts, $bucket_type);
 
@@ -1619,11 +1630,12 @@ class HAM_Assessment_Manager
                                 'student_count' => $school_n,
                             ),
                             array(
-                                'label' => $all_n > 0
-                                    ? sprintf(__('All schools (%d)', 'headless-access-manager'), $all_n)
+                                'label' => $school_count > 0
+                                    ? sprintf(__('All schools (%d)', 'headless-access-manager'), $school_count)
                                     : __('All schools', 'headless-access-manager'),
                                 'values' => $all_values,
                                 'student_count' => $all_n,
+                                'school_count' => $school_count,
                             ),
                         ),
                     );

@@ -764,9 +764,17 @@
         const datasetColorIndexByKey = new Map();
         let nextDatasetColorIndex = 0;
 
+        function normalizeDatasetLabel(label) {
+            const s = label == null ? '' : String(label);
+            // Remove trailing count suffixes like "(23)", "(23st)", "(23 students)".
+            // This keeps colors stable even when counts change between buckets.
+            return s.replace(/\s*\(\s*\d+[^)]*\)\s*$/i, '').trim();
+        }
+
         function datasetKey(ds, fallbackIdx) {
             if (ds && ds.label) {
-                return String(ds.label);
+                const normalized = normalizeDatasetLabel(ds.label);
+                return normalized || String(ds.label);
             }
             return `__dataset_${fallbackIdx}`;
         }
