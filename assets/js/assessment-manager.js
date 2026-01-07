@@ -187,80 +187,79 @@
             dateRangeListeners.push(fn);
         }
 
-        function initBucketToggle({ buttons, defaultKey, isKeyAvailable, onChange }) {
-            const btns = Array.isArray(buttons) ? buttons.filter(Boolean) : [];
-            if (btns.length === 0) {
+        function initBucketToggle(options) {
+            const { buttons, defaultKey, isKeyAvailable, onChange } = options || {};
+
+            const initialButtons = Array.isArray(buttons) ? buttons : [];
+            let btns = [];
+            const btnSet = new Set();
+
+            if (initialButtons.length === 0 || typeof onChange !== 'function') {
                 return null;
             }
 
-            function getKey(btn) {
-                if (!btn) {
-                    return null;
-                }
-                const k = btn.getAttribute('data-bucket');
-                return k ? String(k) : null;
+            function setActive(key) {
+                btns.forEach((b) => {
+                    const isActive = b.getAttribute('data-bucket') === key;
+                    b.classList.toggle('button-primary', isActive);
+                    b.classList.toggle('button-secondary', !isActive);
+                    b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
             }
 
-            function isAvailable(key) {
-                if (typeof isKeyAvailable === 'function') {
-                    return !!isKeyAvailable(key);
-                }
-                return true;
+            let activeKey = defaultKey;
+            if (typeof isKeyAvailable === 'function' && activeKey && !isKeyAvailable(activeKey)) {
+                activeKey = null;
             }
 
-            let activeKey = null;
-
-            const candidateKeys = btns.map(getKey).filter(Boolean);
-            if (defaultKey && isAvailable(defaultKey) && candidateKeys.includes(defaultKey)) {
-                activeKey = defaultKey;
-            } else {
-                activeKey = candidateKeys.find((k) => isAvailable(k)) || candidateKeys[0] || null;
-            }
-
-            function setActive(nextKey, { trigger = true } = {}) {
-                if (!nextKey) {
-                    return;
-                }
-                if (!isAvailable(nextKey)) {
-                    return;
-                }
-                activeKey = nextKey;
-
-                btns.forEach((btn) => {
-                    const k = getKey(btn);
+            if (!activeKey) {
+                for (let i = 0; i < initialButtons.length; i++) {
+                    const k = initialButtons[i] ? initialButtons[i].getAttribute('data-bucket') : null;
                     if (!k) {
+                        continue;
+                    }
+                    if (typeof isKeyAvailable !== 'function' || isKeyAvailable(k)) {
+                        activeKey = k;
+                        break;
+                    }
+                }
+            }
+
+            if (!activeKey) {
+                activeKey = (initialButtons[0] && initialButtons[0].getAttribute('data-bucket')) || defaultKey;
+            }
+
+            function setBucket(bucketKey) {
+                if (!bucketKey) {
+                    return;
+                }
+                activeKey = bucketKey;
+                setActive(bucketKey);
+                onChange(bucketKey);
+            }
+
+            function wireButtons(newButtons) {
+                const incoming = Array.isArray(newButtons) ? newButtons : [];
+                incoming.forEach((b) => {
+                    if (!b || btnSet.has(b)) {
                         return;
                     }
-                    if (k === activeKey) {
-                        btn.classList.add('is-primary');
-                    } else {
-                        btn.classList.remove('is-primary');
-                    }
+                    btnSet.add(b);
+                    btns.push(b);
+                    b.addEventListener('click', () => {
+                        setBucket(b.getAttribute('data-bucket'));
+                    });
                 });
-
-                if (trigger && typeof onChange === 'function') {
-                    onChange(activeKey);
-                }
+                setActive(activeKey);
             }
 
-            btns.forEach((btn) => {
-                const k = getKey(btn);
-                if (!k) {
-                    return;
-                }
-                btn.addEventListener('click', (e) => {
-                    if (e && typeof e.preventDefault === 'function') {
-                        e.preventDefault();
-                    }
-                    setActive(k);
-                });
-            });
-
-            setActive(activeKey, { trigger: false });
+            wireButtons(initialButtons);
+            setBucket(activeKey);
 
             return {
                 getActiveKey: () => activeKey,
-                setActiveKey: (key) => setActive(key),
+                setBucket,
+                addButtons: wireButtons,
             };
         }
 
