@@ -670,8 +670,14 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 </details>
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-student-radar"></canvas></div>
                 <div id="ham-student-radar-legend" class="ham-chart-legend"></div>
-                <div id="ham-student-radar-table" class="ham-radar-values"></div>
 
+                    </div>
+                </div>
+
+                <div id="ham-postbox-student-radar-table" class="postbox">
+                    <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Radar values', 'headless-access-manager'); ?></h2></div>
+                    <div class="inside">
+                        <div id="ham-student-radar-table" class="ham-radar-values"></div>
                     </div>
                 </div>
 
