@@ -1739,8 +1739,8 @@
             buildStudentRadarToggle();
         }
 
-        // School/class radar chart + bucket toggle (counts mode)
-        if (stats && (stats.level === 'school' || stats.level === 'class') && stats.group_radar && stats.group_radar.buckets) {
+        // Schools/school/class radar chart + bucket toggle
+        if (stats && (stats.level === 'schools' || stats.level === 'school' || stats.level === 'class') && stats.group_radar && stats.group_radar.buckets) {
             buildGroupRadarToggle();
         }
 
