@@ -936,6 +936,11 @@
                 return;
             }
 
+            if (stats && stats.level === 'schools' && containerId === 'ham-group-radar-table') {
+                renderGroupRadarValuesMiniLine(containerId, bucketGroup, options);
+                return;
+            }
+
             const mode = options && options.mode ? String(options.mode) : 'counts';
 
             if (!bucketGroup || !bucketGroup.buckets) {
@@ -992,6 +997,84 @@
             }
 
             html += '</tbody></table></div>';
+            el.innerHTML = html;
+        }
+
+        function renderGroupRadarValuesMiniLine(containerId, bucketGroup, options) {
+            const el = document.getElementById(containerId);
+            if (!el) {
+                return;
+            }
+
+            const mode = options && options.mode ? options.mode : 'avg';
+            const buckets = bucketGroup && Array.isArray(bucketGroup.buckets) ? bucketGroup.buckets : [];
+            const labels = bucketGroup && Array.isArray(bucketGroup.labels) ? bucketGroup.labels : [];
+            const bucket = buckets.length > 0 ? buckets[buckets.length - 1] : null;
+
+            if (!bucket || !bucket.datasets || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+
+            const ds = bucket.datasets[0];
+            const values = Array.isArray(ds.values) ? ds.values : [];
+
+            const n = Math.min(labels.length, values.length);
+            if (n === 0) {
+                el.innerHTML = '';
+                return;
+            }
+
+            const w = 100;
+            const row = 22;
+            const padY = 12;
+            const h = padY * 2 + Math.max(0, (n - 1)) * row;
+            const xLeft = 32;
+            const xRight = 68;
+
+            const points = [];
+            const nodes = [];
+            for (let i = 0; i < n; i++) {
+                const x = i % 2 === 0 ? xLeft : xRight;
+                const y = padY + i * row;
+
+                const raw = Number(values[i]);
+                const v = Number.isFinite(raw) ? raw : null;
+                const text = v == null ? '' : (Number.isInteger(v) ? String(v) : v.toFixed(1));
+
+                points.push(`${x},${y}`);
+                nodes.push({
+                    x,
+                    y,
+                    label: String(labels[i] || ''),
+                    value: text,
+                });
+            }
+
+            let html = '';
+            html += `<div class="ham-radar-values-header">${bucket.label ? String(bucket.label) : ''}</div>`;
+            html += '<div class="ham-radar-values-scroll" style="overflow: visible;">';
+            html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMin meet" style="width: 100%; max-width: 260px; height: auto; overflow: visible;">`;
+            html += `<polyline fill="none" stroke="#0073aa" stroke-width="2" points="${points.join(' ')}" />`;
+
+            nodes.forEach((node) => {
+                html += `<g>`;
+                html += `<title>${escapeHtml(node.label)}${node.value ? ': ' + escapeHtml(node.value) : ''}</title>`;
+                html += `<circle cx="${node.x}" cy="${node.y}" r="10" fill="#ffffff" stroke="#0073aa" stroke-width="2" />`;
+                html += `<text x="${node.x}" y="${node.y}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">${escapeHtml(node.value)}</text>`;
+
+                if (mode === 'avg') {
+                    const labelX = node.x === xLeft ? xRight + 8 : xLeft - 8;
+                    const anchor = node.x === xLeft ? 'start' : 'end';
+                    html += `<text x="${labelX}" y="${node.y}" text-anchor="${anchor}" dominant-baseline="middle" font-size="8" fill="#646970">${escapeHtml(node.label)}</text>`;
+                }
+
+                html += `</g>`;
+            });
+
+            html += '</svg>';
+            html += '</div>';
+
             el.innerHTML = html;
         }
 
