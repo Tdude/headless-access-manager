@@ -211,12 +211,12 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
                 // Connecting line (only if > 1 point)
                 if ($n > 1) {
-                    echo '<polyline fill="none" stroke="#0073aa" stroke-width="2" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
+                    echo '<polyline fill="none" stroke="#0073aa" stroke-width="1" points="' . esc_attr(implode(' ', $svg_points)) . '" />';
                 }
 
                 // Ring markers + counts
                 foreach ($circle_nodes as $node) {
-                    echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="11" fill="#ffffff" stroke="#0073aa" stroke-width="2" />';
+                    echo '<circle cx="' . esc_attr($node['x']) . '" cy="' . esc_attr($node['y']) . '" r="11" fill="#ffffff" stroke="#0073aa" stroke-width="1" />';
                     echo '<text x="' . esc_attr($node['x']) . '" y="' . esc_attr($node['y']) . '" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">' . esc_html((string) $node['count']) . '</text>';
                 }
                 echo '</svg>';
