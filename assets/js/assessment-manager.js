@@ -312,7 +312,7 @@
         const CHART_HUE_STEP = 28;
         const CHART_BORDER_WIDTH = 2;
         const CHART_POINT_RADIUS = 2;
-        const CHART_LINE_TENSION = 0.25;
+        const CHART_LINE_TENSION = 0.55;
         const CHART_LINE_POINT_RADIUS = 3;
         const CHART_FILL_ALPHA = 0.70;
         const CHART_OVERLAY_DASH = [6, 4];

@@ -3143,19 +3143,23 @@ public function ajax_get_assessment_details()
         }
 
         // Enqueue CSS
+        $ham_assessment_manager_css_path = HAM_PLUGIN_DIR . 'assets/css/assessment-manager.css';
+        $ham_assessment_manager_css_ver = file_exists($ham_assessment_manager_css_path) ? filemtime($ham_assessment_manager_css_path) : HAM_VERSION;
         wp_enqueue_style(
             'ham-assessment-manager',
             plugins_url('assets/css/assessment-manager.css', HAM_PLUGIN_FILE),
             array(),
-            HAM_VERSION
+            $ham_assessment_manager_css_ver
         );
 
         // Enqueue JavaScript
+        $ham_assessment_manager_js_path = HAM_PLUGIN_DIR . 'assets/js/assessment-manager.js';
+        $ham_assessment_manager_js_ver = file_exists($ham_assessment_manager_js_path) ? filemtime($ham_assessment_manager_js_path) : HAM_VERSION;
         wp_enqueue_script(
             'ham-assessment-manager',
             plugins_url('assets/js/assessment-manager.js', HAM_PLUGIN_FILE),
             array('jquery', 'wp-util'),
-            HAM_VERSION,
+            $ham_assessment_manager_js_ver,
             true
         );
 
