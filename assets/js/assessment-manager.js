@@ -1087,16 +1087,7 @@
             });
 
             let html = '';
-            html += `<div class="ham-radar-values-header" style="display:flex; align-items:flex-end; gap:10px;">`;
-            html += `<div style="flex: 1 1 auto; min-width: 180px;">${bucket.label ? String(bucket.label) : ''}</div>`;
-            html += `<div style="flex: 0 0 auto; width: 260px; max-width: 100%;">`;
-            html += `<div style="display:flex; gap:30px; overflow-x:auto; padding-bottom:6px;">`;
-            charts.forEach((chart) => {
-                html += `<div style="flex:0 0 200px; font-size:11px; font-weight:600; color:#1d2327; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(chart.label)}</div>`;
-            });
-            html += `</div>`;
-            html += `</div>`;
-            html += `</div>`;
+            html += `<div class="ham-radar-values-header">${bucket.label ? String(bucket.label) : ''}</div>`;
             html += '<div class="ham-radar-values-scroll" style="overflow: visible;">';
             html += '<div style="display:flex; gap: 10px; align-items: flex-start;">';
             const labelPadTop = Math.max(0, padY - (row / 2));
