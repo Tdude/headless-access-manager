@@ -613,7 +613,7 @@ msgstr "Radar (genomsnitt per fråga)"
 
 #: templates/admin/assessment-statistics.php
 msgid "Radar values"
-msgstr "Radarvärden"
+msgstr "Ormdiagram"
 
 #: templates/admin/assessment-statistics.php
 msgid "Radar (per evaluation within bucket)"
