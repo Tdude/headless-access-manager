@@ -187,6 +187,83 @@
             dateRangeListeners.push(fn);
         }
 
+        function initBucketToggle({ buttons, defaultKey, isKeyAvailable, onChange }) {
+            const btns = Array.isArray(buttons) ? buttons.filter(Boolean) : [];
+            if (btns.length === 0) {
+                return null;
+            }
+
+            function getKey(btn) {
+                if (!btn) {
+                    return null;
+                }
+                const k = btn.getAttribute('data-bucket');
+                return k ? String(k) : null;
+            }
+
+            function isAvailable(key) {
+                if (typeof isKeyAvailable === 'function') {
+                    return !!isKeyAvailable(key);
+                }
+                return true;
+            }
+
+            let activeKey = null;
+
+            const candidateKeys = btns.map(getKey).filter(Boolean);
+            if (defaultKey && isAvailable(defaultKey) && candidateKeys.includes(defaultKey)) {
+                activeKey = defaultKey;
+            } else {
+                activeKey = candidateKeys.find((k) => isAvailable(k)) || candidateKeys[0] || null;
+            }
+
+            function setActive(nextKey, { trigger = true } = {}) {
+                if (!nextKey) {
+                    return;
+                }
+                if (!isAvailable(nextKey)) {
+                    return;
+                }
+                activeKey = nextKey;
+
+                btns.forEach((btn) => {
+                    const k = getKey(btn);
+                    if (!k) {
+                        return;
+                    }
+                    if (k === activeKey) {
+                        btn.classList.add('is-primary');
+                    } else {
+                        btn.classList.remove('is-primary');
+                    }
+                });
+
+                if (trigger && typeof onChange === 'function') {
+                    onChange(activeKey);
+                }
+            }
+
+            btns.forEach((btn) => {
+                const k = getKey(btn);
+                if (!k) {
+                    return;
+                }
+                btn.addEventListener('click', (e) => {
+                    if (e && typeof e.preventDefault === 'function') {
+                        e.preventDefault();
+                    }
+                    setActive(k);
+                });
+            });
+
+            setActive(activeKey, { trigger: false });
+
+            return {
+                getActiveKey: () => activeKey,
+                setActiveKey: (key) => setActive(key),
+            };
+        }
+
         let studentBucketController = null;
         const studentBucketHandlers = [];
 
@@ -237,7 +314,7 @@
         const CHART_POINT_RADIUS = 2;
         const CHART_LINE_TENSION = 0.25;
         const CHART_LINE_POINT_RADIUS = 3;
-        const CHART_FILL_ALPHA = 0.80;
+        const CHART_FILL_ALPHA = 0.70;
         const CHART_OVERLAY_DASH = [6, 4];
         const CHART_TABLE_INSET_BORDER_PX = (function() {
             try {
