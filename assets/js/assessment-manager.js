@@ -1623,7 +1623,11 @@
                     const c = stableDatasetColor(ds, idx);
                     const v = Array.isArray(ds.values) ? ds.values[qi] : null;
                     const vv = clampNumber(v, 1, 5);
-                    html += `<td class="ham-radar-values-td-eval" style="box-shadow: inset ${CHART_TABLE_INSET_BORDER_PX}px 0 0 ${c.border};">${vv == null ? '—' : vv.toFixed(1)}</td>`;
+                    let out = '—';
+                    if (vv != null && Number.isFinite(vv)) {
+                        out = Number.isInteger(vv) ? String(vv) : vv.toFixed(1);
+                    }
+                    html += `<td class="ham-radar-values-td-eval" style="box-shadow: inset ${CHART_TABLE_INSET_BORDER_PX}px 0 0 ${c.border};">${out}</td>`;
                 });
                 html += '</tr>';
             }
