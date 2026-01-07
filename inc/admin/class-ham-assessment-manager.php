@@ -991,16 +991,24 @@ class HAM_Assessment_Manager
     private static function get_school_year_start_from_timestamp($ts)
     {
         $month_num = (int) gmdate('n', $ts);
+        $day_num = (int) gmdate('j', $ts);
         $year_num = (int) gmdate('Y', $ts);
 
+        // School year is treated as Aug 1 -> Jun 15.
+        // Dates Jun 16 -> Jul 31 are treated as belonging to the upcoming school year.
         if ($month_num >= 8) {
             return $year_num;
         }
 
-        if ($month_num <= 6) {
+        if ($month_num <= 5) {
             return $year_num - 1;
         }
 
+        if ($month_num === 6) {
+            return ($day_num <= 15) ? ($year_num - 1) : $year_num;
+        }
+
+        // July
         return $year_num;
     }
 
@@ -3227,7 +3235,7 @@ public function ajax_get_assessment_details()
                 'noComments' => esc_html__('No comments.', 'headless-access-manager'),
                 'answerAlternatives' => esc_html__('Answer alternatives', 'headless-access-manager'),
                 'month' => esc_html__('Month', 'headless-access-manager'),
-                'term' => esc_html__('Term', 'headless-access-manager'),
+                'term' => esc_html__('Previous term', 'headless-access-manager'),
                 'schoolYear' => esc_html__('School year', 'headless-access-manager'),
                 'hogstadium' => esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'),
                 'radar' => esc_html__('Radar', 'headless-access-manager'),

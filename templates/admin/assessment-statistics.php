@@ -264,7 +264,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
                 <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Previous term', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
                 </div>
@@ -355,7 +355,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
                 <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Previous term', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
                 </div>
@@ -395,7 +395,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <div class="inside">
                     <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Previous term', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
                     </div>
@@ -480,7 +480,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <div class="inside">
                 <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Previous term', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-group-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
                 </div>
@@ -520,7 +520,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <div class="inside">
                     <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Previous term', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
                     </div>
@@ -616,7 +616,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <div class="inside">
                     <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Previous term', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
                         <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
                     </div>
@@ -647,7 +647,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     <div class="inside">
                 <div class="ham-radar-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                     <button type="button" class="button ham-radar-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-radar-toggle-btn" data-bucket="term"><?php echo esc_html__('Previous term', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-radar-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-radar-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
                 </div>
@@ -685,7 +685,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 <?php endif; ?>
                 <div class="ham-radar-toggle ham-answer-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
                     <button type="button" class="button ham-answer-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                    <button type="button" class="button ham-answer-toggle-btn" data-bucket="term"><?php echo esc_html__('Term', 'headless-access-manager'); ?></button>
+                    <button type="button" class="button ham-answer-toggle-btn" data-bucket="term"><?php echo esc_html__('Previous term', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-answer-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
                     <button type="button" class="button ham-answer-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
                 </div>

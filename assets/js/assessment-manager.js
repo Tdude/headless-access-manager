@@ -555,6 +555,26 @@
             return true;
         }
 
+        function pickLatestBucket(buckets) {
+            if (!Array.isArray(buckets) || buckets.length === 0) {
+                return null;
+            }
+            return buckets[buckets.length - 1];
+        }
+
+        function pickBucketForControl(bucketKey, buckets) {
+            if (!Array.isArray(buckets) || buckets.length === 0) {
+                return null;
+            }
+
+            // Term control represents the previous term.
+            if (bucketKey === 'term' && buckets.length >= 2) {
+                return buckets[buckets.length - 2];
+            }
+
+            return pickLatestBucket(buckets);
+        }
+
         function filterBuckets(bucketType, buckets) {
             const arr = Array.isArray(buckets) ? buckets : [];
             return arr.filter((b) => b && bucketIntersectsRange(bucketType, b.key));
@@ -1013,7 +1033,7 @@
             function buildDatasetsForBucket(bucketKey) {
                 const rawBuckets = bucketsByKey && Array.isArray(bucketsByKey[bucketKey]) ? bucketsByKey[bucketKey] : [];
                 const buckets = filterBuckets(bucketKey, rawBuckets);
-                const bucket = pickLatestBucket(buckets);
+                const bucket = pickBucketForControl(bucketKey, buckets);
                 if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
                     return { title: titleByKey[bucketKey] || labelRadar, datasets: [], max: 1, bucketGroup: { labels, buckets: [] } };
                 }
@@ -1297,9 +1317,9 @@
 
             function updateChart(bucketKey) {
                 const bucketGroup = buildBucketGroup(bucketKey);
-                const chart = buildRadarChart('ham-student-radar', bucketGroup, titleByKey[bucketKey] || labelRadar);
+                const chart = buildRadarChart('ham-student-radar', bucketGroup, titleByKey[bucketKey] || labelRadar, bucketKey);
                 if (legendEl) {
-                    const bucket = bucketGroup && bucketGroup.buckets ? pickLatestBucket(bucketGroup.buckets) : null;
+                    const bucket = bucketGroup && bucketGroup.buckets ? pickBucketForControl(bucketKey, bucketGroup.buckets) : null;
                     const rawDatasets = bucket && Array.isArray(bucket.datasets) ? bucket.datasets : [];
                     if (chart && rawDatasets.length > 0) {
                         buildClickableLegend('ham-student-radar-legend', chart, rawDatasets);
@@ -1307,8 +1327,8 @@
                         legendEl.innerHTML = '';
                     }
                 }
-                renderRadarValuesTable('ham-student-radar-table', bucketGroup);
-                renderAnswerAlternativesTable('ham-answer-alternatives', stats.radar_questions, bucketGroup);
+                renderRadarValuesTable('ham-student-radar-table', bucketGroup, bucketKey);
+                renderAnswerAlternativesTable('ham-answer-alternatives', stats.radar_questions, bucketGroup, bucketKey);
             }
 
             registerStudentBucketHandler(updateChart);
@@ -1431,7 +1451,7 @@
             return buckets[buckets.length - 1];
         }
 
-        function renderAnswerAlternativesTable(containerId, radarQuestions, bucketGroup) {
+        function renderAnswerAlternativesTable(containerId, radarQuestions, bucketGroup, bucketKey) {
             const el = document.getElementById(containerId);
             if (!el) {
                 return;
@@ -1447,7 +1467,7 @@
                 return;
             }
 
-            const bucket = pickLatestBucket(bucketGroup.buckets);
+            const bucket = pickBucketForControl(bucketKey || '', bucketGroup.buckets);
             if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
                 el.innerHTML = '';
                 return;
@@ -1580,7 +1600,7 @@
             el.innerHTML = html;
         }
 
-        function renderRadarValuesTable(containerId, bucketGroup) {
+        function renderRadarValuesTable(containerId, bucketGroup, bucketKey) {
             const el = document.getElementById(containerId);
             if (!el) {
                 return;
@@ -1591,7 +1611,7 @@
                 return;
             }
 
-            const bucket = pickLatestBucket(bucketGroup.buckets);
+            const bucket = pickBucketForControl(bucketKey || '', bucketGroup.buckets);
             if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
                 el.innerHTML = '';
                 return;
@@ -1636,7 +1656,7 @@
             el.innerHTML = html;
         }
 
-        function buildRadarChart(canvasId, bucketGroup, title) {
+        function buildRadarChart(canvasId, bucketGroup, title, bucketKey) {
             const el = document.getElementById(canvasId);
             if (!el || !bucketGroup || !bucketGroup.buckets) {
                 return null;
@@ -1647,7 +1667,7 @@
                 existing.destroy();
             }
 
-            const bucket = pickLatestBucket(bucketGroup.buckets);
+            const bucket = pickBucketForControl(bucketKey || '', bucketGroup.buckets);
             if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
                 return null;
             }
