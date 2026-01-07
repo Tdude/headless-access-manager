@@ -1070,7 +1070,9 @@
             html += '</div>';
 
             html += `<div style="flex: 0 1 260px; max-width: 100%;">`;
-            html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMin meet" style="display:block; height: ${h}px; width: auto; max-width: 100%; overflow: visible;">`;
+            // SVG (no text) + HTML overlay numbers.
+            html += `<div style="position: relative; width: 100%; aspect-ratio: ${w} / ${h};">`;
+            html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="position:absolute; inset:0; width:100%; height:100%; overflow: visible;">`;
             html += `<line x1="${xMin}" y1="${padY}" x2="${xMin}" y2="${h - padY}" stroke="#dcdcde" stroke-width="1" />`;
             html += `<line x1="${xMax}" y1="${padY}" x2="${xMax}" y2="${h - padY}" stroke="#dcdcde" stroke-width="1" />`;
             html += `<polyline fill="none" stroke="#0073aa" stroke-width="2" points="${points.join(' ')}" />`;
@@ -1082,7 +1084,17 @@
                 html += `</g>`;
             });
 
-            html += '</svg>';
+            html += `</svg>`;
+
+            html += `<div style="position:absolute; inset:0; pointer-events:none;">`;
+            nodes.forEach((node) => {
+                const left = (node.x / w) * 100;
+                const top = (node.y / h) * 100;
+                html += `<div style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%,-50%); font-size:9px; font-weight:600; color:#1d2327; line-height:1;">${escapeHtml(node.value)}</div>`;
+            });
+            html += `</div>`;
+
+            html += `</div>`;
             html += '</div>';
             html += '</div>';
             html += '</div>';
