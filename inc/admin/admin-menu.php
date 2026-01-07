@@ -241,6 +241,9 @@ class HAM_Admin_Menu
         echo '#toplevel_page_headless-access-manager .wp-submenu a{display:flex;align-items:center;gap:8px;}';
         echo '#toplevel_page_headless-access-manager .wp-submenu a .dashicons{font-size:18px;line-height:18px;width:18px;height:18px;color:#646970;margin-top:-1px;}';
         echo '#toplevel_page_headless-access-manager .wp-submenu a[href="#ham-group-organisation"],#toplevel_page_headless-access-manager .wp-submenu a[href="#ham-group-people"]{font-weight:600;}';
+        echo '#toplevel_page_headless-access-manager .wp-submenu li.ham-submenu-item > a{padding-left: 28px !important; position: relative;}';
+        echo '#toplevel_page_headless-access-manager .wp-submenu li.ham-submenu-item > a:before{content:""; position:absolute; left:16px; top:50%; transform:translateY(-50%); width:6px; height:6px; border-radius: 999px; background:#c3c4c7;}';
+        echo '#toplevel_page_headless-access-manager .wp-submenu li.ham-submenu-group > a{padding-left: 12px !important;}';
         echo '</style>';
     }
 
@@ -269,8 +272,10 @@ class HAM_Admin_Menu
         echo 'function applyGroup(groupHref,key){';
         echo 'var groupLink=menu.querySelector("a[href=\""+groupHref+"\"]");if(!groupLink){return;}';
         echo 'var li=findLi(groupLink);if(!li){return;}';
+        echo 'li.classList.add("ham-submenu-group");';
         echo 'var next=li.nextElementSibling;var members=[];';
         echo 'while(next){var a=next.querySelector("a");if(a&&(a.getAttribute("href")==="#ham-group-organisation"||a.getAttribute("href")==="#ham-group-people")){break;}members.push(next);next=next.nextElementSibling;}';
+        echo 'members.forEach(function(m){m.classList.add("ham-submenu-item");});';
         echo 'var collapsed=getCollapsed(key,false);';
         echo 'var iconSpan=groupLink.querySelector(".dashicons");';
         echo 'if(!iconSpan){iconSpan=document.createElement("span");iconSpan.className="dashicons";groupLink.insertBefore(iconSpan,groupLink.firstChild);}';
