@@ -1122,15 +1122,15 @@
 
                     const bgByScore = {
                         0: '#ffffff',
-                        1: '#ed6d64',
-                        2: '#f09342',
-                        3: '#f0d342',
-                        4: '#99f042',
+                        1: '#ed7c74ff',
+                        2: '#f0a15cff',
+                        3: '#f6dd60ff',
+                        4: '#9ded4dff',
                         5: '#49ba27',
                     };
 
                     const bg = bgByScore[score] || '#ffffff';
-                    const fg = score >= 5 ? '#ffffff' : '#1d2327';
+                    const fg = score >= 5 ? '#1d2327' : '#1d2327'; // Change text color logic if darker colors are used
 
                     html += `<div style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%,-50%); width:22px; height:22px; padding:0; border-radius:999px; background:${escapeHtml(bg)}; color:${escapeHtml(fg)}; border:1px solid ${escapeHtml(stroke)}; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; line-height:1;">${escapeHtml(node.value)}</div>`;
                 });
