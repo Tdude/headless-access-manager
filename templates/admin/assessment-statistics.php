@@ -661,7 +661,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                             <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                         </div>
                     </details>
-                    <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-student"></canvas></div>
+                    <div class="ham-chart-wrapper ham-chart-wrapper--xs"><canvas id="ham-avg-progress-student"></canvas></div>
                         </div>
                     </div>
                 <?php endif; ?>
