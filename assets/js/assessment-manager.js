@@ -1006,7 +1006,6 @@
                 return;
             }
 
-            const mode = options && options.mode ? options.mode : 'avg';
             const buckets = bucketGroup && Array.isArray(bucketGroup.buckets) ? bucketGroup.buckets : [];
             const labels = bucketGroup && Array.isArray(bucketGroup.labels) ? bucketGroup.labels : [];
             const bucket = buckets.length > 0 ? buckets[buckets.length - 1] : null;
@@ -1054,6 +1053,16 @@
             let html = '';
             html += `<div class="ham-radar-values-header">${bucket.label ? String(bucket.label) : ''}</div>`;
             html += '<div class="ham-radar-values-scroll" style="overflow: visible;">';
+            html += '<div style="display:flex; gap: 10px; align-items: flex-start;">';
+            html += `<div style="flex: 1 1 auto; min-width: 180px;">`;
+            html += `<svg viewBox="0 0 100 ${h}" preserveAspectRatio="none" style="display:block; width: 100%; height: ${h}px;">`;
+            nodes.forEach((node) => {
+                html += `<text x="0" y="${node.y}" text-anchor="start" dominant-baseline="middle" font-size="12" fill="#1d2327">${escapeHtml(node.label)}</text>`;
+            });
+            html += '</svg>';
+            html += '</div>';
+
+            html += `<div style="flex: 0 0 260px;">`;
             html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMin meet" style="width: 100%; max-width: 260px; height: auto; overflow: visible;">`;
             html += `<polyline fill="none" stroke="#0073aa" stroke-width="2" points="${points.join(' ')}" />`;
 
@@ -1062,17 +1071,12 @@
                 html += `<title>${escapeHtml(node.label)}${node.value ? ': ' + escapeHtml(node.value) : ''}</title>`;
                 html += `<circle cx="${node.x}" cy="${node.y}" r="11" fill="#ffffff" stroke="#0073aa" stroke-width="1" />`;
                 html += `<text x="${node.x}" y="${node.y}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">${escapeHtml(node.value)}</text>`;
-
-                if (mode === 'avg') {
-                    const labelX = node.x === xLeft ? xRight + 8 : xLeft - 8;
-                    const anchor = node.x === xLeft ? 'start' : 'end';
-                    html += `<text x="${labelX}" y="${node.y}" text-anchor="${anchor}" dominant-baseline="middle" font-size="8" fill="#646970">${escapeHtml(node.label)}</text>`;
-                }
-
                 html += `</g>`;
             });
 
             html += '</svg>';
+            html += '</div>';
+            html += '</div>';
             html += '</div>';
 
             el.innerHTML = html;
