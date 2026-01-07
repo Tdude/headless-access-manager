@@ -547,6 +547,10 @@ msgstr "Utvärderingar denna månad"
 msgid "Evaluations This School Year"
 msgstr "Utvärderingar detta skolår"
 
+#: inc/admin/class-ham-assessment-manager.php
+msgid "Previous"
+msgstr "Föregående"
+
 #: templates/admin/assessment-statistics.php
 msgid "Term Evaluations"
 msgstr "Utvärderingar per termin"
