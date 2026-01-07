@@ -339,6 +339,7 @@
 }
 
 :root {
+    --ham-chart-height-xs: 100px;
     --ham-chart-height-sm: 160px;
     --ham-chart-height-md: 300px;
     --ham-chart-height-lg: 600px;
@@ -369,6 +370,10 @@
     display: block;
     width: 100% !important;
     height: 100% !important;
+}
+
+.ham-chart-wrapper--xs {
+    height: var(--ham-chart-height-xs);
 }
 
 .ham-chart-wrapper--sm {

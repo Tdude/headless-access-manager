@@ -349,6 +349,40 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
             <?php elseif ($drilldown['level'] === 'school') : ?>
 
+                <?php if (!$hide_avg_progress_charts) : ?>
+
+                    <div id="ham-postbox-school-progress" class="postbox">
+                        <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('School average progress', 'headless-access-manager'); ?></h2></div>
+                        <div class="inside">
+                    <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Previous term', 'headless-access-manager'); ?></button>
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
+                    </div>
+                    <details class="ham-date-range" style="margin: 8px 0 0;">
+                        <summary class="button" style="cursor: pointer; user-select: none;">
+                            <?php echo esc_html__('Filter by date:', 'headless-access-manager'); ?>
+                            <span class="ham-date-summary" data-all-dates="<?php echo esc_attr__('All Dates', 'headless-access-manager'); ?>" style="font-weight: 600; margin-left: 6px;"><?php echo esc_html__('All Dates', 'headless-access-manager'); ?></span>
+                        </summary>
+                        <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <label style="display: inline-flex; gap: 6px; align-items: center;">
+                                <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
+                                <input type="text" class="ham-date-from" inputmode="numeric" placeholder="YYYY-MM" pattern="^\d{4}-\d{2}$" />
+                            </label>
+                            <label style="display: inline-flex; gap: 6px; align-items: center;">
+                                <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
+                                <input type="text" class="ham-date-to" inputmode="numeric" placeholder="YYYY-MM" pattern="^\d{4}-\d{2}$" />
+                            </label>
+                            <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
+                        </div>
+                    </details>
+                    <div class="ham-chart-wrapper ham-chart-wrapper--xs"><canvas id="ham-avg-progress-drilldown"></canvas></div>
+
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <div id="ham-postbox-school-radar" class="postbox">
                     <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Radar (avg per question)', 'headless-access-manager'); ?></h2></div>
                     <div class="inside">
@@ -387,45 +421,6 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <div id="ham-group-radar-table" class="ham-radar-values"></div>
                     </div>
                 </div>
-
-                <?php if (!$hide_avg_progress_charts) : ?>
-
-                    <div id="ham-postbox-school-progress" class="postbox">
-                        <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('School average progress', 'headless-access-manager'); ?></h2></div>
-                        <div class="inside">
-                    <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Previous term', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
-                    </div>
-                    <details class="ham-date-range" style="margin: 8px 0 0;">
-                        <summary class="button" style="cursor: pointer; user-select: none;">
-                            <?php echo esc_html__('Filter by date:', 'headless-access-manager'); ?>
-                            <span class="ham-date-summary" data-all-dates="<?php echo esc_attr__('All Dates', 'headless-access-manager'); ?>" style="font-weight: 600; margin-left: 6px;"><?php echo esc_html__('All Dates', 'headless-access-manager'); ?></span>
-                        </summary>
-                        <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                            <label style="display: inline-flex; gap: 6px; align-items: center;">
-                                <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
-                                <input type="text" class="ham-date-from" inputmode="numeric" placeholder="YYYY-MM" pattern="^\d{4}-\d{2}$" />
-                            </label>
-                            <label style="display: inline-flex; gap: 6px; align-items: center;">
-                                <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
-                                <input type="text" class="ham-date-to" inputmode="numeric" placeholder="YYYY-MM" pattern="^\d{4}-\d{2}$" />
-                            </label>
-                            <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
-                        </div>
-                    </details>
-                    <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-drilldown"></canvas></div>
-
-                    <h3 style="margin-top: 10px;">
-                        <?php echo esc_html__('School Progress (by semester)', 'headless-access-manager'); ?>
-                    </h3>
-                    <?php $render_semester_bars($drilldown['series'], 100); ?>
-
-                        </div>
-                    </div>
-                <?php endif; ?>
 
                 <div id="ham-postbox-classes" class="postbox">
                     <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Classes', 'headless-access-manager'); ?></h2></div>
@@ -475,6 +470,40 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
             <?php elseif ($drilldown['level'] === 'class') : ?>
 
+                <?php if (!$hide_avg_progress_charts) : ?>
+
+                    <div id="ham-postbox-class-progress" class="postbox">
+                        <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Class average progress', 'headless-access-manager'); ?></h2></div>
+                        <div class="inside">
+                    <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Previous term', 'headless-access-manager'); ?></button>
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
+                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
+                    </div>
+                    <details class="ham-date-range" style="margin: 8px 0 0;">
+                        <summary class="button" style="cursor: pointer; user-select: none;">
+                            <?php echo esc_html__('Filter by date:', 'headless-access-manager'); ?>
+                            <span class="ham-date-summary" data-all-dates="<?php echo esc_attr__('All Dates', 'headless-access-manager'); ?>" style="font-weight: 600; margin-left: 6px;"><?php echo esc_html__('All Dates', 'headless-access-manager'); ?></span>
+                        </summary>
+                        <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <label style="display: inline-flex; gap: 6px; align-items: center;">
+                                <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
+                                <input type="text" class="ham-date-from" inputmode="numeric" placeholder="YYYY-MM" pattern="^\d{4}-\d{2}$" />
+                            </label>
+                            <label style="display: inline-flex; gap: 6px; align-items: center;">
+                                <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
+                                <input type="text" class="ham-date-to" inputmode="numeric" placeholder="YYYY-MM" pattern="^\d{4}-\d{2}$" />
+                            </label>
+                            <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
+                        </div>
+                    </details>
+                    <div class="ham-chart-wrapper ham-chart-wrapper--xs"><canvas id="ham-avg-progress-drilldown"></canvas></div>
+
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <div id="ham-postbox-class-radar" class="postbox">
                     <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Radar (avg per question)', 'headless-access-manager'); ?></h2></div>
                     <div class="inside">
@@ -512,45 +541,6 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <div id="ham-group-radar-table" class="ham-radar-values"></div>
                     </div>
                 </div>
-
-                <?php if (!$hide_avg_progress_charts) : ?>
-
-                    <div id="ham-postbox-class-progress" class="postbox">
-                        <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Class average progress', 'headless-access-manager'); ?></h2></div>
-                        <div class="inside">
-                    <div class="ham-radar-toggle ham-progress-toggle" role="group" aria-label="<?php echo esc_attr__('Time bucket', 'headless-access-manager'); ?>">
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="month"><?php echo esc_html__('Month', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="term"><?php echo esc_html__('Previous term', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="school_year"><?php echo esc_html__('School year', 'headless-access-manager'); ?></button>
-                        <button type="button" class="button ham-progress-toggle-btn" data-bucket="hogstadium"><?php echo esc_html__('Låg-/Mellan-/Högstadiu', 'headless-access-manager'); ?></button>
-                    </div>
-                    <details class="ham-date-range" style="margin: 8px 0 0;">
-                        <summary class="button" style="cursor: pointer; user-select: none;">
-                            <?php echo esc_html__('Filter by date:', 'headless-access-manager'); ?>
-                            <span class="ham-date-summary" data-all-dates="<?php echo esc_attr__('All Dates', 'headless-access-manager'); ?>" style="font-weight: 600; margin-left: 6px;"><?php echo esc_html__('All Dates', 'headless-access-manager'); ?></span>
-                        </summary>
-                        <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                            <label style="display: inline-flex; gap: 6px; align-items: center;">
-                                <span><?php echo esc_html__('From', 'headless-access-manager'); ?></span>
-                                <input type="text" class="ham-date-from" inputmode="numeric" placeholder="YYYY-MM" pattern="^\d{4}-\d{2}$" />
-                            </label>
-                            <label style="display: inline-flex; gap: 6px; align-items: center;">
-                                <span><?php echo esc_html__('To', 'headless-access-manager'); ?></span>
-                                <input type="text" class="ham-date-to" inputmode="numeric" placeholder="YYYY-MM" pattern="^\d{4}-\d{2}$" />
-                            </label>
-                            <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
-                        </div>
-                    </details>
-                    <div class="ham-chart-wrapper ham-chart-wrapper--sm"><canvas id="ham-avg-progress-drilldown"></canvas></div>
-
-                    <h3 style="margin-top: 10px;">
-                        <?php echo esc_html__('Class Progress (by semester)', 'headless-access-manager'); ?>
-                    </h3>
-                    <?php $render_semester_bars($drilldown['series'], 100); ?>
-
-                        </div>
-                    </div>
-                <?php endif; ?>
 
                 <div id="ham-postbox-class-students" class="postbox">
                     <div class="postbox-header"><h2 class="hndle"><?php echo esc_html__('Students', 'headless-access-manager'); ?></h2></div>
