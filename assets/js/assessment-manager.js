@@ -1087,7 +1087,16 @@
             });
 
             let html = '';
-            html += `<div class="ham-radar-values-header">${bucket.label ? String(bucket.label) : ''}</div>`;
+            html += `<div class="ham-radar-values-header" style="display:flex; align-items:flex-end; gap:10px;">`;
+            html += `<div style="flex: 1 1 auto; min-width: 180px;">${bucket.label ? String(bucket.label) : ''}</div>`;
+            html += `<div style="flex: 0 0 auto; width: 260px; max-width: 100%;">`;
+            html += `<div style="display:flex; gap:30px; overflow-x:auto; padding-bottom:6px;">`;
+            charts.forEach((chart) => {
+                html += `<div style="flex:0 0 200px; font-size:11px; font-weight:600; color:#1d2327; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(chart.label)}</div>`;
+            });
+            html += `</div>`;
+            html += `</div>`;
+            html += `</div>`;
             html += '<div class="ham-radar-values-scroll" style="overflow: visible;">';
             html += '<div style="display:flex; gap: 10px; align-items: flex-start;">';
             const labelPadTop = Math.max(0, padY - (row / 2));
@@ -1107,7 +1116,6 @@
                 const stroke = chart && chart.color && chart.color.border ? String(chart.color.border) : '#0073aa';
 
                 html += `<div style="flex:0 0 200px;">`;
-                html += `<div style="font-size:11px; font-weight:600; color:#1d2327; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(chart.label)}</div>`;
                 html += `<div style="position: relative; width: 100%; height: ${h}px;">`;
                 html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="position:absolute; inset:0; width:100%; height:100%; overflow: visible;">`;
                 html += `<polyline fill="none" stroke="${escapeHtml(stroke)}" stroke-opacity="0.9" stroke-width="1" points="${(chart.points || []).join(' ')}" />`;
