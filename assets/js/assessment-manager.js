@@ -1015,12 +1015,27 @@
                 return;
             }
 
-            const ds = bucket.datasets.find((d) => d && d.label && typeof labelTarget !== 'undefined' && String(d.label) !== String(labelTarget))
-                || bucket.datasets.find((d) => d && d.label && String(d.label).toLowerCase() !== 'target')
-                || bucket.datasets[0];
-            const values = Array.isArray(ds.values) ? ds.values : [];
+            const datasetsRaw = bucket.datasets;
+            const datasets = datasetsRaw.filter((d) => {
+                if (!d) {
+                    return false;
+                }
+                const lbl = d.label == null ? '' : String(d.label);
+                if (typeof labelTarget !== 'undefined' && String(labelTarget) && lbl === String(labelTarget)) {
+                    return false;
+                }
+                if (lbl && lbl.toLowerCase() === 'target') {
+                    return false;
+                }
+                return true;
+            });
 
-            const n = Math.min(labels.length, values.length);
+            if (datasets.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+
+            const n = labels.length;
             if (n === 0) {
                 el.innerHTML = '';
                 return;
@@ -1036,28 +1051,40 @@
             const minVal = 1;
             const maxVal = 5;
 
-            const points = [];
+            const lines = [];
             const nodes = [];
-            for (let i = 0; i < n; i++) {
-                const y = padY + i * row;
+            datasets.forEach((ds, dsIdx) => {
+                const values = Array.isArray(ds.values) ? ds.values : [];
+                const points = [];
+                const c = stableDatasetColor(ds, dsIdx);
 
-                const raw = Number(values[i]);
-                const v = Number.isFinite(raw) ? raw : null;
-                const clamped = v == null ? null : Math.max(minVal, Math.min(maxVal, v));
-                const ratio = clamped == null ? 0.5 : ((clamped - minVal) / (maxVal - minVal));
-                const x = xMin + ratio * (xMax - xMin);
+                for (let i = 0; i < n; i++) {
+                    const y = padY + i * row;
 
-                const text = v == null ? '' : (Number.isInteger(v) ? String(v) : v.toFixed(1));
+                    const raw = Number(values[i]);
+                    const v = Number.isFinite(raw) ? raw : null;
+                    const clamped = v == null ? null : Math.max(minVal, Math.min(maxVal, v));
+                    const ratio = clamped == null ? 0.5 : ((clamped - minVal) / (maxVal - minVal));
+                    const x = xMin + ratio * (xMax - xMin);
 
-                points.push(`${x},${y}`);
-                nodes.push({
-                    x,
-                    y,
-                    label: String(labels[i] || ''),
-                    value: text,
-                    num: v,
+                    const text = v == null ? '' : (Number.isInteger(v) ? String(v) : v.toFixed(1));
+
+                    points.push(`${x},${y}`);
+                    nodes.push({
+                        x,
+                        y,
+                        label: String(labels[i] || ''),
+                        value: text,
+                        num: v,
+                        color: c,
+                    });
+                }
+
+                lines.push({
+                    points,
+                    color: c,
                 });
-            }
+            });
 
             let html = '';
             html += `<div class="ham-radar-values-header">${bucket.label ? String(bucket.label) : ''}</div>`;
@@ -1076,7 +1103,10 @@
             // SVG (no text) + HTML overlay numbers.
             html += `<div style="position: relative; width: 100%; height: ${h}px;">`;
             html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="position:absolute; inset:0; width:100%; height:100%; overflow: visible;">`;
-            html += `<polyline fill="none" stroke="#0073aa" stroke-width="1" points="${points.join(' ')}" />`;
+            lines.forEach((line) => {
+                const stroke = line && line.color && line.color.border ? String(line.color.border) : '#0073aa';
+                html += `<polyline fill="none" stroke="${escapeHtml(stroke)}" stroke-opacity="0.9" stroke-width="1" points="${(line.points || []).join(' ')}" />`;
+            });
 
             html += `</svg>`;
 
@@ -1089,17 +1119,17 @@
                 let stageClass = 'ham-stage-full';
                 if (!Number.isFinite(raw)) {
                     stageClass = 'ham-stage-full';
-                } else if (raw < 1) {
-                    stageClass = 'ham-pill-link';
-                } else if (raw < 3) {
+                } else if (raw < 2) {
                     stageClass = 'ham-stage-not';
-                } else if (raw < 4) {
+                } else if (raw < 3) {
                     stageClass = 'ham-stage-trans';
-                } else if (raw < 5) {
+                } else if (raw < 4) {
                     stageClass = 'ham-stage-mid';
                 }
 
-                html += `<div class="ham-stage-badge ${stageClass}" style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%,-50%); width:22px; height:22px; padding:0; border-radius:999px; border:1px solid currentColor; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; line-height:1;">${escapeHtml(node.value)}</div>`;
+                const border = node.color && node.color.border ? String(node.color.border) : '#0073aa';
+
+                html += `<div class="ham-stage-badge ${stageClass}" style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%,-50%); width:22px; height:22px; padding:0; border-radius:999px; border:1px solid ${escapeHtml(border)}; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; line-height:1;">${escapeHtml(node.value)}</div>`;
             });
             html += `</div>`;
 
