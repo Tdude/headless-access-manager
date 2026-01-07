@@ -648,6 +648,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     </div>
                 </details>
                 <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-student-radar"></canvas></div>
+                <div id="ham-student-radar-legend" class="ham-chart-legend"></div>
                 <div id="ham-student-radar-table" class="ham-radar-values"></div>
 
                     </div>

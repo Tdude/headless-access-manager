@@ -764,6 +764,8 @@
         const datasetColorIndexByKey = new Map();
         let nextDatasetColorIndex = 0;
 
+        const datasetHiddenByKey = new Map();
+
         function normalizeDatasetLabel(label) {
             const s = label == null ? '' : String(label);
             // Remove trailing count suffixes like "(23)", "(23st)", "(23 students)".
@@ -785,6 +787,59 @@
                 datasetColorIndexByKey.set(key, nextDatasetColorIndex++);
             }
             return datasetColor(datasetColorIndexByKey.get(key));
+        }
+
+        function buildClickableLegend(containerId, chart, datasets) {
+            const el = document.getElementById(containerId);
+            if (!el || !chart || !datasets || !Array.isArray(datasets)) {
+                return;
+            }
+
+            const rows = [];
+            datasets.forEach((ds, idx) => {
+                if (!ds || !ds.label) {
+                    return;
+                }
+                // Don't include the target ring in the legend.
+                if (String(ds.label) === String(t.targetScore || 'Målnivå 3')) {
+                    return;
+                }
+
+                const key = datasetKey(ds, idx);
+                const hidden = Boolean(datasetHiddenByKey.get(key));
+                const c = stableDatasetColor(ds, idx);
+
+                const safeLabel = escapeHtml(ds.label);
+                const ariaPressed = hidden ? 'false' : 'true';
+                const opacity = hidden ? '0.35' : '1';
+
+                rows.push(
+                    `<button type="button" class="ham-legend-item button-link" data-key="${escapeHtml(key)}" data-index="${idx}" aria-pressed="${ariaPressed}" style="display:flex;align-items:center;gap:6px;opacity:${opacity};padding:0;border:0;background:none;cursor:pointer;">`
+                    + `<span class="ham-legend-color" style="background:${c.border};"></span>`
+                    + `<span class="ham-legend-label">${safeLabel}</span>`
+                    + `</button>`
+                );
+            });
+
+            el.innerHTML = rows.join('');
+
+            el.querySelectorAll('.ham-legend-item').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const key = btn.getAttribute('data-key') || '';
+                    const idx = Number(btn.getAttribute('data-index'));
+                    if (!Number.isFinite(idx) || !chart.data || !Array.isArray(chart.data.datasets) || !chart.data.datasets[idx]) {
+                        return;
+                    }
+
+                    const nextHidden = !Boolean(datasetHiddenByKey.get(key));
+                    datasetHiddenByKey.set(key, nextHidden);
+                    chart.data.datasets[idx].hidden = nextHidden;
+                    chart.update();
+
+                    btn.style.opacity = nextHidden ? '0.35' : '1';
+                    btn.setAttribute('aria-pressed', nextHidden ? 'false' : 'true');
+                });
+            });
         }
 
         function buildLineChart(canvasId, series, label) {
@@ -836,6 +891,8 @@
                     },
                 },
             });
+
+            return chart;
         }
 
         function renderGroupRadarValuesTable(containerId, bucketGroup, options) {
@@ -1216,6 +1273,7 @@
         function buildStudentRadarToggle() {
             const canvas = document.getElementById('ham-student-radar');
             const btns = Array.from(document.querySelectorAll('.ham-radar-toggle-btn'));
+            const legendEl = document.getElementById('ham-student-radar-legend');
 
             if (!canvas || btns.length === 0 || !stats || stats.level !== 'student' || !stats.student_radar || !stats.student_radar.buckets) {
                 return;
@@ -1239,7 +1297,16 @@
 
             function updateChart(bucketKey) {
                 const bucketGroup = buildBucketGroup(bucketKey);
-                buildRadarChart('ham-student-radar', bucketGroup, titleByKey[bucketKey] || labelRadar);
+                const chart = buildRadarChart('ham-student-radar', bucketGroup, titleByKey[bucketKey] || labelRadar);
+                if (legendEl) {
+                    const bucket = bucketGroup && bucketGroup.buckets ? pickLatestBucket(bucketGroup.buckets) : null;
+                    const rawDatasets = bucket && Array.isArray(bucket.datasets) ? bucket.datasets : [];
+                    if (chart && rawDatasets.length > 0) {
+                        buildClickableLegend('ham-student-radar-legend', chart, rawDatasets);
+                    } else {
+                        legendEl.innerHTML = '';
+                    }
+                }
                 renderRadarValuesTable('ham-student-radar-table', bucketGroup);
                 renderAnswerAlternativesTable('ham-answer-alternatives', stats.radar_questions, bucketGroup);
             }
@@ -1568,7 +1635,7 @@
         function buildRadarChart(canvasId, bucketGroup, title) {
             const el = document.getElementById(canvasId);
             if (!el || !bucketGroup || !bucketGroup.buckets) {
-                return;
+                return null;
             }
 
             const existing = Chart.getChart(el);
@@ -1578,13 +1645,14 @@
 
             const bucket = pickLatestBucket(bucketGroup.buckets);
             if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
-                return;
+                return null;
             }
 
             const labels = Array.isArray(bucketGroup.labels) ? bucketGroup.labels : [];
 
             const datasets = bucket.datasets.map((ds, idx) => {
                 const c = stableDatasetColor(ds, idx);
+                const key = datasetKey(ds, idx);
                 return {
                     label: ds.label,
                     data: Array.isArray(ds.values) ? ds.values.map((v) => clampNumber(v, 1, 5)) : [],
@@ -1594,12 +1662,13 @@
                     pointRadius: CHART_POINT_RADIUS,
                     fill: true,
                     borderDash: idx === 0 ? [] : CHART_OVERLAY_DASH,
+                    hidden: Boolean(datasetHiddenByKey.get(key)),
                 };
             });
 
             datasets.push(buildTargetDataset(labels.length));
 
-            new Chart(el.getContext('2d'), {
+            const chart = new Chart(el.getContext('2d'), {
                 type: 'radar',
                 data: {
                     labels,
