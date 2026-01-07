@@ -1476,6 +1476,13 @@ class HAM_Assessment_Manager
                 );
             }
 
+            $view['avg_progress'] = array(
+                'month' => self::aggregate_evaluations_overall_by_bucket($all_evals, 'month'),
+                'term' => self::aggregate_evaluations_overall_by_bucket($all_evals, 'term'),
+                'school_year' => self::aggregate_evaluations_overall_by_bucket($all_evals, 'school_year'),
+                'hogstadium' => self::aggregate_evaluations_overall_by_bucket($all_evals, 'hogstadium'),
+            );
+
             $school_count = is_array($schools) ? count($schools) : 0;
 
             // Overview radar (root view): overall average score per question (1-5) across all schools.

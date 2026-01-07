@@ -1352,7 +1352,7 @@
             const btnRoot = canvas ? canvas.closest('.ham-stats-panel') : null;
             const btns = Array.from((btnRoot || document).querySelectorAll('.ham-progress-toggle-btn'));
 
-            if (!canvas || btns.length === 0 || !stats || (stats.level !== 'school' && stats.level !== 'class') || !stats.avg_progress) {
+            if (!canvas || btns.length === 0 || !stats || (stats.level !== 'schools' && stats.level !== 'school' && stats.level !== 'class') || !stats.avg_progress) {
                 return;
             }
 
@@ -1872,8 +1872,8 @@
             buildGroupRadarToggle();
         }
 
-        // School/class drilldown avg progress toggle
-        if (stats && (stats.level === 'school' || stats.level === 'class') && stats.avg_progress) {
+        // Schools/school/class drilldown avg progress toggle
+        if (stats && (stats.level === 'schools' || stats.level === 'school' || stats.level === 'class') && stats.avg_progress) {
             buildDrilldownAvgProgressToggle();
         }
 
