@@ -1469,7 +1469,13 @@ class HAM_Assessment_Manager
             }
 
             // Overview radar (root view): overall average score per question (1-5) across all schools.
-            $build_overview_group_bucket = function($bucket_type) use ($all_evals) {
+            $latest_term_bucket = null;
+            $term_series_for_overlay = self::build_group_radar_bucket_avgs($all_evals, 'term');
+            if (is_array($term_series_for_overlay) && !empty($term_series_for_overlay)) {
+                $latest_term_bucket = $term_series_for_overlay[count($term_series_for_overlay) - 1];
+            }
+
+            $build_overview_group_bucket = function($bucket_type) use ($all_evals, $latest_term_bucket) {
                 $series = self::build_group_radar_bucket_avgs($all_evals, $bucket_type);
                 $out = array();
 
@@ -1477,6 +1483,7 @@ class HAM_Assessment_Manager
                 for ($i = 0; $i < $count; $i++) {
                     $b = $series[$i];
                     $prev = ($i > 0) ? $series[$i - 1] : null;
+                    $overlay = ($bucket_type === 'school_year' && is_array($latest_term_bucket)) ? $latest_term_bucket : $prev;
 
                     $n = isset($b['student_count']) ? (int) $b['student_count'] : 0;
 
@@ -1490,14 +1497,23 @@ class HAM_Assessment_Manager
                         ),
                     );
 
-                    if (is_array($prev)) {
-                        $prev_n = isset($prev['student_count']) ? (int) $prev['student_count'] : 0;
-                        $prev_label = isset($prev['label']) ? (string) $prev['label'] : '';
+                    if (is_array($overlay)) {
+                        $prev_n = isset($overlay['student_count']) ? (int) $overlay['student_count'] : 0;
+                        $prev_label = isset($overlay['label']) ? (string) $overlay['label'] : '';
+
+                        $overlay_prefix = ($bucket_type === 'school_year')
+                            ? __('Term', 'headless-access-manager')
+                            : __('Previous', 'headless-access-manager');
+
+                        $overlay_label = $prev_label
+                            ? sprintf(__('%1$s: %2$s', 'headless-access-manager'), $overlay_prefix, $prev_label)
+                            : $overlay_prefix;
+
                         $datasets[] = array(
                             'label' => $prev_n > 0
-                                ? sprintf(__('%1$s (%2$d)', 'headless-access-manager'), $prev_label ? sprintf(__('Previous: %s', 'headless-access-manager'), $prev_label) : __('Previous', 'headless-access-manager'), $prev_n)
-                                : ($prev_label ? sprintf(__('Previous: %s', 'headless-access-manager'), $prev_label) : __('Previous', 'headless-access-manager')),
-                            'values' => isset($prev['values']) ? $prev['values'] : array(),
+                                ? sprintf(__('%1$s (%2$d)', 'headless-access-manager'), $overlay_label, $prev_n)
+                                : $overlay_label,
+                            'values' => isset($overlay['values']) ? $overlay['values'] : array(),
                             'student_count' => $prev_n,
                         );
                     }
