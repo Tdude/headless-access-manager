@@ -1062,8 +1062,8 @@
             html += '</svg>';
             html += '</div>';
 
-            html += `<div style="flex: 0 0 260px;">`;
-            html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMin meet" style="width: 100%; max-width: 260px; height: auto; overflow: visible;">`;
+            html += `<div style="flex: 0 1 260px; max-width: 100%;">`;
+            html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMin meet" style="display:block; width: 100%; height: auto; overflow: visible;">`;
             html += `<polyline fill="none" stroke="#0073aa" stroke-width="2" points="${points.join(' ')}" />`;
 
             nodes.forEach((node) => {
