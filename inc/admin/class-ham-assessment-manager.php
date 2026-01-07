@@ -1468,6 +1468,66 @@ class HAM_Assessment_Manager
                 );
             }
 
+            // Group radar: compare schools, average score per question (1-5) based on latest assessment per student per bucket.
+            $schools_by_id = array();
+            foreach ($schools as $school) {
+                $schools_by_id[(int) $school->ID] = $school;
+            }
+
+            $build_schools_group_bucket = function($bucket_type) use ($schools, $school_to_students) {
+                $buckets_by_key = array();
+
+                foreach ($schools as $school) {
+                    $students_map = isset($school_to_students[$school->ID]) ? $school_to_students[$school->ID] : array();
+                    $student_ids = array_keys($students_map);
+                    $posts = empty($student_ids) ? array() : self::fetch_evaluation_posts($student_ids);
+
+                    $series = self::build_group_radar_bucket_avgs($posts, $bucket_type);
+                    foreach ($series as $b) {
+                        $k = isset($b['key']) ? (string) $b['key'] : '';
+                        if ($k === '') {
+                            continue;
+                        }
+                        if (!isset($buckets_by_key[$k])) {
+                            $buckets_by_key[$k] = array(
+                                'key' => $k,
+                                'label' => isset($b['label']) ? $b['label'] : $k,
+                                'datasets' => array(),
+                            );
+                        }
+
+                        $n = isset($b['student_count']) ? (int) $b['student_count'] : 0;
+                        $label = $school->post_title;
+                        if ($n > 0) {
+                            $label = sprintf(__('%1$s (%2$d)', 'headless-access-manager'), $school->post_title, $n);
+                        }
+
+                        $buckets_by_key[$k]['datasets'][] = array(
+                            'label' => $label,
+                            'values' => isset($b['values']) ? $b['values'] : array(),
+                            'student_count' => $n,
+                        );
+                    }
+                }
+
+                $out = array_values($buckets_by_key);
+                usort($out, function($a, $b) {
+                    return strcmp((string) ($a['key'] ?? ''), (string) ($b['key'] ?? ''));
+                });
+                return $out;
+            };
+
+            $view['group_radar'] = array(
+                'mode' => 'avg',
+                'labels' => isset($radar_meta['labels']) ? $radar_meta['labels'] : array(),
+                'buckets' => array(
+                    'month' => $build_schools_group_bucket('month'),
+                    'term' => $build_schools_group_bucket('term'),
+                    'school_year' => $build_schools_group_bucket('school_year'),
+                    'hogstadium' => $build_schools_group_bucket('hogstadium'),
+                ),
+            );
+
             return $view;
         }
 

@@ -187,6 +187,48 @@
             dateRangeListeners.push(fn);
         }
 
+        let studentBucketController = null;
+        const studentBucketHandlers = [];
+
+        function registerStudentBucketHandler(fn) {
+            if (typeof fn !== 'function') {
+                return;
+            }
+            studentBucketHandlers.push(fn);
+        }
+
+        function ensureStudentBucketController(buttons, defaultKey, isKeyAvailable) {
+            if (studentBucketController) {
+                return studentBucketController;
+            }
+
+            studentBucketController = initBucketToggle({
+                buttons,
+                defaultKey,
+                isKeyAvailable,
+                onChange: (key) => {
+                    studentBucketHandlers.forEach((handler) => {
+                        try {
+                            handler(key);
+                        } catch (e) {
+                        }
+                    });
+                },
+            });
+
+            if (studentBucketController) {
+                const active = studentBucketController.getActiveKey();
+                studentBucketHandlers.forEach((handler) => {
+                    try {
+                        handler(active);
+                    } catch (e) {
+                    }
+                });
+            }
+
+            return studentBucketController;
+        }
+
         const CHART_ANIMATION_DURATION_MS = 300;
         const CHART_ANIMATION_EASING = 'easeInOutQuad';
         const CHART_BASE_HUE = 205;
@@ -781,7 +823,7 @@
             const canvas = document.getElementById('ham-group-radar');
             const btns = Array.from(document.querySelectorAll('.ham-group-radar-toggle-btn'));
 
-            if (!canvas || btns.length === 0 || !stats || (stats.level !== 'school' && stats.level !== 'class') || !stats.group_radar || !stats.group_radar.buckets) {
+            if (!canvas || btns.length === 0 || !stats || (stats.level !== 'schools' && stats.level !== 'school' && stats.level !== 'class') || !stats.group_radar || !stats.group_radar.buckets) {
                 return;
             }
 
