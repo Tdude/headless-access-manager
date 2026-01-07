@@ -1060,7 +1060,7 @@
             nodes.forEach((node) => {
                 html += `<g>`;
                 html += `<title>${escapeHtml(node.label)}${node.value ? ': ' + escapeHtml(node.value) : ''}</title>`;
-                html += `<circle cx="${node.x}" cy="${node.y}" r="10" fill="#ffffff" stroke="#0073aa" stroke-width="2" />`;
+                html += `<circle cx="${node.x}" cy="${node.y}" r="11" fill="#ffffff" stroke="#0073aa" stroke-width="1" />`;
                 html += `<text x="${node.x}" y="${node.y}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1d2327">${escapeHtml(node.value)}</text>`;
 
                 if (mode === 'avg') {
