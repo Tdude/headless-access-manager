@@ -1118,18 +1118,21 @@
                     const top = (node.y / h) * 100;
 
                     const raw = Number(node.num);
-                    let stageClass = 'ham-stage-full';
-                    if (!Number.isFinite(raw)) {
-                        stageClass = 'ham-stage-full';
-                    } else if (raw < 3) {
-                        stageClass = 'ham-stage-not';
-                    } else if (raw < 4) {
-                        stageClass = 'ham-stage-trans';
-                    } else if (raw < 5) {
-                        stageClass = 'ham-stage-mid';
-                    }
+                    const score = Number.isFinite(raw) ? Math.max(0, Math.min(5, Math.round(raw))) : 0;
 
-                    html += `<div class="ham-stage-badge ${stageClass}" style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%,-50%); width:22px; height:22px; padding:0; border-radius:999px; border:1px solid ${escapeHtml(stroke)}; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; line-height:1;">${escapeHtml(node.value)}</div>`;
+                    const bgByScore = {
+                        0: '#ffffff',
+                        1: '#f44336',
+                        2: '#ff9800',
+                        3: '#ffeb3b',
+                        4: '#a5d6a7',
+                        5: '#2e7d32',
+                    };
+
+                    const bg = bgByScore[score] || '#ffffff';
+                    const fg = score >= 5 ? '#ffffff' : '#1d2327';
+
+                    html += `<div style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%,-50%); width:22px; height:22px; padding:0; border-radius:999px; background:${escapeHtml(bg)}; color:${escapeHtml(fg)}; border:1px solid ${escapeHtml(stroke)}; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; line-height:1;">${escapeHtml(node.value)}</div>`;
                 });
                 html += `</div>`;
 
