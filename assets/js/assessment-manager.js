@@ -1060,7 +1060,8 @@
             html += `<div class="ham-radar-values-header">${bucket.label ? String(bucket.label) : ''}</div>`;
             html += '<div class="ham-radar-values-scroll" style="overflow: visible;">';
             html += '<div style="display:flex; gap: 10px; align-items: flex-start;">';
-            html += `<div style="flex: 1 1 auto; min-width: 180px;">`;
+            const labelPadTop = Math.max(0, padY - (row / 2));
+            html += `<div style="flex: 1 1 auto; min-width: 180px; padding-top: ${labelPadTop}px;">`;
             html += `<div style="display:flex; flex-direction:column; gap: 0;">`;
             nodes.forEach((node) => {
                 html += `<div style="height:${row}px; display:flex; align-items:center; font-size:12px; color:#1d2327;">${escapeHtml(node.label)}</div>`;
