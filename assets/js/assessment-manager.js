@@ -1642,6 +1642,92 @@
             });
         }
 
+        function buildOverviewRadarChart(canvasId, radar) {
+            const el = document.getElementById(canvasId);
+            if (!el || !radar) {
+                return;
+            }
+
+            const labels = Array.isArray(radar.labels) ? radar.labels : [];
+            const values = Array.isArray(radar.values) ? radar.values : [];
+            if (labels.length === 0 || values.length === 0) {
+                return;
+            }
+
+            const existing = Chart.getChart(el);
+            if (existing) {
+                existing.destroy();
+            }
+
+            const title = radar.title ? String(radar.title) : '';
+            const c = datasetColor(0);
+
+            const datasets = [
+                {
+                    label: title || labelRadar,
+                    data: values.map((v) => clampNumber(v, 1, 5)),
+                    borderColor: c.border,
+                    backgroundColor: c.fill,
+                    borderWidth: CHART_BORDER_WIDTH,
+                    pointRadius: CHART_POINT_RADIUS,
+                    fill: true,
+                },
+                buildTargetDataset(labels.length),
+            ];
+
+            new Chart(el.getContext('2d'), {
+                type: 'radar',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: CHART_ANIMATION_DURATION_MS,
+                        easing: CHART_ANIMATION_EASING,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: CHART_FONT_SIZE_LEGEND },
+                            },
+                        },
+                        title: {
+                            display: Boolean(title),
+                            text: title,
+                            font: { size: CHART_FONT_SIZE_TITLE },
+                        },
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                showLabelBackdrop: false,
+                                callback: function(value) {
+                                    if (value === 0) {
+                                        return '';
+                                    }
+                                    return value;
+                                },
+                                font: { size: CHART_FONT_SIZE_TICKS },
+                            },
+                            pointLabels: {
+                                font: { size: CHART_FONT_SIZE_POINT_LABELS },
+                            },
+                            grid: {
+                                circular: false,
+                            },
+                            angleLines: {
+                                color: CHART_RADAR_ANGLE_LINE_COLOR,
+                            },
+                        },
+                    },
+                },
+            });
+        }
+
         // Student avg progress toggle
         if (stats && stats.level === 'student' && stats.avg_progress) {
             buildStudentAvgProgressToggle();
