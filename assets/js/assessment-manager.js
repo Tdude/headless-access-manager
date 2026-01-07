@@ -1743,6 +1743,8 @@
                     },
                 },
             });
+
+            return chart;
         }
 
         function buildOverviewRadarChart(canvasId, radar) {
