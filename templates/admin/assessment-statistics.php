@@ -159,7 +159,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
                 // Compact inline line chart
                 $w = 100;
-                $h = ($variant === 'sparkline') ? 34 : 44;
+                $h = ($variant === 'sparkline') ? 30 : 40;
                 $pad_x = 6;
                 $pad_y = ($variant === 'sparkline') ? 8 : 9;
 
@@ -205,9 +205,14 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     }
                 }
 
-                echo '<div class="ham-mini-line" style="display: inline-block; width: 100%;">';
-                $max_h = ($variant === 'sparkline') ? 40 : 54;
-                echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; aspect-ratio: ' . esc_attr($w) . ' / ' . esc_attr($h) . '; max-height: ' . esc_attr($max_h) . 'px; overflow: visible;">';
+                if ($variant === 'sparkline') {
+                    echo '<div class="ham-mini-line" style="display: inline-block; width: 100px;">';
+                    echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="none" style="width: 100px; height: 30px; max-height: 30px; overflow: visible;">';
+                } else {
+                    echo '<div class="ham-mini-line" style="display: inline-block; width: 100%;">';
+                    $max_h = 54;
+                    echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; aspect-ratio: ' . esc_attr($w) . ' / ' . esc_attr($h) . '; max-height: ' . esc_attr($max_h) . 'px; overflow: visible;">';
+                }
 
                 if ($variant !== 'sparkline') {
                     // Baseline
