@@ -75,7 +75,21 @@
             ? String(holders[0].getAttribute('data-page'))
             : 'ham-assessment-stats';
 
+        // WP expects sortable containers to have stable IDs to persist order.
+        // Our templates render `.meta-box-sortables` without IDs, so `save_order()`
+        // can silently fail. Assign deterministic IDs based on the page key.
+        holders.forEach((holder, holderIdx) => {
+            const sortables = Array.from(holder.querySelectorAll('.meta-box-sortables'));
+            sortables.forEach((el, idx) => {
+                if (!el.id) {
+                    el.id = `${page}-sortables-${holderIdx}-${idx}`;
+                }
+            });
+        });
+
         try {
+            // Some WP builds use this property when persisting closed state.
+            window.postboxes.page = page;
             window.postboxes.add_postbox_toggles(page);
         } catch (e) {
         }
