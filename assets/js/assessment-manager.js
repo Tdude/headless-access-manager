@@ -1051,17 +1051,11 @@
             const minVal = 1;
             const maxVal = 5;
 
-            const rangeX = xMax - xMin;
-            const desiredLaneStep = 4;
-            const laneStep = Math.max(0, Math.min(desiredLaneStep, rangeX / (datasets.length + 1)));
-
-            const lines = [];
-            const nodes = [];
-            datasets.forEach((ds, dsIdx) => {
+            const charts = datasets.map((ds, dsIdx) => {
                 const values = Array.isArray(ds.values) ? ds.values : [];
                 const points = [];
+                const nodes = [];
                 const c = stableDatasetColor(ds, dsIdx);
-                const laneOffset = (dsIdx - (datasets.length - 1) / 2) * laneStep;
 
                 for (let i = 0; i < n; i++) {
                     const y = padY + i * row;
@@ -1071,8 +1065,7 @@
                     const vForLabel = v === 0 ? null : v;
                     const clamped = v == null ? null : Math.max(minVal, Math.min(maxVal, v));
                     const ratio = clamped == null ? 0.5 : ((clamped - minVal) / (maxVal - minVal));
-                    const x0 = xMin + ratio * (xMax - xMin);
-                    const x = Math.max(xMin, Math.min(xMax, x0 + laneOffset));
+                    const x = xMin + ratio * (xMax - xMin);
 
                     const text = vForLabel == null ? '-' : (Number.isInteger(vForLabel) ? String(vForLabel) : vForLabel.toFixed(1));
 
@@ -1080,17 +1073,17 @@
                     nodes.push({
                         x,
                         y,
-                        label: String(labels[i] || ''),
                         value: text,
                         num: vForLabel,
-                        color: c,
                     });
                 }
 
-                lines.push({
-                    points,
+                return {
+                    label: ds && ds.label ? String(ds.label) : `${labelRadar} ${dsIdx + 1}`,
                     color: c,
-                });
+                    points,
+                    nodes,
+                };
             });
 
             let html = '';
@@ -1107,38 +1100,43 @@
             html += '</div>';
 
             html += `<div style="flex: 0 1 260px; max-width: 100%;">`;
-            // SVG (no text) + HTML overlay numbers.
-            html += `<div style="position: relative; width: 100%; height: ${h}px;">`;
-            html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="position:absolute; inset:0; width:100%; height:100%; overflow: visible;">`;
-            lines.forEach((line) => {
-                const stroke = line && line.color && line.color.border ? String(line.color.border) : '#0073aa';
-                html += `<polyline fill="none" stroke="${escapeHtml(stroke)}" stroke-opacity="0.9" stroke-width="1" points="${(line.points || []).join(' ')}" />`;
+            // One snake chart per evaluation (no overlay).
+            html += `<div style="display:flex; gap:30px; overflow-x:auto; padding-bottom:6px;">`;
+
+            charts.forEach((chart) => {
+                const stroke = chart && chart.color && chart.color.border ? String(chart.color.border) : '#0073aa';
+
+                html += `<div style="flex:0 0 200px;">`;
+                html += `<div style="font-size:11px; font-weight:600; color:#1d2327; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(chart.label)}</div>`;
+                html += `<div style="position: relative; width: 100%; height: ${h}px;">`;
+                html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="position:absolute; inset:0; width:100%; height:100%; overflow: visible;">`;
+                html += `<polyline fill="none" stroke="${escapeHtml(stroke)}" stroke-opacity="0.9" stroke-width="1" points="${(chart.points || []).join(' ')}" />`;
+                html += `</svg>`;
+
+                html += `<div style="position:absolute; inset:0; pointer-events:none;">`;
+                (chart.nodes || []).forEach((node) => {
+                    const left = (node.x / w) * 100;
+                    const top = (node.y / h) * 100;
+
+                    const raw = Number(node.num);
+                    let stageClass = 'ham-stage-full';
+                    if (!Number.isFinite(raw)) {
+                        stageClass = 'ham-stage-full';
+                    } else if (raw < 3) {
+                        stageClass = 'ham-stage-not';
+                    } else if (raw < 4) {
+                        stageClass = 'ham-stage-trans';
+                    } else if (raw < 5) {
+                        stageClass = 'ham-stage-mid';
+                    }
+
+                    html += `<div class="ham-stage-badge ${stageClass}" style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%,-50%); width:22px; height:22px; padding:0; border-radius:999px; border:1px solid ${escapeHtml(stroke)}; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; line-height:1;">${escapeHtml(node.value)}</div>`;
+                });
+                html += `</div>`;
+
+                html += `</div>`;
+                html += `</div>`;
             });
-
-            html += `</svg>`;
-
-            html += `<div style="position:absolute; inset:0; pointer-events:none;">`;
-            nodes.forEach((node) => {
-                const left = (node.x / w) * 100;
-                const top = (node.y / h) * 100;
-
-                const raw = Number(node.num);
-                let stageClass = 'ham-stage-full';
-                if (!Number.isFinite(raw)) {
-                    stageClass = 'ham-stage-full';
-                } else if (raw < 3) {
-                    stageClass = 'ham-stage-not';
-                } else if (raw < 4) {
-                    stageClass = 'ham-stage-trans';
-                } else if (raw < 5) {
-                    stageClass = 'ham-stage-mid';
-                }
-
-                const border = node.color && node.color.border ? String(node.color.border) : '#0073aa';
-
-                html += `<div class="ham-stage-badge ${stageClass}" style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%,-50%); width:22px; height:22px; padding:0; border-radius:999px; border:1px solid ${escapeHtml(border)}; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; line-height:1;">${escapeHtml(node.value)}</div>`;
-            });
-            html += `</div>`;
 
             html += `</div>`;
             html += '</div>';
