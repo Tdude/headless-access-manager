@@ -1071,16 +1071,9 @@
 
             html += `<div style="flex: 0 1 260px; max-width: 100%;">`;
             // SVG (no text) + HTML overlay numbers.
-            html += `<div style="position: relative; width: 100%; aspect-ratio: ${w} / ${h};">`;
-            html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="position:absolute; inset:0; width:100%; height:500px overflow: visible;">`;
+            html += `<div style="position: relative; width: 100%; height: ${h}px;">`;
+            html += `<svg class="ham-mini-line" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="position:absolute; inset:0; width:100%; height:100%; overflow: visible;">`;
             html += `<polyline fill="none" stroke="#0073aa" stroke-width="2" points="${points.join(' ')}" />`;
-
-            nodes.forEach((node) => {
-                html += `<g>`;
-                html += `<title>${escapeHtml(node.label)}${node.value ? ': ' + escapeHtml(node.value) : ''}</title>`;
-                html += `<circle cx="${node.x}" cy="${node.y}" r="11" fill="#ffffff" stroke="#0073aa" stroke-width="1" />`;
-                html += `</g>`;
-            });
 
             html += `</svg>`;
 
@@ -1088,7 +1081,7 @@
             nodes.forEach((node) => {
                 const left = (node.x / w) * 100;
                 const top = (node.y / h) * 100;
-                html += `<div style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%,-50%); font-size:11px; font-weight:600; color:#1d2327; line-height:1;">${escapeHtml(node.value)}</div>`;
+                html += `<div style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%,-50%); width:22px; height:22px; border-radius:999px; background:#ffffff; border:1px solid #0073aa; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#1d2327; line-height:1;">${escapeHtml(node.value)}</div>`;
             });
             html += `</div>`;
 
