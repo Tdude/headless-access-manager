@@ -329,7 +329,7 @@
         const CHART_FONT_SIZE_TICKS = 11;
         const CHART_FONT_SIZE_POINT_LABELS = 12;
         const CHART_FONT_SIZE_TITLE = 14;
-        const CHART_FONT_SIZE_LEGEND = 12;
+        const CHART_FONT_SIZE_LEGEND = 14;
 
         const CHART_TARGET_SCORE = 3;
         const CHART_TARGET_COLOR = 'rgba(245, 158, 11, 0.3)';
@@ -1320,13 +1320,9 @@
                 const bucketGroup = buildBucketGroup(bucketKey);
                 const chart = buildRadarChart('ham-student-radar', bucketGroup, titleByKey[bucketKey] || labelRadar, bucketKey);
                 if (legendEl) {
-                    const bucket = bucketGroup && bucketGroup.buckets ? pickBucketForControl(bucketKey, bucketGroup.buckets) : null;
-                    const rawDatasets = bucket && Array.isArray(bucket.datasets) ? bucket.datasets : [];
-                    if (chart && rawDatasets.length > 0) {
-                        buildClickableLegend('ham-student-radar-legend', chart, rawDatasets);
-                    } else {
-                        legendEl.innerHTML = '';
-                    }
+                    // Student radar now uses the built-in Chart.js legend (same as ham-group-radar).
+                    // Keep the DOM node empty to avoid a double legend.
+                    legendEl.innerHTML = '';
                 }
                 renderRadarValuesTable('ham-student-radar-table', bucketGroup, bucketKey);
                 renderAnswerAlternativesTable('ham-answer-alternatives', stats.radar_questions, bucketGroup, bucketKey);
@@ -1708,7 +1704,35 @@
                     },
                     plugins: {
                         legend: {
-                            display: false,
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                font: { size: CHART_FONT_SIZE_LEGEND },
+                                filter: function(item, data) {
+                                    // Hide the target ring from the legend.
+                                    const lbl = item && item.text ? String(item.text) : '';
+                                    return lbl !== String(t.targetScore || 'Målnivå 3');
+                                },
+                            },
+                            onClick: function(e, item, legend) {
+                                // Mirror default toggling, but also persist it across bucket switches.
+                                const chart = legend && legend.chart ? legend.chart : null;
+                                const idx = item && Number.isFinite(item.datasetIndex) ? item.datasetIndex : null;
+                                if (!chart || idx == null || !chart.data || !Array.isArray(chart.data.datasets) || !chart.data.datasets[idx]) {
+                                    return;
+                                }
+
+                                const ds = chart.data.datasets[idx];
+                                if (ds && ds.label && String(ds.label) === String(t.targetScore || 'Målnivå 3')) {
+                                    return;
+                                }
+
+                                const key = datasetKey(ds, idx);
+                                const nextHidden = !Boolean(datasetHiddenByKey.get(key));
+                                datasetHiddenByKey.set(key, nextHidden);
+                                chart.data.datasets[idx].hidden = nextHidden;
+                                chart.update();
+                            },
                         },
                         title: {
                             display: Boolean(title),
