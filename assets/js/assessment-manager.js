@@ -1045,7 +1045,7 @@
             const row = 22;
             const padY = 12;
             const h = padY * 2 + Math.max(0, (n - 1)) * row;
-            const padX = 14;
+            const padX = 20; // snake zags wider with lesser value
             const xMin = padX;
             const xMax = w - padX;
             const minVal = 1;
