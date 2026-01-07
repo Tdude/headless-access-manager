@@ -568,18 +568,18 @@
     align-items: center;
     padding: .4em 1.5em;
     border-radius: 999px;
-    background: #f0f0f1;
+    background: #fff;
     border: 1px solid #dcdcde;
     color: #1d2327;
     text-decoration: none;
-    font-size: 1em;
+    font-size: 1.1em;
     line-height: 1.6;
     white-space: nowrap;
 }
 .ham-pill-link:hover {
-    background: #fff;
-    border-color: #2271b1;
-    color: #2271b1;
+    background: #f0f0f1;
+    border-color: #195687;
+    color: #195687;
 }
 .ham-pill-group {
     display: flex;
