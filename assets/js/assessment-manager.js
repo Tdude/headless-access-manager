@@ -1590,6 +1590,8 @@
                 };
             });
 
+            datasets.push(buildTargetDataset(labels.length));
+
             new Chart(el.getContext('2d'), {
                 type: 'radar',
                 data: {
