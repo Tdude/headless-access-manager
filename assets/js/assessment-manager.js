@@ -936,8 +936,8 @@
                 return;
             }
 
-            if (stats && stats.level === 'schools' && containerId === 'ham-group-radar-table') {
-                renderGroupRadarValuesMiniLine(containerId, bucketGroup, options);
+            if (containerId === 'ham-group-radar-table') {
+                renderGroupRadarValuesMiniLine(containerId, bucketGroup, null, options);
                 return;
             }
 
@@ -1000,7 +1000,7 @@
             el.innerHTML = html;
         }
 
-        function renderGroupRadarValuesMiniLine(containerId, bucketGroup, options) {
+        function renderGroupRadarValuesMiniLine(containerId, bucketGroup, bucketKey, options) {
             const el = document.getElementById(containerId);
             if (!el) {
                 return;
@@ -1008,14 +1008,16 @@
 
             const buckets = bucketGroup && Array.isArray(bucketGroup.buckets) ? bucketGroup.buckets : [];
             const labels = bucketGroup && Array.isArray(bucketGroup.labels) ? bucketGroup.labels : [];
-            const bucket = buckets.length > 0 ? buckets[buckets.length - 1] : null;
+            const bucket = bucketKey ? pickBucketForControl(String(bucketKey), buckets) : (buckets.length > 0 ? buckets[buckets.length - 1] : null);
 
             if (!bucket || !bucket.datasets || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
                 el.innerHTML = '';
                 return;
             }
 
-            const ds = bucket.datasets[0];
+            const ds = bucket.datasets.find((d) => d && d.label && typeof labelTarget !== 'undefined' && String(d.label) !== String(labelTarget))
+                || bucket.datasets.find((d) => d && d.label && String(d.label).toLowerCase() !== 'target')
+                || bucket.datasets[0];
             const values = Array.isArray(ds.values) ? ds.values : [];
 
             const n = Math.min(labels.length, values.length);
@@ -1726,6 +1728,11 @@
         function renderRadarValuesTable(containerId, bucketGroup, bucketKey) {
             const el = document.getElementById(containerId);
             if (!el) {
+                return;
+            }
+
+            if (containerId === 'ham-student-radar-table') {
+                renderGroupRadarValuesMiniLine(containerId, bucketGroup, bucketKey, { mode: 'avg' });
                 return;
             }
 
