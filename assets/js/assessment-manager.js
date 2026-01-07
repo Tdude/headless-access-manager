@@ -1045,11 +1045,15 @@
             const row = 22;
             const padY = 12;
             const h = padY * 2 + Math.max(0, (n - 1)) * row;
-            const padX = 20; // snake zags wider with lesser value
+            const padX = 25; // snake zags wider with lesser value
             const xMin = padX;
             const xMax = w - padX;
             const minVal = 1;
             const maxVal = 5;
+
+            const rangeX = xMax - xMin;
+            const desiredLaneStep = 4;
+            const laneStep = Math.max(0, Math.min(desiredLaneStep, rangeX / (datasets.length + 1)));
 
             const lines = [];
             const nodes = [];
@@ -1057,6 +1061,7 @@
                 const values = Array.isArray(ds.values) ? ds.values : [];
                 const points = [];
                 const c = stableDatasetColor(ds, dsIdx);
+                const laneOffset = (dsIdx - (datasets.length - 1) / 2) * laneStep;
 
                 for (let i = 0; i < n; i++) {
                     const y = padY + i * row;
@@ -1066,7 +1071,8 @@
                     const vForLabel = v === 0 ? null : v;
                     const clamped = v == null ? null : Math.max(minVal, Math.min(maxVal, v));
                     const ratio = clamped == null ? 0.5 : ((clamped - minVal) / (maxVal - minVal));
-                    const x = xMin + ratio * (xMax - xMin);
+                    const x0 = xMin + ratio * (xMax - xMin);
+                    const x = Math.max(xMin, Math.min(xMax, x0 + laneOffset));
 
                     const text = vForLabel == null ? '-' : (Number.isInteger(vForLabel) ? String(vForLabel) : vForLabel.toFixed(1));
 
@@ -1094,9 +1100,9 @@
             const labelPadTop = Math.max(0, padY - (row / 2));
             html += `<div style="flex: 1 1 auto; min-width: 180px; padding-top: ${labelPadTop}px;">`;
             html += `<div style="display:flex; flex-direction:column; gap: 0;">`;
-            nodes.forEach((node) => {
-                html += `<div style="height:${row}px; display:flex; align-items:center; font-size:12px; color:#1d2327;">${escapeHtml(node.label)}</div>`;
-            });
+            for (let i = 0; i < n; i++) {
+                html += `<div style="height:${row}px; display:flex; align-items:center; font-size:12px; color:#1d2327;">${escapeHtml(String(labels[i] || ''))}</div>`;
+            }
             html += `</div>`;
             html += '</div>';
 
