@@ -1122,11 +1122,11 @@
 
                     const bgByScore = {
                         0: '#ffffff',
-                        1: '#f44336',
-                        2: '#ff9800',
-                        3: '#ffeb3b',
-                        4: '#a5d6a7',
-                        5: '#2e7d32',
+                        1: '#f44336cc',
+                        2: '#f09342cc',
+                        3: '#f0d342c8',
+                        4: '#99f042b3',
+                        5: '#6bf042a7',
                     };
 
                     const bg = bgByScore[score] || '#ffffff';
