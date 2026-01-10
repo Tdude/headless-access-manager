@@ -1205,6 +1205,9 @@ class HAM_Assessment_Manager
     {
         $groups = array();
 
+        // Debug: log input
+        error_log("HAM build_student_radar_bucket: bucket_type={$bucket_type}, posts count=" . count($posts));
+
         foreach ($posts as $post) {
             $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
             $scores = self::extract_scores_from_assessment_data($assessment_data);
@@ -1227,6 +1230,9 @@ class HAM_Assessment_Manager
                 $bucket_label = self::format_term_label($bucket_key);
             }
 
+            // Debug: log each post
+            error_log("HAM build_student_radar_bucket: post_id={$post->ID}, bucket_key={$bucket_key}, overall_avg=" . ($scores['overall_avg'] ?? 'null'));
+
             if (!isset($groups[$bucket_key])) {
                 $groups[$bucket_key] = array(
                     'key' => $bucket_key,
@@ -1244,6 +1250,11 @@ class HAM_Assessment_Manager
         }
 
         ksort($groups);
+
+        // Debug: log bucket summary
+        foreach ($groups as $key => $bucket) {
+            error_log("HAM build_student_radar_bucket: bucket {$key} has " . count($bucket['items']) . " items");
+        }
 
         $radar = self::get_radar_question_labels_and_options();
         $order = $radar['order'];
