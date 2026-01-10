@@ -1246,18 +1246,9 @@ class HAM_Assessment_Manager
                 return ($a['ts'] ?? 0) <=> ($b['ts'] ?? 0);
             });
 
-            // Keep only the most recent evaluations (max 4), while preserving chronological order.
-            if (count($bucket['items']) > 4) {
-                $bucket['items'] = array_slice($bucket['items'], -4);
-            }
-
             $datasets = array();
             $index = 1;
             foreach ($bucket['items'] as $item) {
-                if ($index > 4) {
-                    break;
-                }
-
                 $dataset_label = sprintf(__('Evaluation %d', 'headless-access-manager'), $index);
                 $post_obj = isset($item['post_id']) ? get_post((int) $item['post_id']) : null;
                 if ($post_obj instanceof WP_Post) {
