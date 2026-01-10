@@ -635,6 +635,7 @@ class HAM_Assessment_Manager
     private static function fetch_evaluation_posts($student_ids = array())
     {
         $meta_query = array(
+            'relation' => 'AND',
             array(
                 'key'     => HAM_ASSESSMENT_META_STUDENT_ID,
                 'value'   => '',
@@ -643,9 +644,11 @@ class HAM_Assessment_Manager
         );
 
         if (!empty($student_ids)) {
+            // Convert to strings for meta comparison (WordPress stores meta as strings)
+            $student_ids_str = array_map('strval', array_values(array_unique(array_map('absint', $student_ids))));
             $meta_query[] = array(
                 'key'     => HAM_ASSESSMENT_META_STUDENT_ID,
-                'value'   => array_values(array_unique(array_map('absint', $student_ids))),
+                'value'   => $student_ids_str,
                 'compare' => 'IN',
             );
         }
@@ -659,7 +662,12 @@ class HAM_Assessment_Manager
             'meta_query'     => $meta_query,
         );
 
-        return get_posts($args);
+        $posts = get_posts($args);
+
+        // Debug logging - remove after debugging
+        error_log('HAM fetch_evaluation_posts: student_ids=' . print_r($student_ids, true) . ', found ' . count($posts) . ' posts');
+
+        return $posts;
     }
 
     private static function aggregate_evaluations_by_semester($posts)
