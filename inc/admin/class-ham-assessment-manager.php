@@ -1306,6 +1306,9 @@ class HAM_Assessment_Manager
                 $index++;
             }
 
+            // Debug: log datasets count
+            error_log("HAM build_student_radar_bucket: bucket {$bucket['key']} output has " . count($datasets) . " datasets");
+
             $out[] = array(
                 'key' => $bucket['key'],
                 'label' => $bucket['label'],
