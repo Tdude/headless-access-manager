@@ -1255,9 +1255,9 @@ class HAM_Assessment_Manager
             $index = 1;
             foreach ($bucket['items'] as $item) {
                 $dataset_label = sprintf(__('Evaluation %d', 'headless-access-manager'), $index);
+                $author_name = '';
                 $post_obj = isset($item['post_id']) ? get_post((int) $item['post_id']) : null;
                 if ($post_obj instanceof WP_Post) {
-                    $author_name = '';
                     if (!empty($post_obj->post_author)) {
                         $author_user = get_user_by('id', (int) $post_obj->post_author);
                         if ($author_user) {
@@ -1282,6 +1282,7 @@ class HAM_Assessment_Manager
 
                 $datasets[] = array(
                     'label' => $dataset_label,
+                    'author' => $author_name,
                     'post_id' => (int) $item['post_id'],
                     'overall_avg' => $item['overall_avg'],
                     'values' => $values,

@@ -1986,9 +1986,18 @@
                 const opacity = isHidden ? '0.4' : '1';
                 const textDecoration = isHidden ? 'line-through' : 'none';
 
-                html += `<div class="ham-legend-item" data-dataset-index="${idx}" style="display: flex; align-items: center; gap: 8px; cursor: pointer; opacity: ${opacity};">`;
-                html += `<span style="display: inline-block; width: 14px; height: 14px; background-color: ${escapeHtml(color)}; border-radius: 2px; flex-shrink: 0;"></span>`;
+                // Get author from original datasets
+                const origDs = originalDatasets[idx] || {};
+                const author = origDs.author || '';
+
+                html += `<div class="ham-legend-item" data-dataset-index="${idx}" style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; opacity: ${opacity};">`;
+                html += `<span style="display: inline-block; width: 14px; height: 14px; background-color: ${escapeHtml(color)}; border-radius: 2px; flex-shrink: 0; margin-top: 2px;"></span>`;
+                html += `<div style="display: flex; flex-direction: column; line-height: 1.3;">`;
                 html += `<span style="font-size: 13px; text-decoration: ${textDecoration}; color: #1d2327;">${escapeHtml(ds.label)}</span>`;
+                if (author) {
+                    html += `<span style="font-size: 11px; color: #646970; text-decoration: ${textDecoration};">${escapeHtml(author)}</span>`;
+                }
+                html += `</div>`;
                 html += '</div>';
             });
 
@@ -2020,10 +2029,10 @@
 
                     // Update legend item appearance
                     this.style.opacity = nextHidden ? '0.4' : '1';
-                    const labelSpan = this.querySelector('span:last-child');
-                    if (labelSpan) {
-                        labelSpan.style.textDecoration = nextHidden ? 'line-through' : 'none';
-                    }
+                    const textSpans = this.querySelectorAll('div span');
+                    textSpans.forEach((span) => {
+                        span.style.textDecoration = nextHidden ? 'line-through' : 'none';
+                    });
                 });
             });
         }
