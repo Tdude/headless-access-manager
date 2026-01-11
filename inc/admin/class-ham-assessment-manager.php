@@ -94,23 +94,29 @@ class HAM_Assessment_Manager
 
         $posts = self::fetch_evaluation_posts($student_ids);
         $latest_by_student = array();
+        $latest_ts_by_student = array();
 
-        // Posts are ordered by date ASC (oldest first), so we keep updating
-        // to ensure the last (most recent) evaluation wins
+        // Use effective date (not post date) to determine the latest evaluation
         foreach ($posts as $post) {
             $sid = (int) get_post_meta($post->ID, HAM_ASSESSMENT_META_STUDENT_ID, true);
             if ($sid <= 0) {
                 continue;
             }
 
-            $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
-            $calc = self::calculate_stage_from_assessment_data($assessment_data);
-            $stage = isset($calc['stage']) ? (string) $calc['stage'] : 'not';
-            if ($stage !== 'full' && $stage !== 'trans' && $stage !== 'not') {
-                $stage = 'not';
-            }
+            $ts = self::get_assessment_effective_date($post);
 
-            $latest_by_student[$sid] = $stage;
+            // Only update if this is the first or a newer evaluation for this student
+            if (!isset($latest_ts_by_student[$sid]) || $ts > $latest_ts_by_student[$sid]) {
+                $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
+                $calc = self::calculate_stage_from_assessment_data($assessment_data);
+                $stage = isset($calc['stage']) ? (string) $calc['stage'] : 'not';
+                if ($stage !== 'full' && $stage !== 'trans' && $stage !== 'not') {
+                    $stage = 'not';
+                }
+
+                $latest_by_student[$sid] = $stage;
+                $latest_ts_by_student[$sid] = $ts;
+            }
         }
 
         $counts = array(
