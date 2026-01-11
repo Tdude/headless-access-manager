@@ -1266,9 +1266,7 @@ class HAM_Assessment_Manager
                     }
 
                     $date_label = date_i18n(get_option('date_format'), (int) ($item['ts'] ?? 0));
-                    if ($date_label && $author_name) {
-                        $dataset_label = $date_label . ' — ' . $author_name;
-                    } elseif ($date_label) {
+                    if ($date_label) {
                         $dataset_label = $date_label;
                     }
                 }
