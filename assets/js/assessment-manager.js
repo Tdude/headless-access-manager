@@ -1500,12 +1500,7 @@
 
             function updateChart(bucketKey) {
                 const bucketGroup = buildBucketGroup(bucketKey);
-                const chart = buildRadarChart('ham-student-radar', bucketGroup, titleByKey[bucketKey] || labelRadar, bucketKey);
-                if (legendEl) {
-                    // Student radar now uses the built-in Chart.js legend (same as ham-group-radar).
-                    // Keep the DOM node empty to avoid a double legend.
-                    legendEl.innerHTML = '';
-                }
+                const chart = buildRadarChart('ham-student-radar', bucketGroup, titleByKey[bucketKey] || labelRadar, bucketKey, legendEl);
                 renderRadarValuesTable('ham-student-radar-table', bucketGroup, bucketKey);
                 renderAnswerAlternativesTable('ham-answer-alternatives', stats.radar_questions, bucketGroup, bucketKey);
             }
@@ -1840,7 +1835,7 @@
             el.innerHTML = html;
         }
 
-        function buildRadarChart(canvasId, bucketGroup, title, bucketKey) {
+        function buildRadarChart(canvasId, bucketGroup, title, bucketKey, legendEl) {
             const el = document.getElementById(canvasId);
             if (!el || !bucketGroup || !bucketGroup.buckets) {
                 return null;
@@ -1876,6 +1871,9 @@
 
             datasets.push(buildTargetDataset(labels.length));
 
+            // If we have a custom legend element, disable the built-in legend
+            const useCustomLegend = Boolean(legendEl);
+
             const chart = new Chart(el.getContext('2d'), {
                 type: 'radar',
                 data: {
@@ -1891,7 +1889,7 @@
                     },
                     plugins: {
                         legend: {
-                            display: true,
+                            display: !useCustomLegend,
                             position: 'bottom',
                             labels: {
                                 font: { size: CHART_FONT_SIZE_LEGEND },
@@ -1955,7 +1953,79 @@
                 },
             });
 
+            // Render custom legend if element is provided
+            if (useCustomLegend) {
+                renderCustomRadarLegend(legendEl, chart, bucket.datasets);
+            }
+
             return chart;
+        }
+
+        /**
+         * Render a custom legend for the radar chart on the left side.
+         * @param {HTMLElement} legendEl - The element to render the legend into.
+         * @param {Chart} chart - The Chart.js chart instance.
+         * @param {Array} originalDatasets - The original datasets array (before Chart.js transformation).
+         */
+        function renderCustomRadarLegend(legendEl, chart, originalDatasets) {
+            if (!legendEl || !chart || !chart.data || !Array.isArray(chart.data.datasets)) {
+                return;
+            }
+
+            const targetLabel = String(t.targetScore || 'Målnivå 3');
+            let html = '<div class="ham-custom-legend" style="display: flex; flex-direction: column; gap: 8px;">';
+
+            chart.data.datasets.forEach((ds, idx) => {
+                // Skip the target dataset in legend
+                if (ds.label === targetLabel) {
+                    return;
+                }
+
+                const isHidden = ds.hidden;
+                const color = ds.borderColor || ds.backgroundColor || '#666';
+                const opacity = isHidden ? '0.4' : '1';
+                const textDecoration = isHidden ? 'line-through' : 'none';
+
+                html += `<div class="ham-legend-item" data-dataset-index="${idx}" style="display: flex; align-items: center; gap: 8px; cursor: pointer; opacity: ${opacity};">`;
+                html += `<span style="display: inline-block; width: 14px; height: 14px; background-color: ${escapeHtml(color)}; border-radius: 2px; flex-shrink: 0;"></span>`;
+                html += `<span style="font-size: 13px; text-decoration: ${textDecoration}; color: #1d2327;">${escapeHtml(ds.label)}</span>`;
+                html += '</div>';
+            });
+
+            html += '</div>';
+            legendEl.innerHTML = html;
+
+            // Add click handlers to toggle dataset visibility
+            const items = legendEl.querySelectorAll('.ham-legend-item');
+            items.forEach((item) => {
+                item.addEventListener('click', function() {
+                    const idx = parseInt(this.getAttribute('data-dataset-index'), 10);
+                    if (!Number.isFinite(idx) || !chart.data.datasets[idx]) {
+                        return;
+                    }
+
+                    const ds = chart.data.datasets[idx];
+                    // Don't allow toggling target dataset
+                    if (ds.label === targetLabel) {
+                        return;
+                    }
+
+                    // Get original dataset for key generation
+                    const origDs = originalDatasets[idx] || ds;
+                    const key = datasetKey(origDs, idx);
+                    const nextHidden = !Boolean(datasetHiddenByKey.get(key));
+                    datasetHiddenByKey.set(key, nextHidden);
+                    ds.hidden = nextHidden;
+                    chart.update();
+
+                    // Update legend item appearance
+                    this.style.opacity = nextHidden ? '0.4' : '1';
+                    const labelSpan = this.querySelector('span:last-child');
+                    if (labelSpan) {
+                        labelSpan.style.textDecoration = nextHidden ? 'line-through' : 'none';
+                    }
+                });
+            });
         }
 
         function buildOverviewRadarChart(canvasId, radar) {

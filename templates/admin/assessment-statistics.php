@@ -763,8 +763,10 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <button type="button" class="button ham-date-clear"><?php echo esc_html__('Clear', 'headless-access-manager'); ?></button>
                     </div>
                 </details>
-                <div class="ham-chart-wrapper ham-chart-wrapper--lg"><canvas id="ham-student-radar"></canvas></div>
-                <div id="ham-student-radar-legend" class="ham-chart-legend"></div>
+                <div style="display: flex; gap: 20px; align-items: flex-start;">
+                    <div id="ham-student-radar-legend" class="ham-chart-legend" style="flex: 0 0 auto; min-width: 180px; max-width: 250px;"></div>
+                    <div class="ham-chart-wrapper ham-chart-wrapper--lg" style="flex: 1 1 auto;"><canvas id="ham-student-radar"></canvas></div>
+                </div>
 
                     </div>
                 </div>
