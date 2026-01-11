@@ -637,20 +637,24 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                             <tbody>
                                 <?php if (!empty($drilldown['students'])) : ?>
                                     <?php
-                                    $total_stage_not = 0;
-                                    $total_stage_trans = 0;
-                                    $total_stage_full = 0;
+                                    // Helper function for stage badge display
+                                    $get_stage_badge = function($stage) {
+                                        $stage = (string) $stage;
+                                        if ($stage === 'full') {
+                                            return array('class' => 'ham-stage-full', 'text' => 'Ok');
+                                        } elseif ($stage === 'trans') {
+                                            return array('class' => 'ham-stage-trans', 'text' => 'Utv.');
+                                        } else {
+                                            return array('class' => 'ham-stage-not', 'text' => 'Ej');
+                                        }
+                                    };
                                     ?>
                                     <?php foreach ($drilldown['students'] as $student) : ?>
                                         <?php
-                                        $stage = isset($student['stage']) ? (string) $student['stage'] : 'not';
-                                        if ($stage === 'full') {
-                                            $total_stage_full += 1;
-                                        } elseif ($stage === 'trans') {
-                                            $total_stage_trans += 1;
-                                        } else {
-                                            $total_stage_not += 1;
-                                        }
+                                        $stage_ank = isset($student['stage_anknytning']) ? (string) $student['stage_anknytning'] : 'not';
+                                        $stage_ans = isset($student['stage_ansvar']) ? (string) $student['stage_ansvar'] : 'not';
+                                        $badge_ank = $get_stage_badge($stage_ank);
+                                        $badge_ans = $get_stage_badge($stage_ans);
                                         ?>
                                         <tr>
                                             <td>
@@ -658,19 +662,8 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                             </td>
                                             <td><?php echo esc_html((int) $student['evaluation_count']); ?></td>
                                             <td>
-                                                <?php
-                                                if ($stage === 'full') {
-                                                    $stage_class = 'ham-stage-full';
-                                                    $stage_text = esc_html__('Established', 'headless-access-manager');
-                                                } elseif ($stage === 'trans') {
-                                                    $stage_class = 'ham-stage-trans';
-                                                    $stage_text = esc_html__('Developing', 'headless-access-manager');
-                                                } else {
-                                                    $stage_class = 'ham-stage-not';
-                                                    $stage_text = esc_html__('Not Established', 'headless-access-manager');
-                                                }
-                                                ?>
-                                                <span class="ham-stage-badge <?php echo esc_attr($stage_class); ?>"><?php echo $stage_text; ?></span>
+                                                <span class="ham-stage-badge <?php echo esc_attr($badge_ank['class']); ?>" title="<?php esc_attr_e('Anknytning', 'headless-access-manager'); ?>">A: <?php echo esc_html($badge_ank['text']); ?></span>
+                                                <span class="ham-stage-badge <?php echo esc_attr($badge_ans['class']); ?>" title="<?php esc_attr_e('Ansvar', 'headless-access-manager'); ?>">B: <?php echo esc_html($badge_ans['text']); ?></span>
                                             </td>
                                             <td style="min-width: 320px;">
                                                 <?php $render_semester_bars($student['series'], 100, 'sparkline'); ?>
@@ -682,9 +675,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                         <td style="font-weight: 700;"><?php echo esc_html__('Total', 'headless-access-manager'); ?></td>
                                         <td></td>
                                         <td>
-                                            <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_stage_not); ?></span>
-                                            <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_stage_trans); ?></span>
-                                            <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_stage_full); ?></span>
+                                            <span style="font-size: 11px; color: #646970;"><?php esc_html_e('See individual rows', 'headless-access-manager'); ?></span>
                                         </td>
                                         <td></td>
                                     </tr>

@@ -110,25 +110,25 @@ if (! defined('ABSPATH')) {
                             <td class="column-date"><?php echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($assessment['date']))); ?></td>
                             <td class="column-author" data-author-id="<?php echo esc_attr($assessment['author_id'] ?? 0); ?>"><?php echo esc_html($assessment['author_name']); ?></td>
                             <td class="column-completion">
-                                <?php 
-                                $stage = $assessment['stage'] ?? 'not';
-                                $stage_class = '';
-                                $stage_text = '';
-                                
-                                if ($stage === 'full') {
-                                    $stage_class = 'ham-stage-full';
-                                    $stage_text = esc_html__('Established', 'headless-access-manager');
-                                } elseif ($stage === 'trans') {
-                                    $stage_class = 'ham-stage-trans';
-                                    $stage_text = esc_html__('Developing', 'headless-access-manager');
-                                } else {
-                                    $stage_class = 'ham-stage-not';
-                                    $stage_text = esc_html__('Not Established', 'headless-access-manager');
-                                }
+                                <?php
+                                // Helper function for stage badge
+                                $get_badge = function($stage) {
+                                    $stage = (string) $stage;
+                                    if ($stage === 'full') {
+                                        return array('class' => 'ham-stage-full', 'text' => 'Ok');
+                                    } elseif ($stage === 'trans') {
+                                        return array('class' => 'ham-stage-trans', 'text' => 'Utv.');
+                                    } else {
+                                        return array('class' => 'ham-stage-not', 'text' => 'Ej');
+                                    }
+                                };
+                                $stage_ank = $assessment['stage_anknytning'] ?? 'not';
+                                $stage_ans = $assessment['stage_ansvar'] ?? 'not';
+                                $badge_ank = $get_badge($stage_ank);
+                                $badge_ans = $get_badge($stage_ans);
                                 ?>
-                                <span class="ham-stage-badge <?php echo esc_attr($stage_class); ?>">
-                                    <?php echo $stage_text; ?>
-                                </span>
+                                <span class="ham-stage-badge <?php echo esc_attr($badge_ank['class']); ?>" title="<?php esc_attr_e('Anknytning', 'headless-access-manager'); ?>">A: <?php echo esc_html($badge_ank['text']); ?></span>
+                                <span class="ham-stage-badge <?php echo esc_attr($badge_ans['class']); ?>" title="<?php esc_attr_e('Ansvar', 'headless-access-manager'); ?>">B: <?php echo esc_html($badge_ans['text']); ?></span>
                             </td>
                             <td class="column-actions">
                                 <button class="button ham-view-assessment" data-id="<?php echo esc_attr($assessment['id']); ?>">

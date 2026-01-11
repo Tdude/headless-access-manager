@@ -24,6 +24,67 @@ class HAM_Assessment_Manager
     private const QUESTION_BANK_META_KEY = '_ham_assessment_data';
     private const QUESTION_BANK_MIGRATION_OPTION = 'ham_question_bank_migrated_to_tpl';
 
+    /**
+     * Calculate stage for a single section (anknytning or ansvar).
+     *
+     * @param array  $assessment_data  The full assessment data array.
+     * @param string $section_key      The section key ('anknytning' or 'ansvar').
+     * @param int    $threshold        Score threshold for "established" (default 3).
+     * @param float  $majority_factor  Factor for majority calculation (default 0.7).
+     * @return array Array with 'stage', 'k', and 'n' keys.
+     */
+    private static function calculate_stage_for_section($assessment_data, $section_key, $threshold = 3, $majority_factor = 0.7)
+    {
+        $steps = array();
+        if (is_array($assessment_data) && isset($assessment_data[$section_key]['questions']) && is_array($assessment_data[$section_key]['questions'])) {
+            foreach ($assessment_data[$section_key]['questions'] as $answer) {
+                if ($answer === '' || $answer === null) {
+                    continue;
+                }
+                if (!is_numeric($answer)) {
+                    continue;
+                }
+                $steps[] = (float) $answer;
+            }
+        }
+
+        $n = count($steps);
+        if ($n === 0) {
+            return array(
+                'stage' => 'not',
+                'k' => 0,
+                'n' => 0,
+            );
+        }
+
+        $k = 0;
+        foreach ($steps as $s) {
+            if ($s >= $threshold) {
+                $k++;
+            }
+        }
+
+        $m = (int) ceil($majority_factor * $n);
+        $half = (int) ceil($n / 2);
+
+        if ($k >= $m) {
+            $stage = 'full';
+        } elseif ($k >= $half) {
+            $stage = 'trans';
+        } else {
+            $stage = 'not';
+        }
+
+        return array(
+            'stage' => $stage,
+            'k' => $k,
+            'n' => $n,
+        );
+    }
+
+    /**
+     * Calculate combined stage from assessment data (both sections).
+     */
     private static function calculate_stage_from_assessment_data($assessment_data, $threshold = 3, $majority_factor = 0.7)
     {
         $steps = array();
@@ -78,6 +139,20 @@ class HAM_Assessment_Manager
         );
     }
 
+    /**
+     * Calculate stages for both sections separately.
+     *
+     * @param array $assessment_data The full assessment data array.
+     * @return array Array with 'anknytning' and 'ansvar' stage data.
+     */
+    private static function calculate_section_stages($assessment_data)
+    {
+        return array(
+            'anknytning' => self::calculate_stage_for_section($assessment_data, 'anknytning'),
+            'ansvar' => self::calculate_stage_for_section($assessment_data, 'ansvar'),
+        );
+    }
+
     private static function calculate_latest_stage_counts_for_students(array $student_ids)
     {
         $student_ids = array_values(array_filter(array_map('absint', $student_ids)));
@@ -89,11 +164,13 @@ class HAM_Assessment_Manager
                     'full' => 0,
                 ),
                 'by_student' => array(),
+                'sections_by_student' => array(),
             );
         }
 
         $posts = self::fetch_evaluation_posts($student_ids);
         $latest_by_student = array();
+        $latest_sections_by_student = array();
         $latest_ts_by_student = array();
 
         // Use effective date (not post date) to determine the latest evaluation
@@ -108,13 +185,24 @@ class HAM_Assessment_Manager
             // Only update if this is the first or a newer evaluation for this student
             if (!isset($latest_ts_by_student[$sid]) || $ts > $latest_ts_by_student[$sid]) {
                 $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
+
+                // Combined stage (for backward compatibility)
                 $calc = self::calculate_stage_from_assessment_data($assessment_data);
                 $stage = isset($calc['stage']) ? (string) $calc['stage'] : 'not';
                 if ($stage !== 'full' && $stage !== 'trans' && $stage !== 'not') {
                     $stage = 'not';
                 }
 
+                // Per-section stages
+                $section_stages = self::calculate_section_stages($assessment_data);
+                $ank_stage = isset($section_stages['anknytning']['stage']) ? $section_stages['anknytning']['stage'] : 'not';
+                $ans_stage = isset($section_stages['ansvar']['stage']) ? $section_stages['ansvar']['stage'] : 'not';
+
                 $latest_by_student[$sid] = $stage;
+                $latest_sections_by_student[$sid] = array(
+                    'anknytning' => $ank_stage,
+                    'ansvar' => $ans_stage,
+                );
                 $latest_ts_by_student[$sid] = $ts;
             }
         }
@@ -135,6 +223,7 @@ class HAM_Assessment_Manager
         return array(
             'counts' => $counts,
             'by_student' => $latest_by_student,
+            'sections_by_student' => $latest_sections_by_student,
         );
     }
 
@@ -1826,13 +1915,17 @@ class HAM_Assessment_Manager
 
                 $stage_rollup = self::calculate_latest_stage_counts_for_students(array($student_post->ID));
                 $by_student = isset($stage_rollup['by_student']) ? $stage_rollup['by_student'] : array();
+                $sections_by_student = isset($stage_rollup['sections_by_student']) ? $stage_rollup['sections_by_student'] : array();
                 $latest_stage = isset($by_student[$student_post->ID]) ? $by_student[$student_post->ID] : 'not';
+                $section_stages = isset($sections_by_student[$student_post->ID]) ? $sections_by_student[$student_post->ID] : array('anknytning' => 'not', 'ansvar' => 'not');
 
                 $view['students'][] = array(
                     'id' => $student_post->ID,
                     'name' => $student_post->post_title,
                     'evaluation_count' => $total_evals,
                     'stage' => $latest_stage,
+                    'stage_anknytning' => $section_stages['anknytning'],
+                    'stage_ansvar' => $section_stages['ansvar'],
                     'series' => $series,
                     'url' => admin_url('admin.php?page=ham-assessment-stats&school_id=' . $school_id . '&class_id=' . $class_id . '&student_id=' . $student_post->ID),
                 );
@@ -2146,6 +2239,11 @@ class HAM_Assessment_Manager
             $n = isset($calc['n']) ? (int) $calc['n'] : 0;
             $stage_score = $n > 0 ? ($k / $n) : 0;
 
+            // Per-section stages
+            $section_stages = self::calculate_section_stages($assessment_data);
+            $stage_anknytning = isset($section_stages['anknytning']['stage']) ? $section_stages['anknytning']['stage'] : 'not';
+            $stage_ansvar = isset($section_stages['ansvar']['stage']) ? $section_stages['ansvar']['stage'] : 'not';
+
             $completion_percentage = self::calculate_completion_percentage($assessment_data);
 
             // Get teacher info - prefer explicitly saved teacher meta, fallback to class relationship and post_author
@@ -2263,6 +2361,8 @@ class HAM_Assessment_Manager
                 'author_id'    => $teacher_id,
                 'author_name'  => $teacher_name,
                 'stage'        => $summary_stage,
+                'stage_anknytning' => $stage_anknytning,
+                'stage_ansvar' => $stage_ansvar,
                 'stage_score'  => $stage_score,
             );
         }
