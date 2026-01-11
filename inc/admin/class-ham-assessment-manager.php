@@ -95,9 +95,11 @@ class HAM_Assessment_Manager
         $posts = self::fetch_evaluation_posts($student_ids);
         $latest_by_student = array();
 
+        // Posts are ordered by date ASC (oldest first), so we keep updating
+        // to ensure the last (most recent) evaluation wins
         foreach ($posts as $post) {
             $sid = (int) get_post_meta($post->ID, HAM_ASSESSMENT_META_STUDENT_ID, true);
-            if ($sid <= 0 || isset($latest_by_student[$sid])) {
+            if ($sid <= 0) {
                 continue;
             }
 
