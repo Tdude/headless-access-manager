@@ -2350,6 +2350,7 @@ class HAM_Assessment_Manager
         $student_ids = array();
         $completion_sum = 0;
         $latest_stage_by_student_id = array();
+        $latest_date_by_student_id = array();
         $section_sums = array('anknytning' => 0, 'ansvar' => 0);
         $section_counts = array('anknytning' => 0, 'ansvar' => 0);
         $question_sums = array();
@@ -2365,14 +2366,16 @@ class HAM_Assessment_Manager
                 $student_ids[] = $assessment['student_id'];
             }
 
-            // Capture the most recent stage per student (assessments are ordered newest -> oldest)
+            // Capture the most recent stage per student using effective date
             $sid = isset($assessment['student_id']) ? (int) $assessment['student_id'] : 0;
-            if ($sid > 0 && !isset($latest_stage_by_student_id[$sid])) {
+            $assessment_date = isset($assessment['date']) ? $assessment['date'] : '';
+            if ($sid > 0 && (!isset($latest_date_by_student_id[$sid]) || $assessment_date > $latest_date_by_student_id[$sid])) {
                 $s = isset($assessment['stage']) ? (string) $assessment['stage'] : 'not';
                 if ($s !== 'full' && $s !== 'trans' && $s !== 'not') {
                     $s = 'not';
                 }
                 $latest_stage_by_student_id[$sid] = $s;
+                $latest_date_by_student_id[$sid] = $assessment_date;
             }
 
             // Sum completion percentages
