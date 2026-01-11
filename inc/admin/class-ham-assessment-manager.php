@@ -662,12 +662,7 @@ class HAM_Assessment_Manager
             'meta_query'     => $meta_query,
         );
 
-        $posts = get_posts($args);
-
-        // Debug logging - remove after debugging
-        error_log('HAM fetch_evaluation_posts: student_ids=' . print_r($student_ids, true) . ', found ' . count($posts) . ' posts');
-
-        return $posts;
+        return get_posts($args);
     }
 
     private static function aggregate_evaluations_by_semester($posts)
@@ -1088,8 +1083,9 @@ class HAM_Assessment_Manager
                 $key = (string) self::get_school_year_start_from_timestamp($ts);
                 $label = self::format_school_year_label($key);
             } elseif ($bucket_type === 'hogstadium') {
-                $key = self::get_hogstadium_key_from_timestamp($ts);
-                $label = self::format_hogstadium_label($key);
+                // For student view, show each evaluation as individual data point
+                $key = gmdate('Y-m-d', $ts) . '_' . $post->ID;
+                $label = date_i18n(get_option('date_format'), $ts);
             } else {
                 $key = self::get_term_key_from_timestamp($ts);
                 $label = self::format_term_label($key);
@@ -1205,9 +1201,6 @@ class HAM_Assessment_Manager
     {
         $groups = array();
 
-        // Debug: log input
-        error_log("HAM build_student_radar_bucket: bucket_type={$bucket_type}, posts count=" . count($posts));
-
         foreach ($posts as $post) {
             $assessment_data = get_post_meta($post->ID, HAM_ASSESSMENT_META_DATA, true);
             $scores = self::extract_scores_from_assessment_data($assessment_data);
@@ -1223,15 +1216,13 @@ class HAM_Assessment_Manager
                 $bucket_key = (string) self::get_school_year_start_from_timestamp($ts);
                 $bucket_label = self::format_school_year_label($bucket_key);
             } elseif ($bucket_type === 'hogstadium') {
-                $bucket_key = self::get_hogstadium_key_from_timestamp($ts);
-                $bucket_label = self::format_hogstadium_label($bucket_key);
+                // For student view, put all evaluations in one bucket to show complete history
+                $bucket_key = 'all';
+                $bucket_label = __('All evaluations', 'headless-access-manager');
             } else {
                 $bucket_key = self::get_term_key_from_timestamp($ts);
                 $bucket_label = self::format_term_label($bucket_key);
             }
-
-            // Debug: log each post
-            error_log("HAM build_student_radar_bucket: post_id={$post->ID}, bucket_key={$bucket_key}, overall_avg=" . ($scores['overall_avg'] ?? 'null'));
 
             if (!isset($groups[$bucket_key])) {
                 $groups[$bucket_key] = array(
@@ -1250,11 +1241,6 @@ class HAM_Assessment_Manager
         }
 
         ksort($groups);
-
-        // Debug: log bucket summary
-        foreach ($groups as $key => $bucket) {
-            error_log("HAM build_student_radar_bucket: bucket {$key} has " . count($bucket['items']) . " items");
-        }
 
         $radar = self::get_radar_question_labels_and_options();
         $order = $radar['order'];
@@ -1305,9 +1291,6 @@ class HAM_Assessment_Manager
 
                 $index++;
             }
-
-            // Debug: log datasets count
-            error_log("HAM build_student_radar_bucket: bucket {$bucket['key']} output has " . count($datasets) . " datasets");
 
             $out[] = array(
                 'key' => $bucket['key'],

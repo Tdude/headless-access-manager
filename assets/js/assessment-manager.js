@@ -520,6 +520,19 @@
             }
 
             if (bucketType === 'hogstadium') {
+                // 'all' bucket contains all evaluations, always include it
+                if (key === 'all') {
+                    return null;
+                }
+                // Individual evaluation keys (date_postid format) for progress chart
+                if (key.includes('_')) {
+                    const datePart = key.split('_')[0];
+                    const ts = Date.parse(datePart);
+                    if (Number.isFinite(ts)) {
+                        return { start: ts, end: ts + 86400000 }; // One day range
+                    }
+                    return null;
+                }
                 const base = parseInt(key, 10);
                 if (!Number.isFinite(base)) {
                     return null;
@@ -1137,6 +1150,8 @@
                 html += `</div>`;
 
                 html += `</div>`;
+                // Legend label showing the evaluation date
+                html += `<div style="text-align:center; font-size:11px; color:#1d2327; margin-top:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px;" title="${escapeHtml(chart.label)}">${escapeHtml(chart.label)}</div>`;
                 html += `</div>`;
             });
 
