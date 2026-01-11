@@ -346,7 +346,7 @@
         const CHART_FONT_SIZE_LEGEND = 14;
 
         const CHART_TARGET_SCORE = 3;
-        const CHART_TARGET_COLOR = 'rgba(245, 158, 11, 0.3)';
+        const CHART_TARGET_COLOR = 'rgba(245, 158, 11, 0.5)';
 
         const t = (window.hamAssessment && window.hamAssessment.texts) ? window.hamAssessment.texts : {};
         const labelMonth = t.month || 'Month';
