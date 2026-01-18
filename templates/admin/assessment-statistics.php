@@ -344,12 +344,12 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <table class="wp-list-table widefat fixed striped">
                             <thead>
                                 <tr>
-                                    <th><?php echo esc_html__('School', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('# Classes', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Status Anknytning/Ansvar', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-15"><?php echo esc_html__('School', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-5"><?php echo esc_html__('# Classes', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-5"><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-5"><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-30"><?php echo esc_html__('Status Anknytning/Ansvar', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-40"><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -391,7 +391,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                                     <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ans['full'] ?? 0); ?></span>
                                                 </span>
                                             </td>
-                                            <td style="min-width: 320px;">
+                                            <td>
                                                 <?php $render_semester_bars($school['series'], 100); ?>
                                             </td>
                                         </tr>
@@ -507,11 +507,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <table class="wp-list-table widefat fixed striped">
                             <thead>
                                 <tr>
-                                    <th><?php echo esc_html__('Class', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Status Anknytning/Ansvar', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-15"><?php echo esc_html__('Class', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-8"><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-8"><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-30"><?php echo esc_html__('Status Anknytning/Ansvar', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-40"><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -552,7 +552,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                                     <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ans['full'] ?? 0); ?></span>
                                                 </span>
                                             </td>
-                                            <td style="min-width: 320px;">
+                                            <td>
                                                 <?php $render_semester_bars($class['series'], 100); ?>
                                             </td>
                                         </tr>
@@ -666,10 +666,10 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <table class="wp-list-table widefat fixed striped">
                             <thead>
                                 <tr>
-                                    <th><?php echo esc_html__('Student', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Status Anknytning/Ansvar', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-15"><?php echo esc_html__('Student', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-8"><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-30"><?php echo esc_html__('Status Anknytning/Ansvar', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-45"><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -703,7 +703,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                                 <span class="ham-stage-badge <?php echo esc_attr($badge_ank['class']); ?>" title="<?php esc_attr_e('Anknytning', 'headless-access-manager'); ?>">A: <?php echo esc_html($badge_ank['text']); ?></span>
                                                 <span class="ham-stage-badge <?php echo esc_attr($badge_ans['class']); ?>" title="<?php esc_attr_e('Ansvar', 'headless-access-manager'); ?>">B: <?php echo esc_html($badge_ans['text']); ?></span>
                                             </td>
-                                            <td style="min-width: 320px;">
+                                            <td>
                                                 <?php $render_semester_bars($student['series'], 100); ?>
                                             </td>
                                         </tr>
@@ -858,6 +858,19 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 
 <style>
 /* Statistics Page Styles */
+
+/* Table column widths for stats tables */
+.ham-col-5 { width: 5%; }
+.ham-col-8 { width: 8%; }
+.ham-col-10 { width: 10%; }
+.ham-col-15 { width: 15%; }
+.ham-col-20 { width: 20%; }
+.ham-col-25 { width: 25%; }
+.ham-col-30 { width: 30%; }
+.ham-col-35 { width: 35%; }
+.ham-col-40 { width: 40%; }
+.ham-col-45 { width: 45%; }
+
 .ham-stats-overview {
     display: flex;
     flex-wrap: wrap;
