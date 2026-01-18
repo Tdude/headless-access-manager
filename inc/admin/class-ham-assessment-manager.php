@@ -1786,6 +1786,24 @@ class HAM_Assessment_Manager
 
                 $stage_rollup = self::calculate_latest_stage_counts_for_students($class_student_ids);
                 $stage_counts = isset($stage_rollup['counts']) ? $stage_rollup['counts'] : array('not' => 0, 'trans' => 0, 'full' => 0);
+
+                // Calculate per-section stage counts
+                $sections_by_student = isset($stage_rollup['sections_by_student']) ? $stage_rollup['sections_by_student'] : array();
+                $section_counts = array(
+                    'anknytning' => array('not' => 0, 'trans' => 0, 'full' => 0),
+                    'ansvar' => array('not' => 0, 'trans' => 0, 'full' => 0),
+                );
+                foreach ($sections_by_student as $sid => $sections) {
+                    $ank = isset($sections['anknytning']) ? $sections['anknytning'] : 'not';
+                    $ans = isset($sections['ansvar']) ? $sections['ansvar'] : 'not';
+                    if (isset($section_counts['anknytning'][$ank])) {
+                        $section_counts['anknytning'][$ank]++;
+                    }
+                    if (isset($section_counts['ansvar'][$ans])) {
+                        $section_counts['ansvar'][$ans]++;
+                    }
+                }
+
                 $series = empty($class_student_ids) ? array() : self::aggregate_evaluations_by_semester(self::fetch_evaluation_posts($class_student_ids));
 
                 $total_evals = 0;
@@ -1806,6 +1824,7 @@ class HAM_Assessment_Manager
                     'student_count' => count($class_student_ids),
                     'evaluation_count' => $total_evals,
                     'stage_counts' => $stage_counts,
+                    'section_counts' => $section_counts,
                     'series' => $series,
                     'url' => admin_url('admin.php?page=ham-assessment-stats&school_id=' . $school_id . '&class_id=' . $class_post->ID),
                 );
