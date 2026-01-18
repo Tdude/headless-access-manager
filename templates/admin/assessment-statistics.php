@@ -246,10 +246,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 echo '</svg>';
 
                 if ($variant !== 'sparkline') {
-                    // Labels row - padding matches SVG pad_x (6 out of 100 = 6%)
-                    echo '<div style="display: grid; grid-template-columns: repeat(' . esc_attr($n) . ', 1fr); padding: 0 6%; margin-top: 0;">';
+                    // Labels row - use flexbox space-between to match SVG point distribution
+                    // SVG points go from pad_x (6) to w-pad_x (94), distributed with space-between
+                    echo '<div style="display: flex; justify-content: space-between; padding: 0 6%; margin-top: 0;">';
                     for ($i = 0; $i < $n; $i++) {
-                        echo '<div style="text-align: center; font-size: 11px; color: #646970; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' . esc_html($labels[$i]) . '</div>';
+                        echo '<div style="text-align: center; font-size: 11px; color: #646970; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 0 0 auto;">' . esc_html($labels[$i]) . '</div>';
                     }
                     echo '</div>';
                 }
