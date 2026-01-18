@@ -347,10 +347,9 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                     <th><?php echo esc_html__('School', 'headless-access-manager'); ?></th>
                                     <th><?php echo esc_html__('# Classes', 'headless-access-manager'); ?></th>
                                     <th><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('# Evals', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Anknytning', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Ansvar', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Progress', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Status Anknytning/Ansvar', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -379,14 +378,18 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                             <td><?php echo esc_html((int) $school['student_count']); ?></td>
                                             <td><?php echo esc_html((int) $school['evaluation_count']); ?></td>
                                             <td>
-                                                <span class="ham-stage-badge ham-stage-not" title="<?php esc_attr_e('Ej', 'headless-access-manager'); ?>"><?php echo esc_html($ank['not'] ?? 0); ?></span>
-                                                <span class="ham-stage-badge ham-stage-trans" title="<?php esc_attr_e('Utv.', 'headless-access-manager'); ?>"><?php echo esc_html($ank['trans'] ?? 0); ?></span>
-                                                <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ank['full'] ?? 0); ?></span>
-                                            </td>
-                                            <td>
-                                                <span class="ham-stage-badge ham-stage-not" title="<?php esc_attr_e('Ej', 'headless-access-manager'); ?>"><?php echo esc_html($ans['not'] ?? 0); ?></span>
-                                                <span class="ham-stage-badge ham-stage-trans" title="<?php esc_attr_e('Utv.', 'headless-access-manager'); ?>"><?php echo esc_html($ans['trans'] ?? 0); ?></span>
-                                                <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ans['full'] ?? 0); ?></span>
+                                                <span style="display: inline-block; margin-right: 8px;" title="<?php esc_attr_e('Anknytning', 'headless-access-manager'); ?>">
+                                                    <strong>A:</strong>
+                                                    <span class="ham-stage-badge ham-stage-not" title="<?php esc_attr_e('Ej', 'headless-access-manager'); ?>"><?php echo esc_html($ank['not'] ?? 0); ?></span>
+                                                    <span class="ham-stage-badge ham-stage-trans" title="<?php esc_attr_e('Utv.', 'headless-access-manager'); ?>"><?php echo esc_html($ank['trans'] ?? 0); ?></span>
+                                                    <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ank['full'] ?? 0); ?></span>
+                                                </span>
+                                                <span style="display: inline-block;" title="<?php esc_attr_e('Ansvar', 'headless-access-manager'); ?>">
+                                                    <strong>B:</strong>
+                                                    <span class="ham-stage-badge ham-stage-not" title="<?php esc_attr_e('Ej', 'headless-access-manager'); ?>"><?php echo esc_html($ans['not'] ?? 0); ?></span>
+                                                    <span class="ham-stage-badge ham-stage-trans" title="<?php esc_attr_e('Utv.', 'headless-access-manager'); ?>"><?php echo esc_html($ans['trans'] ?? 0); ?></span>
+                                                    <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ans['full'] ?? 0); ?></span>
+                                                </span>
                                             </td>
                                             <td style="min-width: 320px;">
                                                 <?php $render_semester_bars($school['series'], 100); ?>
@@ -400,19 +403,23 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                         <td></td>
                                         <td></td>
                                         <td>
-                                            <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_ank['not']); ?></span>
-                                            <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_ank['trans']); ?></span>
-                                            <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_ank['full']); ?></span>
-                                        </td>
-                                        <td>
-                                            <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_ans['not']); ?></span>
-                                            <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_ans['trans']); ?></span>
-                                            <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_ans['full']); ?></span>
+                                            <span style="display: inline-block; margin-right: 8px;">
+                                                <strong>A:</strong>
+                                                <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_ank['not']); ?></span>
+                                                <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_ank['trans']); ?></span>
+                                                <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_ank['full']); ?></span>
+                                            </span>
+                                            <span style="display: inline-block;">
+                                                <strong>B:</strong>
+                                                <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_ans['not']); ?></span>
+                                                <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_ans['trans']); ?></span>
+                                                <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_ans['full']); ?></span>
+                                            </span>
                                         </td>
                                         <td></td>
                                     </tr>
                                 <?php else : ?>
-                                    <tr><td colspan="7"><?php echo esc_html__('No schools found.', 'headless-access-manager'); ?></td></tr>
+                                    <tr><td colspan="6"><?php echo esc_html__('No schools found.', 'headless-access-manager'); ?></td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -502,10 +509,9 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                 <tr>
                                     <th><?php echo esc_html__('Class', 'headless-access-manager'); ?></th>
                                     <th><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('# Evals', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Anknytning', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Ansvar', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Progress', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Status Anknytning/Ansvar', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -533,14 +539,18 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                             <td><?php echo esc_html((int) $class['student_count']); ?></td>
                                             <td><?php echo esc_html((int) $class['evaluation_count']); ?></td>
                                             <td>
-                                                <span class="ham-stage-badge ham-stage-not" title="<?php esc_attr_e('Ej', 'headless-access-manager'); ?>"><?php echo esc_html($ank['not'] ?? 0); ?></span>
-                                                <span class="ham-stage-badge ham-stage-trans" title="<?php esc_attr_e('Utv.', 'headless-access-manager'); ?>"><?php echo esc_html($ank['trans'] ?? 0); ?></span>
-                                                <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ank['full'] ?? 0); ?></span>
-                                            </td>
-                                            <td>
-                                                <span class="ham-stage-badge ham-stage-not" title="<?php esc_attr_e('Ej', 'headless-access-manager'); ?>"><?php echo esc_html($ans['not'] ?? 0); ?></span>
-                                                <span class="ham-stage-badge ham-stage-trans" title="<?php esc_attr_e('Utv.', 'headless-access-manager'); ?>"><?php echo esc_html($ans['trans'] ?? 0); ?></span>
-                                                <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ans['full'] ?? 0); ?></span>
+                                                <span style="display: inline-block; margin-right: 8px;" title="<?php esc_attr_e('Anknytning', 'headless-access-manager'); ?>">
+                                                    <strong>A:</strong>
+                                                    <span class="ham-stage-badge ham-stage-not" title="<?php esc_attr_e('Ej', 'headless-access-manager'); ?>"><?php echo esc_html($ank['not'] ?? 0); ?></span>
+                                                    <span class="ham-stage-badge ham-stage-trans" title="<?php esc_attr_e('Utv.', 'headless-access-manager'); ?>"><?php echo esc_html($ank['trans'] ?? 0); ?></span>
+                                                    <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ank['full'] ?? 0); ?></span>
+                                                </span>
+                                                <span style="display: inline-block;" title="<?php esc_attr_e('Ansvar', 'headless-access-manager'); ?>">
+                                                    <strong>B:</strong>
+                                                    <span class="ham-stage-badge ham-stage-not" title="<?php esc_attr_e('Ej', 'headless-access-manager'); ?>"><?php echo esc_html($ans['not'] ?? 0); ?></span>
+                                                    <span class="ham-stage-badge ham-stage-trans" title="<?php esc_attr_e('Utv.', 'headless-access-manager'); ?>"><?php echo esc_html($ans['trans'] ?? 0); ?></span>
+                                                    <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ans['full'] ?? 0); ?></span>
+                                                </span>
                                             </td>
                                             <td style="min-width: 320px;">
                                                 <?php $render_semester_bars($class['series'], 100); ?>
@@ -553,19 +563,23 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                         <td></td>
                                         <td></td>
                                         <td>
-                                            <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_ank['not']); ?></span>
-                                            <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_ank['trans']); ?></span>
-                                            <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_ank['full']); ?></span>
-                                        </td>
-                                        <td>
-                                            <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_ans['not']); ?></span>
-                                            <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_ans['trans']); ?></span>
-                                            <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_ans['full']); ?></span>
+                                            <span style="display: inline-block; margin-right: 8px;">
+                                                <strong>A:</strong>
+                                                <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_ank['not']); ?></span>
+                                                <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_ank['trans']); ?></span>
+                                                <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_ank['full']); ?></span>
+                                            </span>
+                                            <span style="display: inline-block;">
+                                                <strong>B:</strong>
+                                                <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_ans['not']); ?></span>
+                                                <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_ans['trans']); ?></span>
+                                                <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_ans['full']); ?></span>
+                                            </span>
                                         </td>
                                         <td></td>
                                     </tr>
                                 <?php else : ?>
-                                    <tr><td colspan="6"><?php echo esc_html__('No classes found for this school.', 'headless-access-manager'); ?></td></tr>
+                                    <tr><td colspan="5"><?php echo esc_html__('No classes found for this school.', 'headless-access-manager'); ?></td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
