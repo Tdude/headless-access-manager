@@ -344,7 +344,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <table class="wp-list-table widefat fixed striped">
                             <thead>
                                 <tr>
-                                    <th class="ham-col-12"><?php echo esc_html__('School', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-15"><?php echo esc_html__('School', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-5"><?php echo esc_html__('# Classes', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-5"><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-5"><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
@@ -512,12 +512,12 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <table class="wp-list-table widefat fixed striped">
                             <thead>
                                 <tr>
-                                    <th class="ham-col-12"><?php echo esc_html__('Class', 'headless-access-manager'); ?></th>
-                                    <th class="ham-col-8"><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-20"><?php echo esc_html__('Class', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-7"><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-8"><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-15"><?php echo esc_html__('Anknytning', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-15"><?php echo esc_html__('Ansvar', 'headless-access-manager'); ?></th>
-                                    <th class="ham-col-40"><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-35"><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
