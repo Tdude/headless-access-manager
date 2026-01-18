@@ -215,8 +215,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                     echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="none" style="width: 100px; height: 30px; max-height: 30px; overflow: visible;">';
                 } else {
                     // Scale width based on number of points: 2 circles = 100%, 4 circles = 130%
-                    $width_pct = 100 + max(0, ($n - 2) * 15);
-                    echo '<div class="ham-mini-line" style="display: inline-block; width: ' . esc_attr($width_pct) . '%;">';
+                    // Center by shifting left half the extra width
+                    $extra_pct = max(0, ($n - 2) * 15);
+                    $width_pct = 100 + $extra_pct;
+                    $margin_left = -($extra_pct / 2);
+                    echo '<div class="ham-mini-line" style="display: inline-block; width: ' . esc_attr($width_pct) . '%; margin-left: ' . esc_attr($margin_left) . '%;">';
                     $max_h = 54;
                     echo '<svg viewBox="0 0 ' . esc_attr($w) . ' ' . esc_attr($h) . '" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; aspect-ratio: ' . esc_attr($w) . ' / ' . esc_attr($h) . '; max-height: ' . esc_attr($max_h) . 'px; overflow: visible;">';
                 }
