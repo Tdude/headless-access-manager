@@ -71,9 +71,13 @@
         } catch (e) {
         }
 
-        const page = holders[0].getAttribute('data-page')
-            ? String(holders[0].getAttribute('data-page'))
-            : 'ham-assessment-stats';
+        // Use the screen ID from PHP for proper postbox state persistence
+        // WordPress expects the exact screen ID for AJAX handlers to work
+        const page = (typeof hamAssessment !== 'undefined' && hamAssessment.screenId)
+            ? String(hamAssessment.screenId)
+            : (holders[0].getAttribute('data-page')
+                ? String(holders[0].getAttribute('data-page'))
+                : 'ham-assessment-stats');
 
         // WP expects sortable containers to have stable IDs to persist order.
         // Our templates render `.meta-box-sortables` without IDs, so `save_order()`

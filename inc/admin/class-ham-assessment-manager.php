@@ -3360,11 +3360,19 @@ public function ajax_get_assessment_details()
             );
         }
 
+        // Get current screen ID for postbox state persistence
+        $screen_id = '';
+        $current_screen = get_current_screen();
+        if ($current_screen) {
+            $screen_id = $current_screen->id;
+        }
+
         // Localize script
         wp_localize_script('ham-assessment-manager', 'hamAssessment', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('ham_assessment_nonce'),
             'studentSearchNonce' => wp_create_nonce('ham_ajax_nonce'),
+            'screenId' => $screen_id,
             'texts' => array(
                 'loading' => esc_html__('Loading...', 'headless-access-manager'),
                 'error' => esc_html__('Error loading data', 'headless-access-manager'),

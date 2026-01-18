@@ -667,9 +667,9 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                             <thead>
                                 <tr>
                                     <th><?php echo esc_html__('Student', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('# Evaluations', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Status', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Progress (by semester)', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Status Anknytning/Ansvar', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -704,7 +704,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                                 <span class="ham-stage-badge <?php echo esc_attr($badge_ans['class']); ?>" title="<?php esc_attr_e('Ansvar', 'headless-access-manager'); ?>">B: <?php echo esc_html($badge_ans['text']); ?></span>
                                             </td>
                                             <td style="min-width: 320px;">
-                                                <?php $render_semester_bars($student['series'], 100, 'sparkline'); ?>
+                                                <?php $render_semester_bars($student['series'], 100); ?>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
