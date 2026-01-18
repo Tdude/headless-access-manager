@@ -248,9 +248,9 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                 if ($variant !== 'sparkline') {
                     // Labels row - use flexbox space-between to match SVG point distribution
                     // SVG points go from pad_x (6) to w-pad_x (94), distributed with space-between
-                    echo '<div style="display: flex; justify-content: space-between; padding: 0 6%; margin-top: 0;">';
+                    echo '<div style="display: flex; justify-content: center; margin-top: 0;">';
                     for ($i = 0; $i < $n; $i++) {
-                        echo '<div style="text-align: center; font-size: 11px; color: #646970; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 0 0 auto;">' . esc_html($labels[$i]) . '</div>';
+                        echo '<div style="text-align: center; font-size: 11px; color: #646970; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 0 0 auto; padding: 0 2px;">' . esc_html($labels[$i]) . '</div>';
                     }
                     echo '</div>';
                 }
