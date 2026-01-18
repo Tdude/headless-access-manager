@@ -344,11 +344,12 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <table class="wp-list-table widefat fixed striped">
                             <thead>
                                 <tr>
-                                    <th class="ham-col-15"><?php echo esc_html__('School', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-12"><?php echo esc_html__('School', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-5"><?php echo esc_html__('# Classes', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-5"><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-5"><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
-                                    <th class="ham-col-30"><?php echo esc_html__('Status Anknytning/Ansvar', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-15"><?php echo esc_html__('Anknytning', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-15"><?php echo esc_html__('Ansvar', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-40"><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
                                 </tr>
                             </thead>
@@ -384,6 +385,8 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                                     <span class="ham-stage-badge ham-stage-trans" title="<?php esc_attr_e('Utv.', 'headless-access-manager'); ?>"><?php echo esc_html($ank['trans'] ?? 0); ?></span>
                                                     <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ank['full'] ?? 0); ?></span>
                                                 </span>
+                                            </td>
+                                            <td>
                                                 <span style="display: inline-block;" title="<?php esc_attr_e('Ansvar', 'headless-access-manager'); ?>">
                                                     <strong>B:</strong>
                                                     <span class="ham-stage-badge ham-stage-not" title="<?php esc_attr_e('Ej', 'headless-access-manager'); ?>"><?php echo esc_html($ans['not'] ?? 0); ?></span>
@@ -409,6 +412,8 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                                 <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_ank['trans']); ?></span>
                                                 <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_ank['full']); ?></span>
                                             </span>
+                                        </td>
+                                        <td>
                                             <span style="display: inline-block;">
                                                 <strong>B:</strong>
                                                 <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_ans['not']); ?></span>
@@ -419,7 +424,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                         <td></td>
                                     </tr>
                                 <?php else : ?>
-                                    <tr><td colspan="6"><?php echo esc_html__('No schools found.', 'headless-access-manager'); ?></td></tr>
+                                    <tr><td colspan="7"><?php echo esc_html__('No schools found.', 'headless-access-manager'); ?></td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -507,10 +512,11 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                         <table class="wp-list-table widefat fixed striped">
                             <thead>
                                 <tr>
-                                    <th class="ham-col-15"><?php echo esc_html__('Class', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-12"><?php echo esc_html__('Class', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-8"><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-8"><?php echo esc_html__('Observationer', 'headless-access-manager'); ?></th>
-                                    <th class="ham-col-30"><?php echo esc_html__('Status Anknytning/Ansvar', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-15"><?php echo esc_html__('Anknytning', 'headless-access-manager'); ?></th>
+                                    <th class="ham-col-15"><?php echo esc_html__('Ansvar', 'headless-access-manager'); ?></th>
                                     <th class="ham-col-40"><?php echo esc_html__('Utveckling', 'headless-access-manager'); ?></th>
                                 </tr>
                             </thead>
@@ -545,6 +551,8 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                                     <span class="ham-stage-badge ham-stage-trans" title="<?php esc_attr_e('Utv.', 'headless-access-manager'); ?>"><?php echo esc_html($ank['trans'] ?? 0); ?></span>
                                                     <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ank['full'] ?? 0); ?></span>
                                                 </span>
+                                            </td>
+                                            <td>
                                                 <span style="display: inline-block;" title="<?php esc_attr_e('Ansvar', 'headless-access-manager'); ?>">
                                                     <strong>B:</strong>
                                                     <span class="ham-stage-badge ham-stage-not" title="<?php esc_attr_e('Ej', 'headless-access-manager'); ?>"><?php echo esc_html($ans['not'] ?? 0); ?></span>
@@ -569,6 +577,8 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                                 <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_ank['trans']); ?></span>
                                                 <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_ank['full']); ?></span>
                                             </span>
+                                            </td>
+                                            <td>
                                             <span style="display: inline-block;">
                                                 <strong>B:</strong>
                                                 <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_ans['not']); ?></span>
@@ -579,7 +589,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                         <td></td>
                                     </tr>
                                 <?php else : ?>
-                                    <tr><td colspan="5"><?php echo esc_html__('No classes found for this school.', 'headless-access-manager'); ?></td></tr>
+                                    <tr><td colspan="6"><?php echo esc_html__('No classes found for this school.', 'headless-access-manager'); ?></td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -863,6 +873,7 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
 .ham-col-5 { width: 5%; }
 .ham-col-8 { width: 8%; }
 .ham-col-10 { width: 10%; }
+.ham-col-12 { width: 12%; }
 .ham-col-15 { width: 15%; }
 .ham-col-20 { width: 20%; }
 .ham-col-25 { width: 25%; }
