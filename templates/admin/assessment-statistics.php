@@ -346,28 +346,30 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                 <tr>
                                     <th><?php echo esc_html__('School', 'headless-access-manager'); ?></th>
                                     <th><?php echo esc_html__('# Classes', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('# Students evaluated', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('# Evaluations', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Status (students)', 'headless-access-manager'); ?></th>
-                                    <th><?php echo esc_html__('Progress (by semester)', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('# Students', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('# Evals', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Anknytning', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Ansvar', 'headless-access-manager'); ?></th>
+                                    <th><?php echo esc_html__('Progress', 'headless-access-manager'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if (!empty($drilldown['schools'])) : ?>
                                     <?php
-                                    $total_stage_not = 0;
-                                    $total_stage_trans = 0;
-                                    $total_stage_full = 0;
+                                    $total_ank = array('not' => 0, 'trans' => 0, 'full' => 0);
+                                    $total_ans = array('not' => 0, 'trans' => 0, 'full' => 0);
                                     ?>
                                     <?php foreach ($drilldown['schools'] as $school) : ?>
                                         <?php
-                                        $sc = isset($school['stage_counts']) && is_array($school['stage_counts']) ? $school['stage_counts'] : array();
-                                        $sc_not = isset($sc['not']) ? (int) $sc['not'] : 0;
-                                        $sc_trans = isset($sc['trans']) ? (int) $sc['trans'] : 0;
-                                        $sc_full = isset($sc['full']) ? (int) $sc['full'] : 0;
-                                        $total_stage_not += $sc_not;
-                                        $total_stage_trans += $sc_trans;
-                                        $total_stage_full += $sc_full;
+                                        $sec = isset($school['section_counts']) && is_array($school['section_counts']) ? $school['section_counts'] : array();
+                                        $ank = isset($sec['anknytning']) ? $sec['anknytning'] : array('not' => 0, 'trans' => 0, 'full' => 0);
+                                        $ans = isset($sec['ansvar']) ? $sec['ansvar'] : array('not' => 0, 'trans' => 0, 'full' => 0);
+                                        $total_ank['not'] += (int) ($ank['not'] ?? 0);
+                                        $total_ank['trans'] += (int) ($ank['trans'] ?? 0);
+                                        $total_ank['full'] += (int) ($ank['full'] ?? 0);
+                                        $total_ans['not'] += (int) ($ans['not'] ?? 0);
+                                        $total_ans['trans'] += (int) ($ans['trans'] ?? 0);
+                                        $total_ans['full'] += (int) ($ans['full'] ?? 0);
                                         ?>
                                         <tr>
                                             <td>
@@ -377,9 +379,14 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                             <td><?php echo esc_html((int) $school['student_count']); ?></td>
                                             <td><?php echo esc_html((int) $school['evaluation_count']); ?></td>
                                             <td>
-                                                <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($sc_not); ?></span>
-                                                <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($sc_trans); ?></span>
-                                                <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($sc_full); ?></span>
+                                                <span class="ham-stage-badge ham-stage-not" title="<?php esc_attr_e('Ej', 'headless-access-manager'); ?>"><?php echo esc_html($ank['not'] ?? 0); ?></span>
+                                                <span class="ham-stage-badge ham-stage-trans" title="<?php esc_attr_e('Utv.', 'headless-access-manager'); ?>"><?php echo esc_html($ank['trans'] ?? 0); ?></span>
+                                                <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ank['full'] ?? 0); ?></span>
+                                            </td>
+                                            <td>
+                                                <span class="ham-stage-badge ham-stage-not" title="<?php esc_attr_e('Ej', 'headless-access-manager'); ?>"><?php echo esc_html($ans['not'] ?? 0); ?></span>
+                                                <span class="ham-stage-badge ham-stage-trans" title="<?php esc_attr_e('Utv.', 'headless-access-manager'); ?>"><?php echo esc_html($ans['trans'] ?? 0); ?></span>
+                                                <span class="ham-stage-badge ham-stage-full" title="<?php esc_attr_e('Ok', 'headless-access-manager'); ?>"><?php echo esc_html($ans['full'] ?? 0); ?></span>
                                             </td>
                                             <td style="min-width: 320px;">
                                                 <?php $render_semester_bars($school['series'], 100); ?>
@@ -393,14 +400,19 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
                                         <td></td>
                                         <td></td>
                                         <td>
-                                            <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_stage_not); ?></span>
-                                            <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_stage_trans); ?></span>
-                                            <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_stage_full); ?></span>
+                                            <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_ank['not']); ?></span>
+                                            <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_ank['trans']); ?></span>
+                                            <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_ank['full']); ?></span>
+                                        </td>
+                                        <td>
+                                            <span class="ham-stage-badge ham-stage-not"><?php echo esc_html($total_ans['not']); ?></span>
+                                            <span class="ham-stage-badge ham-stage-trans"><?php echo esc_html($total_ans['trans']); ?></span>
+                                            <span class="ham-stage-badge ham-stage-full"><?php echo esc_html($total_ans['full']); ?></span>
                                         </td>
                                         <td></td>
                                     </tr>
                                 <?php else : ?>
-                                    <tr><td colspan="6"><?php echo esc_html__('No schools found.', 'headless-access-manager'); ?></td></tr>
+                                    <tr><td colspan="7"><?php echo esc_html__('No schools found.', 'headless-access-manager'); ?></td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
