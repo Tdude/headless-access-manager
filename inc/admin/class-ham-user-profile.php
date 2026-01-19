@@ -25,6 +25,7 @@ class HAM_User_Profile
     public function __construct()
     {
         add_action('admin_init', array( $this, 'remove_admin_color_scheme_picker' ));
+        add_filter('wp_is_application_passwords_available_for_user', array( $this, 'filter_application_passwords_for_user' ), 10, 2);
 
         // Add user profile fields
         add_action('show_user_profile', array( $this, 'add_user_profile_fields' ));
@@ -56,6 +57,15 @@ class HAM_User_Profile
         }
 
         remove_action('admin_color_scheme_picker', 'admin_color_scheme_picker');
+    }
+
+    public function filter_application_passwords_for_user($available, $user)
+    {
+        if ($user instanceof WP_User) {
+            return user_can($user, 'manage_options');
+        }
+
+        return false;
     }
 
     /**
