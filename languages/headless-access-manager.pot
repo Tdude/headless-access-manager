@@ -1,27 +1,24 @@
+# Copyright (C) 2026 Tibor Berki
+# This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Headless Access Manager\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/headless-access-"
-"manager\n"
-"POT-Creation-Date: 2026-01-19T16:18:26+00:00\n"
-"PO-Revision-Date: 2025-06-17 21:55+0200\n"
-"Last-Translator: Tdude <tibbecodes@gmail.com>\n"
-"Language-Team: \n"
-"Language: sv_SE\n"
+"Project-Id-Version: Headless Access Manager 1.0.5\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/headless-access-manager\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.6\n"
-"X-Poedit-KeywordsList: "
-"__;_e;_x;_n;_ex;_nx;esc_html__;esc_html_e;esc_attr__;esc_attr_e;wp_kses_post\n"
+"POT-Creation-Date: 2026-01-19T16:18:26+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: headless-access-manager\n"
 
-# Plugin Settings
 #. Plugin Name of the plugin
-#: headless-access-manager.php inc/admin/class-ham-user-profile.php:195
-#, fuzzy
+#: headless-access-manager.php
+#: inc/admin/class-ham-user-profile.php:195
 msgid "Headless Access Manager"
-msgstr "Observationsschemat Inställningar"
+msgstr ""
 
 #. Plugin URI of the plugin
 #. Author URI of the plugin
@@ -31,9 +28,7 @@ msgstr ""
 
 #. Description of the plugin
 #: headless-access-manager.php
-msgid ""
-"Manages user roles, permissions, and form data for a headless WordPress site "
-"with Next.js frontend."
+msgid "Manages user roles, permissions, and form data for a headless WordPress site with Next.js frontend."
 msgstr ""
 
 #. Author of the plugin
@@ -42,14 +37,12 @@ msgid "Tibor Berki"
 msgstr ""
 
 #: inc/activation.php:68
-#, fuzzy
 msgid "Default School"
-msgstr "Ny skola"
+msgstr ""
 
 #: inc/admin/admin-loader.php:321
-#, fuzzy
 msgid "All Schools"
-msgstr "Alla skolor"
+msgstr ""
 
 #: inc/admin/admin-loader.php:345
 #: inc/admin/class-ham-assessment-manager.php:3377
@@ -57,60 +50,65 @@ msgstr "Alla skolor"
 #: inc/admin/class-ham-class-admin-list-table.php:168
 #: templates/admin/assessments-list.php:162
 msgid "Loading..."
-msgstr "Laddar..."
+msgstr ""
 
 #: inc/admin/admin-loader.php:346
 #: inc/admin/class-ham-base-admin-list-table.php:177
 #: inc/admin/class-ham-class-admin-list-table.php:169
-#, fuzzy
 msgid "Error loading content"
-msgstr "Fel vid laddning av data"
+msgstr ""
 
 #: inc/admin/admin-loader.php:347
 #: inc/admin/class-ham-base-admin-list-table.php:178
 #: inc/admin/class-ham-class-admin-list-table.php:170
-#, fuzzy
 msgid "No results found"
-msgstr "Inga elever hittades."
+msgstr ""
 
 #: inc/admin/admin-loader.php:474
 #: inc/admin/class-ham-assessment-templates-admin.php:50
-#: inc/core/post-types.php:54 inc/core/post-types.php:109
-#: inc/core/post-types.php:171 inc/core/post-types.php:233
-#: inc/core/post-types.php:295 inc/core/post-types.php:358
+#: inc/core/post-types.php:54
+#: inc/core/post-types.php:109
+#: inc/core/post-types.php:171
+#: inc/core/post-types.php:233
+#: inc/core/post-types.php:295
+#: inc/core/post-types.php:358
 #: inc/core/post-types.php:421
 msgid "Add New"
-msgstr "Lägg till nytt"
+msgstr ""
 
-# Class CPT
-#: inc/admin/admin-loader.php:506 inc/admin/admin-loader.php:572
+#: inc/admin/admin-loader.php:506
+#: inc/admin/admin-loader.php:572
 #: inc/admin/class-ham-assessment-manager.php:1901
 #: inc/admin/class-ham-student-admin-list-table.php:91
-#: inc/core/post-types.php:230 inc/core/post-types.php:232
+#: inc/core/post-types.php:230
+#: inc/core/post-types.php:232
 #: templates/admin/assessment-statistics.php:523
 #: templates/admin/assessments-list.php:67
 msgid "Class"
-msgstr "Klass"
+msgstr ""
 
-#: inc/admin/admin-loader.php:541 templates/admin/assessments-list.php:72
+#: inc/admin/admin-loader.php:541
+#: templates/admin/assessments-list.php:72
 msgid "Actions"
-msgstr "Åtgärder"
+msgstr ""
 
-#: inc/admin/admin-loader.php:550 templates/admin/assessments-list.php:138
+#: inc/admin/admin-loader.php:550
+#: templates/admin/assessments-list.php:138
 msgid "Edit"
-msgstr "Redigera"
+msgstr ""
 
-#: inc/admin/admin-loader.php:551 templates/admin/assessments-list.php:142
+#: inc/admin/admin-loader.php:551
+#: templates/admin/assessments-list.php:142
 msgid "Delete"
-msgstr "Ta bort"
+msgstr ""
 
 #: inc/admin/admin-loader.php:565
 msgid "Student Name"
-msgstr "Elevnamn"
+msgstr ""
 
 #: inc/admin/admin-loader.php:593
 msgid "Class Name"
-msgstr "Klassnamn"
+msgstr ""
 
 #: inc/admin/admin-loader.php:600
 #: inc/admin/class-ham-assessment-manager.php:1908
@@ -123,261 +121,273 @@ msgstr "Klassnamn"
 #: inc/admin/class-ham-teacher-admin-list-table.php:89
 #: inc/admin/class-ham-user-profile.php:209
 #: inc/admin/class-ham-user-profile.php:442
-#: inc/admin/class-ham-class-admin-list-table.php:57
-#: inc/admin/class-ham-class-admin-list-table.php:245
-#: inc/admin/class-ham-principal-admin-list-table.php:353
-#: inc/admin/class-ham-student-admin-list-table.php:48
-#: inc/admin/class-ham-student-admin-list-table.php:90
-#: inc/admin/class-ham-teacher-admin-list-table.php:48
-#: inc/admin/class-ham-teacher-admin-list-table.php:89
-#: inc/admin/class-ham-user-profile.php:209
-#: inc/admin/class-ham-user-profile.php:442
 #: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:24
-#: inc/core/post-types.php:292 inc/core/post-types.php:294
+#: inc/core/post-types.php:292
+#: inc/core/post-types.php:294
 #: templates/admin/assessment-statistics.php:355
 #: templates/admin/assessments-list.php:68
 msgid "School"
-msgstr "Skola"
+msgstr ""
 
-#: inc/admin/admin-loader.php:601 inc/admin/admin-loader.php:728
+#: inc/admin/admin-loader.php:601
+#: inc/admin/admin-loader.php:728
 #: inc/admin/admin-loader.php:733
 #: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:44
 #: inc/admin/meta-boxes/class-ham-school-meta-boxes.php:33
 msgid "Assigned Teachers"
-msgstr "Tilldelade lärare"
+msgstr ""
 
 #: inc/admin/admin-loader.php:670
-#, fuzzy
 msgid "School not found"
-msgstr "Användare hittades inte"
+msgstr ""
 
 #: inc/admin/admin-loader.php:673
-#, fuzzy
 msgid "No school assigned"
-msgstr "Inga skolledare hittades."
+msgstr ""
 
 #: inc/admin/admin-loader.php:685
 msgid "School Name"
-msgstr "Skolnamn"
+msgstr ""
 
 #: inc/admin/admin-loader.php:686
 msgid "Teacher Name"
-msgstr "Lärarnamn"
+msgstr ""
 
 #: inc/admin/admin-loader.php:687
 msgid "Principal Name"
-msgstr "Rektors namn"
+msgstr ""
 
 #: inc/admin/admin-loader.php:688
 msgid "Assessment Title"
-msgstr "Titel"
+msgstr ""
 
 #: inc/admin/admin-loader.php:689
 msgid "School Head Name"
-msgstr "Skolledares namn"
+msgstr ""
 
-#: inc/admin/admin-menu.php:29 inc/admin/admin-menu.php:30
+#: inc/admin/admin-menu.php:29
+#: inc/admin/admin-menu.php:30
 msgid "Observationsschemat"
 msgstr ""
 
-#: inc/admin/admin-menu.php:41 inc/admin/admin-menu.php:42
-#: inc/admin/admin-menu.php:140 inc/admin/admin-menu.php:141
+#: inc/admin/admin-menu.php:41
+#: inc/admin/admin-menu.php:42
+#: inc/admin/admin-menu.php:140
+#: inc/admin/admin-menu.php:141
 msgid "Översikt"
 msgstr ""
 
-#: inc/admin/admin-menu.php:51 inc/admin/admin-menu.php:52
-#: inc/admin/admin-menu.php:148 inc/admin/admin-menu.php:149
+#: inc/admin/admin-menu.php:51
+#: inc/admin/admin-menu.php:52
+#: inc/admin/admin-menu.php:148
+#: inc/admin/admin-menu.php:149
 #: templates/admin/assessment-statistics.php:358
 #: templates/admin/assessment-statistics.php:525
 #: templates/admin/assessment-statistics.php:688
 msgid "Observationer"
 msgstr ""
 
-#: inc/admin/admin-menu.php:61 inc/admin/admin-menu.php:62
-#: inc/admin/admin-menu.php:218 inc/admin/admin-menu.php:219
+#: inc/admin/admin-menu.php:61
+#: inc/admin/admin-menu.php:62
+#: inc/admin/admin-menu.php:218
+#: inc/admin/admin-menu.php:219
 msgid "Frågebank"
 msgstr ""
 
-#: inc/admin/admin-menu.php:70 inc/admin/admin-menu.php:71
-#: inc/admin/admin-menu.php:156 inc/admin/admin-menu.php:157
-#, fuzzy
+#: inc/admin/admin-menu.php:70
+#: inc/admin/admin-menu.php:71
+#: inc/admin/admin-menu.php:156
+#: inc/admin/admin-menu.php:157
 msgid "Statistik"
-msgstr "Statistik"
+msgstr ""
 
-#: inc/admin/admin-menu.php:80 inc/admin/admin-menu.php:81
-#: inc/admin/admin-menu.php:226 inc/admin/admin-menu.php:227
+#: inc/admin/admin-menu.php:80
+#: inc/admin/admin-menu.php:81
+#: inc/admin/admin-menu.php:226
+#: inc/admin/admin-menu.php:227
 msgid "Inställningar"
 msgstr ""
 
-#: inc/admin/admin-menu.php:163 inc/admin/admin-menu.php:166
-#, fuzzy
+#: inc/admin/admin-menu.php:163
+#: inc/admin/admin-menu.php:166
 msgid "Organisation"
-msgstr "Utvecklas"
+msgstr ""
 
-#: inc/admin/admin-menu.php:171 inc/admin/admin-menu.php:172
+#: inc/admin/admin-menu.php:171
+#: inc/admin/admin-menu.php:172
 msgid "Skolor"
 msgstr ""
 
-#: inc/admin/admin-menu.php:177 inc/admin/admin-menu.php:178
-#, fuzzy
+#: inc/admin/admin-menu.php:177
+#: inc/admin/admin-menu.php:178
 msgid "Klasser"
-msgstr "Klasser"
+msgstr ""
 
-#: inc/admin/admin-menu.php:184 inc/admin/admin-menu.php:187
+#: inc/admin/admin-menu.php:184
+#: inc/admin/admin-menu.php:187
 msgid "Personer"
 msgstr ""
 
-#: inc/admin/admin-menu.php:192 inc/admin/admin-menu.php:193
+#: inc/admin/admin-menu.php:192
+#: inc/admin/admin-menu.php:193
 msgid "Elever"
 msgstr ""
 
-#: inc/admin/admin-menu.php:198 inc/admin/admin-menu.php:199
+#: inc/admin/admin-menu.php:198
+#: inc/admin/admin-menu.php:199
 msgid "Lärare"
 msgstr ""
 
-#: inc/admin/admin-menu.php:204 inc/admin/admin-menu.php:205
+#: inc/admin/admin-menu.php:204
+#: inc/admin/admin-menu.php:205
 msgid "Rektorer"
 msgstr ""
 
-#: inc/admin/admin-menu.php:210 inc/admin/admin-menu.php:211
+#: inc/admin/admin-menu.php:210
+#: inc/admin/admin-menu.php:211
 msgid "Skolledare"
 msgstr ""
 
 #: inc/admin/admin-menu.php:336
-#, fuzzy
 msgid "Handle Access Dashboard"
-msgstr "Observationsschemat kontrollpanel"
+msgstr ""
 
 #: inc/admin/admin-menu.php:339
 msgid "System Overview"
-msgstr "Systemöversikt"
+msgstr ""
 
-#: inc/admin/admin-menu.php:343 inc/core/post-types.php:50
+#: inc/admin/admin-menu.php:343
+#: inc/core/post-types.php:50
 #: inc/core/post-types.php:52
 msgid "Evaluations"
-msgstr "Observationer"
+msgstr ""
 
-# User Roles and Management
 #: inc/admin/admin-menu.php:348
 #: inc/admin/class-ham-class-admin-list-table.php:247
 #: inc/admin/class-ham-class-admin-list-table.php:352
 #: inc/admin/class-ham-class-admin-list-table.php:355
-#: inc/core/post-types.php:105 inc/core/post-types.php:107
-#: inc/core/post-types.php:114 templates/admin/assessment-statistics.php:682
+#: inc/core/post-types.php:105
+#: inc/core/post-types.php:107
+#: inc/core/post-types.php:114
+#: templates/admin/assessment-statistics.php:682
 msgid "Students"
-msgstr "Elever"
+msgstr ""
 
 #: inc/admin/admin-menu.php:353
 #: inc/admin/class-ham-class-admin-list-table.php:246
-#: inc/core/post-types.php:167 inc/core/post-types.php:169
+#: inc/core/post-types.php:167
+#: inc/core/post-types.php:169
 #: inc/core/post-types.php:176
 msgid "Teachers"
-msgstr "Lärare"
+msgstr ""
 
 #: inc/admin/admin-menu.php:358
 #: inc/admin/class-ham-teacher-admin-list-table.php:90
-#: inc/admin/class-ham-user-profile.php:239 inc/core/post-types.php:229
-#: inc/core/post-types.php:231 inc/core/post-types.php:238
+#: inc/admin/class-ham-user-profile.php:239
+#: inc/core/post-types.php:229
+#: inc/core/post-types.php:231
+#: inc/core/post-types.php:238
 #: templates/admin/assessment-statistics.php:518
 msgid "Classes"
-msgstr "Klasser"
+msgstr ""
 
-# School CPT
-#: inc/admin/admin-menu.php:363 inc/core/post-types.php:291
-#: inc/core/post-types.php:293 inc/core/post-types.php:300
+#: inc/admin/admin-menu.php:363
+#: inc/core/post-types.php:291
+#: inc/core/post-types.php:293
+#: inc/core/post-types.php:300
 #: templates/admin/assessment-statistics.php:349
 msgid "Schools"
-msgstr "Skolor"
+msgstr ""
 
-# Principal CPT
 #: inc/admin/admin-menu.php:368
 #: inc/admin/class-ham-school-admin-list-table.php:302
-#: inc/core/post-types.php:354 inc/core/post-types.php:356
+#: inc/core/post-types.php:354
+#: inc/core/post-types.php:356
 #: inc/core/post-types.php:363
 msgid "Principals"
-msgstr "Rektorer"
+msgstr ""
 
-# School Head CPT
-#: inc/admin/admin-menu.php:373 inc/core/post-types.php:417
-#: inc/core/post-types.php:419 inc/core/post-types.php:426
+#: inc/admin/admin-menu.php:373
+#: inc/core/post-types.php:417
+#: inc/core/post-types.php:419
+#: inc/core/post-types.php:426
 msgid "School Heads"
-msgstr "Skolledare"
+msgstr ""
 
 #: inc/admin/admin-menu.php:381
 msgid "Quick Links"
-msgstr "Snabblänkar"
+msgstr ""
 
-# Management Links
 #: inc/admin/admin-menu.php:386
 msgid "View Evaluations"
-msgstr "Visa observationer"
+msgstr ""
 
 #: inc/admin/admin-menu.php:391
 msgid "Manage Students"
-msgstr "Hantera elever"
+msgstr ""
 
 #: inc/admin/admin-menu.php:396
 msgid "Manage Teachers"
-msgstr "Hantera lärare"
+msgstr ""
 
 #: inc/admin/admin-menu.php:401
 msgid "Manage Classes"
-msgstr "Hantera klasser"
+msgstr ""
 
 #: inc/admin/admin-menu.php:406
 msgid "Manage Schools"
-msgstr "Hantera skolor"
+msgstr ""
 
 #: inc/admin/admin-menu.php:411
 msgid "Manage Principals"
-msgstr "Hantera rektorer"
+msgstr ""
 
 #: inc/admin/admin-menu.php:416
 msgid "Manage School Heads"
-msgstr "Hantera skolledare"
+msgstr ""
 
 #: inc/admin/admin-menu.php:420
 msgid "Manage Users"
-msgstr "Hantera användare"
+msgstr ""
 
 #: inc/admin/admin-menu.php:423
 msgid "Settings"
-msgstr "Inställningar"
+msgstr ""
 
 #: inc/admin/admin-menu.php:429
-#, fuzzy
 msgid "Assessment overview"
-msgstr "Förhandsgranskning av observation"
+msgstr ""
 
 #: inc/admin/admin-menu.php:438
 msgid "Total Evaluations"
-msgstr "Totalt antal utvärderingar"
+msgstr ""
 
 #: inc/admin/admin-menu.php:448
 msgid "Established students"
-msgstr "Etablerade elever"
+msgstr ""
 
 #: inc/admin/admin-menu.php:458
 msgid "Developing students"
-msgstr "Utvecklande elever"
+msgstr ""
 
 #: inc/admin/admin-menu.php:468
 msgid "Not established students"
-msgstr "Ej etablerade elever"
+msgstr ""
 
 #: inc/admin/admin-menu.php:480
 msgid "Monthly Evaluations"
-msgstr "Månatliga utvärderingar"
+msgstr ""
 
 #: inc/admin/admin-menu.php:482
 msgid "School Year Evaluations"
-msgstr "Utvärderingar per skolår"
+msgstr ""
 
 #: inc/admin/admin-menu.php:484
 msgid "Term Evaluations"
-msgstr "Utvärderingar per termin"
+msgstr ""
 
-#: inc/admin/admin-menu.php:512 inc/admin/class-ham-assessment-manager.php:3395
+#: inc/admin/admin-menu.php:512
+#: inc/admin/class-ham-assessment-manager.php:3395
 #: templates/admin/assessment-statistics.php:280
 #: templates/admin/assessment-statistics.php:313
 #: templates/admin/assessment-statistics.php:450
@@ -388,13 +398,15 @@ msgstr "Utvärderingar per termin"
 #: templates/admin/assessment-statistics.php:791
 #: templates/admin/assessment-statistics.php:837
 msgid "Month"
-msgstr "Månad"
+msgstr ""
 
-#: inc/admin/admin-menu.php:513 inc/admin/class-ham-assessment-manager.php:1633
+#: inc/admin/admin-menu.php:513
+#: inc/admin/class-ham-assessment-manager.php:1633
 msgid "Term"
-msgstr "Termin"
+msgstr ""
 
-#: inc/admin/admin-menu.php:514 inc/admin/class-ham-assessment-manager.php:3397
+#: inc/admin/admin-menu.php:514
+#: inc/admin/class-ham-assessment-manager.php:3397
 #: templates/admin/assessment-statistics.php:282
 #: templates/admin/assessment-statistics.php:315
 #: templates/admin/assessment-statistics.php:452
@@ -405,192 +417,158 @@ msgstr "Termin"
 #: templates/admin/assessment-statistics.php:793
 #: templates/admin/assessment-statistics.php:839
 msgid "School year"
-msgstr "Läsår"
+msgstr ""
 
-#: inc/admin/admin-menu.php:545 inc/admin/admin-menu.php:561
-#, fuzzy
+#: inc/admin/admin-menu.php:545
+#: inc/admin/admin-menu.php:561
 msgid "No data to display"
-msgstr "Ingen data tillgänglig"
+msgstr ""
 
 #: inc/admin/admin-menu.php:615
 msgid "Status Distribution"
-msgstr "Statusfördelning"
+msgstr ""
 
 #: inc/admin/admin-menu.php:622
 msgid "Not established"
-msgstr "Ej etablerad"
+msgstr ""
 
-#: inc/admin/admin-menu.php:627 templates/admin/assessments-list.php:54
+#: inc/admin/admin-menu.php:627
+#: templates/admin/assessments-list.php:54
 msgid "Developing"
-msgstr "Utvecklas"
+msgstr ""
 
 #: inc/admin/admin-menu.php:632
 msgid "Established"
-msgstr "Etablerad"
+msgstr ""
 
-# Plugin Settings
 #: inc/admin/admin-menu.php:785
 msgid "Headless Access Manager Settings"
-msgstr "Observationsschemat Inställningar"
+msgstr ""
 
 #: inc/admin/admin-menu.php:810
 msgid "JSON Web Token Authentication Settings"
-msgstr "JSON Web Token Autentiseringsinställningar"
+msgstr ""
 
-# JWT Settings
 #: inc/admin/admin-menu.php:817
 msgid "JWT Secret Key"
-msgstr "JWT hemlig nyckel"
+msgstr ""
 
 #: inc/admin/admin-menu.php:825
 msgid "JWT Expiration (days)"
-msgstr "JWT utgångsdatum (dagar)"
+msgstr ""
 
 #: inc/admin/admin-menu.php:833
 msgid "General Settings"
-msgstr "Allmänna inställningar"
+msgstr ""
 
 #: inc/admin/admin-menu.php:840
 msgid "Cleanup on Deactivation"
-msgstr "Rensa vid inaktivering"
+msgstr ""
 
 #: inc/admin/admin-menu.php:848
-#, fuzzy
 msgid "Active Question Bank"
-msgstr "Frågebank"
+msgstr ""
 
 #: inc/admin/admin-menu.php:860
 msgid "Configure JWT authentication settings for the API."
-msgstr "Konfigurera JWT autentiseringsinställningar för API."
+msgstr ""
 
 #: inc/admin/admin-menu.php:878
-msgid ""
-"Secret key used to sign the JWT. This key should be kept secure and only "
-"shared with authorized personnel."
+msgid "Secret key used to sign the JWT. This key should be kept secure and only shared with authorized personnel."
 msgstr ""
-"Hemlig nyckel används för att signera JWT (Jason Web Token). Den här nyckeln "
-"bör hållas säker och delas endast med godkända personer."
 
 #: inc/admin/admin-menu.php:893
-msgid ""
-"Number of days before the JWT expires and the admin needs to log in again."
+msgid "Number of days before the JWT expires and the admin needs to log in again."
 msgstr ""
-"Antal dagar innan JWT upphör att gälla och admin behöver logga in igen."
 
-# Plugin Settings
 #: inc/admin/admin-menu.php:903
 msgid "General plugin settings."
-msgstr "Allmänna plugininställningar."
+msgstr ""
 
 #: inc/admin/admin-menu.php:915
 msgid "Delete all plugin data upon deactivation"
-msgstr "Ta bort all plugin data vid inaktivering"
+msgstr ""
 
 #: inc/admin/admin-menu.php:918
-msgid ""
-"DANGER: Checking this box will permanently delete ALL data associated with "
-"this plugin upon deactivation. This includes all Questions, Student "
-"Evaluations, Students, Teachers, Classes, Schools, and user roles. This "
-"action cannot be undone."
+msgid "DANGER: Checking this box will permanently delete ALL data associated with this plugin upon deactivation. This includes all Questions, Student Evaluations, Students, Teachers, Classes, Schools, and user roles. This action cannot be undone."
 msgstr ""
-"FARA: Detta kommer att radera all data såsom elever, lärare, klasser, "
-"rektorer, skolledare, observationer, anpassade roller, behörigheter och "
-"plugininställningar när pluginet inaktiveras. Avmarkera detta för att "
-"behålla inställningarna i databasen. Denna åtgärd kan inte återställas."
 
 #: inc/admin/admin-menu.php:955
-#, fuzzy
 msgid "Auto (latest Question Bank)"
-msgstr "Auto (senaste frågebanken)"
+msgstr ""
 
 #: inc/admin/admin-menu.php:963
-msgid ""
-"Select which Assessment post acts as the Question Bank that powers the "
-"evaluation form and admin reporting. Choose Auto to use the newest available "
-"bank."
+msgid "Select which Assessment post acts as the Question Bank that powers the evaluation form and admin reporting. Choose Auto to use the newest available bank."
 msgstr ""
-"Välj vilken frågebank som ska användas för utvärderingsformuläret och "
-"administratörsrapporter. Välj Auto för att använda den senast tillgängliga "
-"frågebanken."
 
 #: inc/admin/class-ham-admin-assets.php:50
 msgid "Please select a school first."
-msgstr "Välj en skola först."
+msgstr ""
 
 #: inc/admin/class-ham-admin-assets.php:51
-#, fuzzy
 msgid "Loading classes..."
-msgstr "Laddar klasser..."
+msgstr ""
 
 #: inc/admin/class-ham-admin-assets.php:52
 #: templates/admin/assessment-statistics.php:600
 msgid "No classes found for this school."
-msgstr "Inga klasser hittades för denna skola."
+msgstr ""
 
 #: inc/admin/class-ham-admin-assets.php:53
-#, fuzzy
 msgid "Error loading classes."
-msgstr "Fel vid laddning av klasser."
+msgstr ""
 
 #: inc/admin/class-ham-admin-assets.php:54
 msgid "AJAX request failed."
-msgstr "AJAX-begäran misslyckades."
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:280
 msgid "Heads up:"
-msgstr "Observera:"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:281
-msgid ""
-"This page contains the global evaluation question bank that the whole system "
-"depends on."
+msgid "This page contains the global evaluation question bank that the whole system depends on."
 msgstr ""
-"Den här sidan innehåller den globala frågebanken som hela systemet är beroende "
-"av."
 
 #: inc/admin/class-ham-assessment-manager.php:282
-msgid ""
-"For normal work with student evaluations, use the Evaluations list instead:"
-msgstr "För normalt arbete med elevobservationer, använd i stället listan med observationer:"
+msgid "For normal work with student evaluations, use the Evaluations list instead:"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:283
-#, fuzzy
 msgid "Go to Evaluations"
-msgstr "Gå till observationer"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:362
 #, php-format
 msgid "Updated source metadata for %d assessments."
-msgstr "Uppdaterade källmetadata för %d observationer."
+msgstr ""
 
-# Semester labels
 #: inc/admin/class-ham-assessment-manager.php:619
 msgid "Spring"
-msgstr "Vår"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:619
 msgid "Fall"
-msgstr "Ht"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:1138
 #: inc/admin/class-ham-assessment-manager.php:2634
 msgid "Spring term"
-msgstr "Vt"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:1138
 #: inc/admin/class-ham-assessment-manager.php:2634
 msgid "Autumn term"
-msgstr "Ht"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:1318
-#, fuzzy
 msgid "All evaluations"
-msgstr "Alla observationer"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:1354
-#, fuzzy, php-format
+#, php-format
 msgid "Evaluation %d"
-msgstr "Observation %d"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:1620
 #: inc/admin/class-ham-assessment-manager.php:1642
@@ -603,11 +581,11 @@ msgstr ""
 #: inc/admin/class-ham-assessment-manager.php:1760
 #: templates/admin/assessment-statistics.php:88
 msgid "All schools"
-msgstr "Alla skolor"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:1634
 msgid "Previous"
-msgstr "Föregående"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:1637
 #, php-format
@@ -616,26 +594,26 @@ msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:1753
 msgid "This school"
-msgstr "Denna skola"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:1759
 #, php-format
 msgid "All schools (%d)"
-msgstr "Alla skolor (%dst)"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:1900
 #, php-format
 msgid "Class: %d student"
 msgid_plural "Class: %d students"
-msgstr[0] "Klassen: %d elev"
-msgstr[1] "Klassen: %d elever"
+msgstr[0] ""
+msgstr[1] ""
 
 #: inc/admin/class-ham-assessment-manager.php:1907
 #, php-format
 msgid "School: %d student"
 msgid_plural "School: %d students"
-msgstr[0] "Skolan: %d elev"
-msgstr[1] "Skolan: %d elever"
+msgstr[0] ""
+msgstr[1] ""
 
 #: inc/admin/class-ham-assessment-manager.php:2042
 #: inc/admin/class-ham-assessment-manager.php:2071
@@ -648,47 +626,47 @@ msgstr[1] "Skolan: %d elever"
 #: inc/api/class-ham-assessment-controller.php:462
 #: inc/core/class-ham-statistics-manager.php:98
 #: inc/core/class-ham-statistics-manager.php:208
-#, fuzzy
 msgid "Unknown Teacher"
-msgstr "Ny lärare"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:2214
 #: inc/admin/class-ham-assessment-manager.php:2897
 #: inc/api/class-ham-assessment-controller.php:444
 #: inc/core/class-ham-statistics-manager.php:142
 #: inc/core/class-ham-statistics-manager.php:209
-#, fuzzy
 msgid "Unknown Student"
-msgstr "Ny elev"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3378
 msgid "Error loading data"
-msgstr "Fel vid laddning av data"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3379
 msgid "No data available"
-msgstr "Ingen data tillgänglig"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3380
 msgid "View Details"
-msgstr "Visa detaljer"
+msgstr ""
 
-# General UI Elements
 #: inc/admin/class-ham-assessment-manager.php:3381
 #: templates/admin/assessments-list.php:227
 msgid "Close"
-msgstr "Stäng"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3382
 #: inc/admin/class-ham-class-admin-list-table.php:350
-#: inc/admin/class-ham-user-profile.php:464 inc/admin/meta-boxes.php:32
+#: inc/admin/class-ham-user-profile.php:464
+#: inc/admin/meta-boxes.php:32
 #: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:229
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:271
-#: inc/core/post-types.php:106 inc/core/post-types.php:108
-#: inc/core/roles.php:39 templates/admin/assessment-statistics.php:687
+#: inc/core/post-types.php:106
+#: inc/core/post-types.php:108
+#: inc/core/roles.php:39
+#: templates/admin/assessment-statistics.php:687
 #: templates/admin/assessments-list.php:66
 msgid "Student"
-msgstr "Elev"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3383
 #: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:228
@@ -696,46 +674,44 @@ msgstr "Elev"
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:270
 #: templates/admin/assessments-list.php:69
 msgid "Date"
-msgstr "Datum"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3384
 msgid "Author"
-msgstr "Ansvarig pedagog"
+msgstr ""
 
-# Assessment (Question Bank) CPT specific labels from post-types.php
 #: inc/admin/class-ham-assessment-manager.php:3385
 #: inc/admin/class-ham-assessment-meta-boxes.php:204
 #: templates/admin/assessments-list.php:191
 #: templates/admin/assessments-list.php:210
-#, fuzzy
 msgid "Question"
-msgstr "Fråga"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3386
 msgid "Option 1"
-msgstr "Alternativ 1"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3387
 msgid "Option 2"
-msgstr "Alternativ 2"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3388
 msgid "Option 3"
-msgstr "Alternativ 3"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3389
 msgid "Option 4"
-msgstr "Alternativ 4"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3390
 msgid "Option 5"
-msgstr "Alternativ 5"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3391
 #: templates/admin/assessments-list.php:192
 #: templates/admin/assessments-list.php:211
 msgid "Answer"
-msgstr "Svar"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3392
 #: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:232
@@ -744,15 +720,15 @@ msgstr "Svar"
 #: templates/admin/assessments-list.php:200
 #: templates/admin/assessments-list.php:219
 msgid "Comments"
-msgstr "Kommentarer"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3393
 msgid "No comments."
-msgstr "Inga kommentarer."
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3394
 msgid "Answer alternatives"
-msgstr "Svarsalternativ"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3396
 #: templates/admin/assessment-statistics.php:281
@@ -765,7 +741,7 @@ msgstr "Svarsalternativ"
 #: templates/admin/assessment-statistics.php:792
 #: templates/admin/assessment-statistics.php:838
 msgid "Previous term"
-msgstr "Förra terminen"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3398
 #: templates/admin/assessment-statistics.php:283
@@ -778,618 +754,631 @@ msgstr "Förra terminen"
 #: templates/admin/assessment-statistics.php:794
 #: templates/admin/assessment-statistics.php:840
 msgid "L/M/H-stadium"
-msgstr "L/M/H-stadium"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-manager.php:3399
 msgid "Radar"
-msgstr "Radar"
+msgstr ""
 
-# Confirmation Messages
 #: inc/admin/class-ham-assessment-manager.php:3400
 msgid "Are you sure you want to delete this assessment?"
-msgstr "Är du säker på att du vill ta bort denna observation?"
+msgstr ""
 
-# Assessment Questions Post Type
 #: inc/admin/class-ham-assessment-meta-boxes.php:47
 msgid "Assessment Questions"
-msgstr "Observationsfrågor"
+msgstr ""
 
-# Assessment Editor Interface
 #: inc/admin/class-ham-assessment-meta-boxes.php:84
 msgid "Instructions:"
-msgstr "Instruktioner:"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-meta-boxes.php:85
-msgid ""
-"Use the Wordpress editor above to add explanatory text that will be visible "
-"publicly. Use the tabs below to configure the assessment questions (admin "
-"only)."
+msgid "Use the Wordpress editor above to add explanatory text that will be visible publicly. Use the tabs below to configure the assessment questions (admin only)."
 msgstr ""
-"Använd WordPress-editorn ovan för att lägga till förklarande text som kommer "
-"att synas publikt. Använd flikarna nedan för att konfigurera "
-"observationsfrågorna (endast admin)."
 
 #: inc/admin/class-ham-assessment-meta-boxes.php:105
 #: inc/admin/class-ham-assessment-meta-boxes.php:111
 msgid "Add Question"
-msgstr "Lägg till fråga"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-meta-boxes.php:205
 msgid "Option"
-msgstr "Alternativ"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-meta-boxes.php:206
 msgid "Delete Question"
-msgstr "Ta bort fråga"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-meta-boxes.php:207
 msgid "Delete Option"
-msgstr "Ta bort alternativ"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-meta-boxes.php:208
 msgid "Add Option"
-msgstr "Lägg till alternativ"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-meta-boxes.php:209
 msgid "Stage"
-msgstr "Nuläge"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-meta-boxes.php:210
 msgid "Value"
-msgstr "Värde"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-meta-boxes.php:211
 msgid "Label"
-msgstr "Etikett"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-meta-boxes.php:214
 msgid "Not Connected"
-msgstr "Ej anknuten"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-meta-boxes.php:215
 msgid "In Transition"
-msgstr "Utvecklas"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-meta-boxes.php:216
 msgid "Fully Connected"
-msgstr "Fullt anknuten"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:46
-#, fuzzy
 msgctxt "Post type general name"
 msgid "Question Bank"
-msgstr "Frågebank"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:47
-#, fuzzy
 msgctxt "Post type singular name"
 msgid "Question Bank"
-msgstr "Frågebank"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:48
-#, fuzzy
 msgctxt "Admin Menu text"
 msgid "Question Bank"
-msgstr "Frågebank"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:49
-#, fuzzy
 msgctxt "Add New on Toolbar"
 msgid "Question Bank"
-msgstr "Frågebank"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:51
-#, fuzzy
 msgid "Add New Question Bank"
-msgstr "Lägg till ny fråga"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:52
-#, fuzzy
 msgid "New Question Bank"
-msgstr "Frågebank"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:53
-#, fuzzy
 msgid "Edit Question Bank"
-msgstr "Frågebank"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:54
-#, fuzzy
 msgid "View Question Bank"
-msgstr "Frågebank"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:55
-#, fuzzy
 msgid "All Question Banks"
-msgstr "Frågebank"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:56
-#, fuzzy
 msgid "Search Question Banks"
-msgstr "Sök frågor"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:57
-#, fuzzy
 msgid "No question banks found."
-msgstr "Inga frågor hittades."
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:58
-#, fuzzy
 msgid "No question banks found in Trash."
-msgstr "Inga frågor hittades i papperskorgen."
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:101
 msgid "Template Structure"
-msgstr "Mallstruktur"
+msgstr ""
 
 #: inc/admin/class-ham-assessment-templates-admin.php:131
-msgid ""
-"Define the structure of the assessment template below. You can add sections "
-"and fields, and configure their options."
+msgid "Define the structure of the assessment template below. You can add sections and fields, and configure their options."
 msgstr ""
-"Definiera strukturen för observationsmallen nedan. Du kan lägga till avsnitt "
-"och fält, och konfigurera deras alternativ."
 
 #: inc/admin/class-ham-assessment-templates-admin.php:138
-#, fuzzy
 msgid "Add Section"
-msgstr "Lägg till fråga"
+msgstr ""
+
+#: inc/admin/class-ham-base-admin-list-table.php:126
+msgid "Filter by"
+msgstr ""
+
+#: inc/admin/class-ham-base-admin-list-table.php:790
+#: templates/admin/assessments-list.php:59
+msgid "Reset Filters"
+msgstr ""
+
+#: inc/admin/class-ham-class-admin-list-table.php:58
+#: inc/admin/class-ham-principal-admin-list-table.php:354
+#: inc/admin/class-ham-student-admin-list-table.php:49
+#: inc/admin/class-ham-teacher-admin-list-table.php:49
+msgid "Filter by School"
+msgstr ""
+
+#: inc/admin/class-ham-class-admin-list-table.php:67
+#: inc/admin/class-ham-user-profile.php:466
+#: inc/admin/meta-boxes.php:40
+#: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:230
+#: inc/admin/meta-boxes/class-ham-student-meta-boxes.php:96
+#: inc/core/post-types.php:168
+#: inc/core/post-types.php:170
+#: inc/core/roles.php:48
+msgid "Teacher"
+msgstr ""
+
+#: inc/admin/class-ham-class-admin-list-table.php:68
+msgid "Filter by Teacher"
+msgstr ""
+
+#: inc/admin/class-ham-principal-admin-list-table.php:70
+msgid "Linked User Account"
+msgstr ""
+
+#: inc/admin/class-ham-principal-admin-list-table.php:71
+#: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:138
+msgid "Assigned Schools"
+msgstr ""
+
+#: inc/admin/class-ham-principal-admin-list-table.php:102
+msgid "Not linked"
+msgstr ""
+
+#: inc/admin/class-ham-principal-admin-list-table.php:103
+msgid "Link a user to assign schools"
+msgstr ""
+
+#: inc/admin/class-ham-principal-admin-list-table.php:111
+msgid "User not found"
+msgstr ""
+
+#: inc/admin/class-ham-principal-admin-list-table.php:121
+msgid "No user linked"
+msgstr ""
+
+#: inc/admin/class-ham-school-admin-list-table.php:48
+#: inc/admin/class-ham-user-profile.php:468
+#: inc/core/post-types.php:355
+#: inc/core/post-types.php:357
+#: inc/core/roles.php:57
+msgid "Principal"
+msgstr ""
 
 #: inc/admin/class-ham-school-admin-list-table.php:49
-#, fuzzy
 msgid "Filter by Principal"
-msgstr "Filtrera rektorslista"
+msgstr ""
 
 #: inc/admin/class-ham-user-profile.php:202
-msgid ""
-"Teachers: manage School(s) and Class(es) assignments here. These assignments "
-"control which students the teacher can access. The Teacher post (CPT) only "
-"links to the WordPress user and displays assignments for reference."
+msgid "Teachers: manage School(s) and Class(es) assignments here. These assignments control which students the teacher can access. The Teacher post (CPT) only links to the WordPress user and displays assignments for reference."
 msgstr ""
-"Lärare: hantera tilldelningar av skola/skolor och klass/klasser här. Dessa "
-"tilldelningar styr vilka elever läraren kan komma åt. Lärarposten (CPT) "
-"länkar bara till WordPress-användaren och visar tilldelningar som referens."
 
 #: inc/admin/class-ham-user-profile.php:221
 #: inc/admin/class-ham-user-profile.php:312
 msgid "Hold Ctrl/Cmd key to select multiple schools"
-msgstr "Håll Ctrl/Cmd för att välja flera skolor"
+msgstr ""
 
 #: inc/admin/class-ham-user-profile.php:225
 msgid "— Select School —"
-msgstr "— Välj skola —"
+msgstr ""
 
 #: inc/admin/class-ham-user-profile.php:252
-#, fuzzy
 msgid "No School"
-msgstr "Ny skola"
+msgstr ""
 
 #: inc/admin/class-ham-user-profile.php:260
 msgid "Hold Ctrl/Cmd key to select multiple classes"
-msgstr "Håll Ctrl/Cmd för att välja flera klasser"
+msgstr ""
 
 #: inc/admin/class-ham-user-profile.php:269
 #: inc/admin/class-ham-user-profile.php:294
-#, fuzzy
 msgid "Managed Schools"
-msgstr "Hantera skolor"
+msgstr ""
 
 #: inc/admin/class-ham-user-profile.php:284
 msgid "This user does not manage any schools."
-msgstr "Den här användaren hanterar inga skolor."
+msgstr ""
 
 #: inc/admin/class-ham-user-profile.php:286
-msgid ""
-"Schools managed by this user. This is typically set when assigning the user "
-"to a school (e.g., as a School Head)."
+msgid "Schools managed by this user. This is typically set when assigning the user to a school (e.g., as a School Head)."
 msgstr ""
-"Skolor som hanteras av den här användaren. Detta sätts vanligtvis när "
-"användaren kopplas till en skola (t.ex. som skolledare)."
 
 #: inc/admin/class-ham-user-profile.php:441
 msgid "HAM Role"
-msgstr "HAM-roll"
+msgstr ""
 
 #: inc/admin/class-ham-user-profile.php:470
 #: inc/core/post-types.php:418
 #: inc/core/post-types.php:420
 #: inc/core/roles.php:66
 msgid "School Head"
-msgstr "Skolledare"
+msgstr ""
+
+#: inc/admin/meta-boxes.php:48
+msgid "Assessment Data"
+msgstr ""
 
 #: inc/admin/meta-boxes.php:69
-#, fuzzy
 msgid "Select Student:"
-msgstr "Sök elever"
+msgstr ""
 
 #: inc/admin/meta-boxes.php:75
 msgid "Type to search for a student by name."
-msgstr "Skriv för att söka efter en elev via namn."
+msgstr ""
 
 #: inc/admin/meta-boxes.php:129
-#, fuzzy
 msgid "Select Teacher:"
-msgstr "Sök lärare"
+msgstr ""
 
 #: inc/admin/meta-boxes.php:135
 msgid "Type to search for a teacher by name."
-msgstr "Skriv för att söka efter en lärare via namn."
+msgstr ""
 
 #: inc/admin/meta-boxes.php:184
-#, fuzzy
 msgid "Assessment Date:"
-msgstr "Observation uppdaterad"
+msgstr ""
 
 #: inc/admin/meta-boxes.php:189
-#, fuzzy
 msgid "Assessment Data (JSON):"
-msgstr "Detaljer för elevobservation"
+msgstr ""
 
 #: inc/admin/meta-boxes.php:191
 msgid "Enter assessment data in JSON format."
-msgstr "Ange observationsdata i JSON-format."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:34
-#, fuzzy
 msgid "Assign Students"
-msgstr "Tilldelade elever"
+msgstr ""
 
+#: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:53
+msgid "Class Statistics"
+msgstr ""
+
+#: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:76
+msgid "Select School"
+msgstr ""
+
+#: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:128
+msgid "Search students..."
+msgstr ""
+
+#: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:134
+msgid "Assigned Students:"
+msgstr ""
+
+#: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:153
+msgid "No students are currently assigned to this class."
+msgstr ""
+
+#: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:200
+msgid "No teachers are currently assigned to this class."
+msgstr ""
+
+#: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:215
+msgid "Average Class Score"
+msgstr ""
+
+#: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:219
+msgid "No evaluations recorded for this class yet."
+msgstr ""
+
+#: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:222
 #: inc/core/post-types.php:59
-#, fuzzy
 msgid "All Evaluations"
-msgstr "Observationer"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:231
 #: inc/admin/meta-boxes/class-ham-student-meta-boxes.php:97
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:272
 msgid "Grade"
-msgstr "Årskurs"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-class-meta-boxes.php:249
-#, fuzzy
 msgid "No evaluations found for the students in this class."
-msgstr "Inga elever hittades för denna klass."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:160
 msgid "User not found or not a principal."
-msgstr "Användaren hittades inte eller är inte rektor."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:219
-#, fuzzy
 msgid "Link to User Account"
-msgstr "Länkat användarkonto"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:229
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:53
-#, fuzzy
 msgid "Assign Schools"
-msgstr "Tilldelade skolor"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:254
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:228
 msgid "Select User:"
-msgstr "Välj användare:"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:256
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:230
 msgid "-- Select a User --"
-msgstr "-- Välj en användare --"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:269
 msgid "Select the WordPress user account for this principal."
-msgstr "Välj WordPress-användarkontot för denna rektor."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:283
-#, fuzzy
 msgid "Please link a user account first before assigning schools."
-msgstr "Länka en användare för att tilldela skolor"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:307
 msgid "Select Schools for this Principal:"
-msgstr "Välj skolor för denna rektor:"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:316
 msgid "Hold Ctrl (Windows) or Cmd (Mac) to select multiple Schools."
-msgstr "Håll Ctrl (Windows) eller Cmd (Mac) för att välja flera skolor."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:330
 msgid "No user account is linked to this principal entry."
-msgstr "Inget användarkonto är länkat till denna rektor."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:336
 msgid "Linked user not found or is not a principal."
-msgstr "Länkad användare hittades inte eller är inte rektor."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:390
 msgid "This principal is not currently assigned to any schools."
-msgstr "Denna rektor är för närvarande inte tilldelad någon skola."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-principal-meta-boxes.php:392
 msgid "School assignments are managed from the School edit screen."
-msgstr "Skoltilldelningar hanteras från redigeringsvyn för skolan."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-school-meta-boxes.php:23
-#, fuzzy
 msgid "Assign Principals"
-msgstr "Tilldelade rektorer"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-school-meta-boxes.php:56
 msgid "Select Principals for this School:"
-msgstr "Välj rektorer för denna skola:"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-school-meta-boxes.php:65
-msgid ""
-"Hold Ctrl (Windows) or Cmd (Mac) to select multiple Principals. These users "
-"will be associated with this school."
+msgid "Hold Ctrl (Windows) or Cmd (Mac) to select multiple Principals. These users will be associated with this school."
 msgstr ""
-"Håll Ctrl (Windows) eller Cmd (Mac) för att välja flera rektorer. Dessa "
-"användare kommer att kopplas till denna skola."
 
 #: inc/admin/meta-boxes/class-ham-school-meta-boxes.php:102
-#, fuzzy
 msgid "No teachers are currently assigned to this school."
-msgstr "Inga klasser hittades för denna skola."
+msgstr ""
+
+#: inc/admin/meta-boxes/class-ham-school-meta-boxes.php:173
+#: inc/admin/meta-boxes/class-ham-school-meta-boxes.php:178
+msgid "Assigned Principals"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-student-meta-boxes.php:31
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:71
-#, fuzzy
 msgid "Evaluation Statistics"
-msgstr "Utvärderingsdetaljer"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-student-meta-boxes.php:61
-#, fuzzy
 msgid "Assign School"
-msgstr "Tilldelade skolor"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-student-meta-boxes.php:70
-#, fuzzy
 msgid "Assign Class"
-msgstr "Tilldelade klasser"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-student-meta-boxes.php:88
-#, fuzzy
 msgid "No evaluations found for this student."
-msgstr "Ingen observationsdata tillgänglig för denna elev."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-student-meta-boxes.php:159
-#, fuzzy
 msgid "Assign School to this Student:"
-msgstr "Skolan: %d elev"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-student-meta-boxes.php:161
 msgid "-- Select a School --"
-msgstr "-- Välj en skola --"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-student-meta-boxes.php:234
-msgid ""
-"This student is not assigned to any school. All classes are listed. Please "
-"assign a school to this student to see school-specific classes."
+msgid "This student is not assigned to any school. All classes are listed. Please assign a school to this student to see school-specific classes."
 msgstr ""
-"Den här eleven är inte tilldelad någon skola. Alla klasser listas. Tilldela "
-"en skola till eleven för att se skol-specifika klasser."
 
 #: inc/admin/meta-boxes/class-ham-student-meta-boxes.php:240
-#, fuzzy
 msgid "No classes found for the student's assigned school."
-msgstr "Inga klasser hittades för denna skola."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-student-meta-boxes.php:249
-#, fuzzy
 msgid "Assign Class(es) to this Student:"
-msgstr "Tilldelade elever"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-student-meta-boxes.php:267
 msgid "Hold Ctrl/Cmd to select multiple classes."
-msgstr "Håll Ctrl/Cmd för att välja flera klasser."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:44
-#, fuzzy
 msgid "Assign Classes"
-msgstr "Tilldelade klasser"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:62
 msgid "Link to WordPress User"
-msgstr "Länka till WordPress-användare"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:121
-msgid ""
-"This teacher is not linked to a WordPress user yet. Link the user first; "
-"assignments are managed on the WordPress user profile."
+msgid "This teacher is not linked to a WordPress user yet. Link the user first; assignments are managed on the WordPress user profile."
 msgstr ""
-"Den här läraren är ännu inte länkad till en WordPress-användare. Länka "
-"användaren först; tilldelningar hanteras på WordPress-användarprofilen."
 
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:137
-#, fuzzy
 msgid "No classes found for the selected schools."
-msgstr "Inga klasser hittades för denna skola."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:140
-msgid ""
-"This teacher is not assigned to any school yet. Please assign one or more "
-"schools first."
+msgid "This teacher is not assigned to any school yet. Please assign one or more schools first."
 msgstr ""
-"Den här läraren är ännu inte tilldelad någon skola. Tilldela en eller flera "
-"skolor först."
 
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:145
-#, fuzzy
 msgid "Assign Classes to this Teacher:"
-msgstr "Tilldelade lärare"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:164
 msgid "Classes are managed on the linked WordPress user profile."
-msgstr "Klasser hanteras på den länkade WordPress-användarprofilen."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:198
-#, fuzzy
 msgid "Assign Schools to this Teacher:"
-msgstr "Tilldelade skolledare"
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:207
 msgid "Schools are managed on the linked WordPress user profile."
-msgstr "Skolor hanteras på den länkade WordPress-användarprofilen."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:243
 msgid "Select the WordPress user account for this teacher."
-msgstr "Välj WordPress-användarkontot för denna lärare."
+msgstr ""
 
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:255
-msgid ""
-"This teacher is not linked to a WordPress user. No statistics can be shown."
+msgid "This teacher is not linked to a WordPress user. No statistics can be shown."
 msgstr ""
-"Den här läraren är inte länkad till en WordPress-användare. Ingen statistik "
-"kan visas."
 
-# Evaluation Interface
 #: inc/admin/meta-boxes/class-ham-teacher-meta-boxes.php:263
-#, fuzzy
 msgid "No evaluations found for this teacher."
-msgstr "Inga observationer hittades."
+msgstr ""
 
 #: inc/api/class-ham-assessment-controller.php:280
 #: inc/api/class-ham-users-controller.php:578
-#, fuzzy
 msgid "Current user not found."
-msgstr "Användare hittades inte"
+msgstr ""
 
 #: inc/api/class-ham-assessment-controller.php:300
 msgid "Students can only access their own assessments."
-msgstr "Elever kan bara komma åt sina egna observationer."
+msgstr ""
 
 #: inc/api/class-ham-assessment-controller.php:314
 msgid "Teachers can only access assessments they created."
-msgstr "Lärare kan bara komma åt observationer som de har skapat."
+msgstr ""
 
 #: inc/api/class-ham-assessment-controller.php:326
 msgid "Teachers can only access assessments for their classes."
-msgstr "Lärare kan bara komma åt observationer för sina klasser."
+msgstr ""
 
 #: inc/api/class-ham-assessment-controller.php:341
 #: inc/api/class-ham-assessment-controller.php:351
 msgid "Teachers can only access assessments for students in their classes."
-msgstr "Lärare kan bara komma åt observationer för elever i sina klasser."
+msgstr ""
 
 #: inc/api/class-ham-assessment-controller.php:368
 msgid "Principals can only access assessments for their school."
-msgstr "Rektorer kan bara komma åt observationer för sin skola."
+msgstr ""
 
 #: inc/api/class-ham-assessment-controller.php:385
 msgid "School heads can only access assessments for their managed schools."
-msgstr "Skolledare kan bara komma åt observationer för skolor de hanterar."
+msgstr ""
 
 #: inc/api/class-ham-assessment-controller.php:396
 msgid "You do not have permission to access assessments."
-msgstr "Du har inte behörighet att komma åt observationer."
+msgstr ""
 
 #: inc/api/class-ham-assessment-controller.php:414
-#, fuzzy
 msgid "Invalid assessment ID."
-msgstr "Infoga i observation"
+msgstr ""
 
 #: inc/api/class-ham-assessment-controller.php:424
-#, fuzzy
 msgid "Assessment not found."
-msgstr "Inga elevobservationer hittades"
+msgstr ""
 
 #: inc/api/class-ham-assessment-data-controller.php:163
 msgid "Invalid JSON in form data."
-msgstr "Ogiltig JSON i formulärdata."
+msgstr ""
 
 #: inc/api/class-ham-assessment-data-controller.php:180
 #: inc/api/class-ham-stats-controller.php:149
-#, fuzzy
 msgid "Invalid student ID."
-msgstr "Etablerade elever"
+msgstr ""
 
 #: inc/api/class-ham-assessment-data-controller.php:197
 #: inc/api/class-ham-stats-controller.php:379
 #: inc/api/class-ham-stats-controller.php:484
 msgid "Invalid teacher ID."
-msgstr "Ogiltigt lärar-ID."
+msgstr ""
 
 #: inc/api/class-ham-assessment-data-controller.php:224
 #, php-format
 msgid "Utvärdering för %s - %s"
-msgstr "Utvärdering för %s - %s"
+msgstr ""
 
 #: inc/api/class-ham-assessment-data-controller.php:262
 msgid "Utvärdering sparad."
-msgstr "Utvärdering sparad."
+msgstr ""
 
 #: inc/api/class-ham-assessment-data-controller.php:289
 msgid "You must be logged in to save an evaluation."
-msgstr "Du måste vara inloggad för att spara en observation."
+msgstr ""
 
 #: inc/api/class-ham-assessment-data-controller.php:300
 msgid "You do not have permission to save evaluations."
-msgstr "Du har inte behörighet att spara observationer."
+msgstr ""
 
 #: inc/api/class-ham-assessment-data-controller.php:305
-#, fuzzy
 msgid "Invalid student."
-msgstr "Etablerade elever"
+msgstr ""
 
-# Evaluation Interface
 #: inc/api/class-ham-assessment-data-controller.php:356
 #: inc/api/class-ham-assessment-data-controller.php:424
-#, fuzzy
 msgid "Evaluation not found."
-msgstr "Inga observationer hittades."
+msgstr ""
 
 #: inc/api/class-ham-assessment-data-controller.php:436
 #: inc/api/class-ham-assessment-data-controller.php:496
 msgid "You do not have permission to view evaluations for this student."
-msgstr "Du har inte behörighet att se observationer för denna elev."
+msgstr ""
 
 #: inc/api/class-ham-assessment-data-controller.php:517
 msgid "No assessment questions found."
-msgstr "Inga observationsfrågor hittades."
+msgstr ""
 
 #: inc/api/class-ham-assessment-templates-controller.php:151
 #: inc/api/class-ham-assessment-templates-controller.php:190
-#, fuzzy
 msgid "Template not found."
-msgstr "Användare hittades inte"
+msgstr ""
 
 #: inc/api/class-ham-auth-controller.php:108
 msgid "Invalid credentials."
-msgstr "Ogiltiga inloggningsuppgifter."
+msgstr ""
 
-# JWT Settings
 #: inc/api/class-ham-auth-controller.php:187
-#, fuzzy
 msgid "JWT secret key is not set."
-msgstr "JWT hemlig nyckel"
+msgstr ""
 
 #: inc/api/class-ham-auth-controller.php:292
 #: inc/api/class-ham-base-controller.php:56
 msgid "Authorization header not found."
-msgstr "Authorization-header hittades inte."
+msgstr ""
 
 #: inc/api/class-ham-auth-controller.php:301
 msgid "Authorization header format is invalid."
-msgstr "Authorization-headerns format är ogiltigt."
+msgstr ""
 
 #: inc/api/class-ham-auth-controller.php:315
 msgid "Invalid token."
-msgstr "Ogiltig token."
+msgstr ""
 
 #: inc/api/class-ham-base-controller.php:67
 msgid "Authorization header must be in format: Bearer {token}"
-msgstr "Authorization-header måste ha formatet: Bearer {token}"
+msgstr ""
 
 #: inc/api/class-ham-base-controller.php:98
 msgid "JWT library not found. Please run composer install."
-msgstr "JWT-biblioteket hittades inte. Kör composer install."
+msgstr ""
 
 #: inc/api/class-ham-base-controller.php:106
 msgid "JWT secret key is not configured."
-msgstr "JWT-hemlig nyckel är inte konfigurerad."
+msgstr ""
 
 #: inc/api/class-ham-base-controller.php:119
 msgid "Invalid token payload."
-msgstr "Ogiltig token-payload."
+msgstr ""
 
 #: inc/api/class-ham-base-controller.php:130
 #: inc/api/class-ham-users-controller.php:205
@@ -1397,558 +1386,545 @@ msgstr "Ogiltig token-payload."
 #: inc/api/class-ham-users-controller.php:415
 #: inc/api/class-ham-users-controller.php:623
 #: inc/api/class-ham-users-controller.php:774
-#, fuzzy
 msgid "User not found."
-msgstr "Användare hittades inte"
+msgstr ""
 
 #: inc/api/class-ham-base-controller.php:156
 msgid "You must be logged in to access this endpoint."
-msgstr "Du måste vara inloggad för att komma åt denna endpoint."
+msgstr ""
 
 #: inc/api/class-ham-base-controller.php:175
 msgid "You do not have permission to access this resource."
-msgstr "Du har inte behörighet att komma åt denna resurs."
+msgstr ""
 
 #: inc/api/class-ham-data-controller.php:191
 #: inc/api/class-ham-stats-controller.php:530
-#, fuzzy
 msgid "School not found."
-msgstr "Inga skolor hittades."
+msgstr ""
 
 #: inc/api/class-ham-data-controller.php:219
 msgid "You do not have permission to access this school."
-msgstr "Du har inte behörighet att komma åt denna skola."
+msgstr ""
 
 #: inc/api/class-ham-data-controller.php:377
 msgid "You do not have permission to access classes from this school."
-msgstr "Du har inte behörighet att komma åt klasser från denna skola."
+msgstr ""
 
 #: inc/api/class-ham-data-controller.php:400
 #: inc/api/class-ham-stats-controller.php:265
-#, fuzzy
 msgid "Class not found."
-msgstr "Användare hittades inte"
+msgstr ""
 
 #: inc/api/class-ham-data-controller.php:428
 #: inc/api/class-ham-student-controller.php:134
 #: inc/api/class-ham-student-controller.php:150
 msgid "You do not have permission to access this class."
-msgstr "Du har inte behörighet att komma åt denna klass."
+msgstr ""
 
 #: inc/api/class-ham-stats-controller.php:243
 msgid "You do not have permission to access this student's progress."
-msgstr "Du har inte behörighet att komma åt elevens utveckling."
+msgstr ""
 
 #: inc/api/class-ham-stats-controller.php:357
 msgid "You do not have permission to access statistics for this class."
-msgstr "Du har inte behörighet att komma åt statistik för denna klass."
+msgstr ""
 
 #: inc/api/class-ham-stats-controller.php:511
 msgid "You do not have permission to access statistics for this teacher."
-msgstr "Du har inte behörighet att komma åt statistik för denna lärare."
+msgstr ""
 
 #: inc/api/class-ham-stats-controller.php:632
 msgid "You do not have permission to access statistics for this school."
-msgstr "Du har inte behörighet att komma åt statistik för denna skola."
+msgstr ""
 
 #: inc/api/class-ham-stats-controller.php:675
 msgid "You do not have permission to access multi-school statistics."
-msgstr "Du har inte behörighet att komma åt statistik för flera skolor."
+msgstr ""
 
 #: inc/api/class-ham-student-controller.php:46
 msgid "Teacher ID to fetch assigned students for."
-msgstr "Lärar-ID för att hämta tilldelade elever."
+msgstr ""
 
 #: inc/api/class-ham-student-controller.php:66
-#, fuzzy
 msgid "Search term for students."
-msgstr "Sök elever"
+msgstr ""
 
 #: inc/api/class-ham-student-controller.php:92
 msgid "You must be logged in to search students."
-msgstr "Du måste vara inloggad för att söka elever."
+msgstr ""
 
 #: inc/api/class-ham-student-controller.php:107
 msgid "You do not have permission to search students."
-msgstr "Du har inte behörighet att söka elever."
+msgstr ""
 
 #: inc/api/class-ham-student-controller.php:304
 msgid "You are not currently logged in."
-msgstr "Du är inte inloggad."
+msgstr ""
 
 #: inc/api/class-ham-student-controller.php:314
 msgid "You are not authorized to access these students."
-msgstr "Du har inte behörighet att komma åt dessa elever."
+msgstr ""
 
 #: inc/api/class-ham-users-controller.php:346
 msgid "You do not have permission to access users from this school."
-msgstr "Du har inte behörighet att komma åt användare från denna skola."
+msgstr ""
 
 #: inc/api/class-ham-users-controller.php:357
 msgid "You do not have permission to access users from this class."
-msgstr "Du har inte behörighet att komma åt användare från denna klass."
+msgstr ""
 
 #: inc/api/class-ham-users-controller.php:443
 msgid "You do not have permission to access this user."
-msgstr "Du har inte behörighet att komma åt denna användare."
+msgstr ""
 
 #: inc/api/class-ham-users-controller.php:481
 msgid "Invalid role."
-msgstr "Ogiltig roll."
+msgstr ""
 
 #: inc/api/class-ham-users-controller.php:494
 #: inc/api/class-ham-users-controller.php:686
 #: inc/api/class-ham-users-controller.php:709
 msgid "Invalid school ID."
-msgstr "Ogiltigt skol-ID."
+msgstr ""
 
 #: inc/api/class-ham-users-controller.php:509
 #: inc/api/class-ham-users-controller.php:730
 msgid "Invalid class ID."
-msgstr "Ogiltigt klass-ID."
+msgstr ""
 
 #: inc/api/class-ham-users-controller.php:604
 msgid "You do not have permission to create users with this role."
-msgstr "Du har inte behörighet att skapa användare med denna roll."
+msgstr ""
 
-# Management Links
 #: inc/core/post-types.php:55
-#, fuzzy
 msgid "Add New Evaluation"
-msgstr "Lägg till ny observation"
+msgstr ""
 
-# Management Links
 #: inc/core/post-types.php:56
-#, fuzzy
 msgid "New Evaluation"
-msgstr "Visa observationer"
+msgstr ""
 
 #: inc/core/post-types.php:57
-#, fuzzy
 msgid "Edit Evaluation"
-msgstr "Observationer"
+msgstr ""
 
-# Management Links
 #: inc/core/post-types.php:58
-#, fuzzy
 msgid "View Evaluation"
-msgstr "Visa observationer"
+msgstr ""
 
 #: inc/core/post-types.php:60
-#, fuzzy
 msgid "Search Evaluations"
-msgstr "Utvärderingar per termin"
+msgstr ""
 
-# Evaluation Interface
-#: inc/core/post-types.php:61 templates/admin/assessments-list.php:78
+#: inc/core/post-types.php:61
+#: templates/admin/assessments-list.php:78
 msgid "No evaluations found."
-msgstr "Inga observationer hittades."
+msgstr ""
 
 #: inc/core/post-types.php:62
-#, fuzzy
 msgid "No evaluations found in Trash."
-msgstr "Inga frågor hittades i papperskorgen."
+msgstr ""
 
 #: inc/core/post-types.php:63
-#, fuzzy
 msgid "Filter evaluations list"
-msgstr "Filtrera frågelista"
+msgstr ""
 
 #: inc/core/post-types.php:64
-#, fuzzy
 msgid "Evaluations list navigation"
-msgstr "Navigering frågelista"
+msgstr ""
 
 #: inc/core/post-types.php:65
-#, fuzzy
 msgid "Evaluations list"
-msgstr "Observationer"
+msgstr ""
 
-# Student CPT
 #: inc/core/post-types.php:110
 msgid "Add New Student"
-msgstr "Lägg till ny elev"
+msgstr ""
 
 #: inc/core/post-types.php:111
 msgid "New Student"
-msgstr "Ny elev"
+msgstr ""
 
 #: inc/core/post-types.php:112
 msgid "Edit Student"
-msgstr "Redigera elev"
+msgstr ""
 
 #: inc/core/post-types.php:113
 msgid "View Student"
-msgstr "Visa elev"
+msgstr ""
 
 #: inc/core/post-types.php:115
 msgid "Search Students"
-msgstr "Sök elever"
+msgstr ""
 
 #: inc/core/post-types.php:116
 msgid "No students found."
-msgstr "Inga elever hittades."
+msgstr ""
 
 #: inc/core/post-types.php:117
 msgid "No students found in Trash."
-msgstr "Inga elever hittades i papperskorgen."
+msgstr ""
 
 #: inc/core/post-types.php:118
 msgid "Student Cover Image"
-msgstr "Elevens omslagsbild"
+msgstr ""
 
-#: inc/core/post-types.php:119 inc/core/post-types.php:181
-#: inc/core/post-types.php:243 inc/core/post-types.php:305
-#: inc/core/post-types.php:368 inc/core/post-types.php:431
+#: inc/core/post-types.php:119
+#: inc/core/post-types.php:181
+#: inc/core/post-types.php:243
+#: inc/core/post-types.php:305
+#: inc/core/post-types.php:368
+#: inc/core/post-types.php:431
 msgid "Set cover image"
-msgstr "Ange omslagsbild"
+msgstr ""
 
-#: inc/core/post-types.php:120 inc/core/post-types.php:182
-#: inc/core/post-types.php:244 inc/core/post-types.php:306
-#: inc/core/post-types.php:369 inc/core/post-types.php:432
+#: inc/core/post-types.php:120
+#: inc/core/post-types.php:182
+#: inc/core/post-types.php:244
+#: inc/core/post-types.php:306
+#: inc/core/post-types.php:369
+#: inc/core/post-types.php:432
 msgid "Remove cover image"
-msgstr "Ta bort omslagsbild"
+msgstr ""
 
-#: inc/core/post-types.php:121 inc/core/post-types.php:183
-#: inc/core/post-types.php:245 inc/core/post-types.php:307
-#: inc/core/post-types.php:370 inc/core/post-types.php:433
+#: inc/core/post-types.php:121
+#: inc/core/post-types.php:183
+#: inc/core/post-types.php:245
+#: inc/core/post-types.php:307
+#: inc/core/post-types.php:370
+#: inc/core/post-types.php:433
 msgid "Use as cover image"
-msgstr "Använd som omslagsbild"
+msgstr ""
 
 #: inc/core/post-types.php:122
 msgid "Student archives"
-msgstr "Elevarkiv"
+msgstr ""
 
 #: inc/core/post-types.php:123
 msgid "Insert into student post type"
-msgstr "Infoga i elevposttyp"
+msgstr ""
 
 #: inc/core/post-types.php:124
 msgid "Uploaded to this student post type"
-msgstr "Uppladdad till denna elevposttyp"
+msgstr ""
 
 #: inc/core/post-types.php:125
 msgid "Filter students list"
-msgstr "Filtrera elevlista"
+msgstr ""
 
 #: inc/core/post-types.php:126
 msgid "Students list navigation"
-msgstr "Navigering elevlista"
+msgstr ""
 
 #: inc/core/post-types.php:127
 msgid "Students list"
-msgstr "Elevlista"
+msgstr ""
 
-# Teacher CPT
 #: inc/core/post-types.php:172
 msgid "Add New Teacher"
-msgstr "Lägg till ny lärare"
+msgstr ""
 
 #: inc/core/post-types.php:173
 msgid "New Teacher"
-msgstr "Ny lärare"
+msgstr ""
 
 #: inc/core/post-types.php:174
 msgid "Edit Teacher"
-msgstr "Redigera lärare"
+msgstr ""
 
 #: inc/core/post-types.php:175
 msgid "View Teacher"
-msgstr "Visa lärare"
+msgstr ""
 
 #: inc/core/post-types.php:177
 msgid "Search Teachers"
-msgstr "Sök lärare"
+msgstr ""
 
 #: inc/core/post-types.php:178
 msgid "No teachers found."
-msgstr "Inga lärare hittades."
+msgstr ""
 
 #: inc/core/post-types.php:179
 msgid "No teachers found in Trash."
-msgstr "Inga lärare hittades i papperskorgen."
+msgstr ""
 
 #: inc/core/post-types.php:180
 msgid "Teacher Cover Image"
-msgstr "Lärarens omslagsbild"
+msgstr ""
 
 #: inc/core/post-types.php:184
 msgid "Teacher archives"
-msgstr "Lärararkiv"
+msgstr ""
 
 #: inc/core/post-types.php:185
 msgid "Insert into teacher post type"
-msgstr "Infoga i lärarposttyp"
+msgstr ""
 
 #: inc/core/post-types.php:186
 msgid "Uploaded to this teacher post type"
-msgstr "Uppladdad till denna lärarposttyp"
+msgstr ""
 
 #: inc/core/post-types.php:187
 msgid "Filter teachers list"
-msgstr "Filtrera lärarlista"
+msgstr ""
 
 #: inc/core/post-types.php:188
 msgid "Teachers list navigation"
-msgstr "Navigering lärarlista"
+msgstr ""
 
 #: inc/core/post-types.php:189
 msgid "Teachers list"
-msgstr "Lärarlista"
+msgstr ""
 
 #: inc/core/post-types.php:234
 msgid "Add New Class"
-msgstr "Lägg till ny klass"
+msgstr ""
 
 #: inc/core/post-types.php:235
 msgid "New Class"
-msgstr "Ny klass"
+msgstr ""
 
 #: inc/core/post-types.php:236
 msgid "Edit Class"
-msgstr "Redigera klass"
+msgstr ""
 
 #: inc/core/post-types.php:237
 msgid "View Class"
-msgstr "Visa klass"
+msgstr ""
 
 #: inc/core/post-types.php:239
 msgid "Search Classes"
-msgstr "Sök klasser"
+msgstr ""
 
 #: inc/core/post-types.php:240
 msgid "No classes found."
-msgstr "Inga klasser hittades."
+msgstr ""
 
 #: inc/core/post-types.php:241
 msgid "No classes found in Trash."
-msgstr "Inga klasser hittades i papperskorgen."
+msgstr ""
 
 #: inc/core/post-types.php:242
 msgid "Class Cover Image"
-msgstr "Klassens omslagsbild"
+msgstr ""
 
 #: inc/core/post-types.php:246
 msgid "Class archives"
-msgstr "Klassarkiv"
+msgstr ""
 
 #: inc/core/post-types.php:247
 msgid "Insert into class"
-msgstr "Infoga i klass"
+msgstr ""
 
 #: inc/core/post-types.php:248
 msgid "Uploaded to this class"
-msgstr "Uppladdad till denna klass"
+msgstr ""
 
 #: inc/core/post-types.php:249
 msgid "Filter classes list"
-msgstr "Filtrera klasslista"
+msgstr ""
 
 #: inc/core/post-types.php:250
 msgid "Classes list navigation"
-msgstr "Navigering klasslista"
+msgstr ""
 
 #: inc/core/post-types.php:251
 msgid "Classes list"
-msgstr "Klasslista"
+msgstr ""
 
 #: inc/core/post-types.php:296
 msgid "Add New School"
-msgstr "Lägg till ny skola"
+msgstr ""
 
 #: inc/core/post-types.php:297
 msgid "New School"
-msgstr "Ny skola"
+msgstr ""
 
 #: inc/core/post-types.php:298
 msgid "Edit School"
-msgstr "Redigera skola"
+msgstr ""
 
 #: inc/core/post-types.php:299
 msgid "View School"
-msgstr "Visa skola"
+msgstr ""
 
 #: inc/core/post-types.php:301
 msgid "Search Schools"
-msgstr "Sök skolor"
+msgstr ""
 
-#: inc/core/post-types.php:302 templates/admin/assessment-statistics.php:435
+#: inc/core/post-types.php:302
+#: templates/admin/assessment-statistics.php:435
 msgid "No schools found."
-msgstr "Inga skolor hittades."
+msgstr ""
 
 #: inc/core/post-types.php:303
 msgid "No schools found in Trash."
-msgstr "Inga skolor hittades i papperskorgen."
+msgstr ""
 
 #: inc/core/post-types.php:304
 msgid "School Cover Image"
-msgstr "Skolans omslagsbild"
+msgstr ""
 
 #: inc/core/post-types.php:308
 msgid "School archives"
-msgstr "Skolarkiv"
+msgstr ""
 
 #: inc/core/post-types.php:309
 msgid "Insert into school"
-msgstr "Infoga i skola"
+msgstr ""
 
 #: inc/core/post-types.php:310
 msgid "Uploaded to this school"
-msgstr "Uppladdad till denna skola"
+msgstr ""
 
 #: inc/core/post-types.php:311
 msgid "Filter schools list"
-msgstr "Filtrera skollista"
+msgstr ""
 
 #: inc/core/post-types.php:312
 msgid "Schools list navigation"
-msgstr "Navigering skollista"
+msgstr ""
 
 #: inc/core/post-types.php:313
 msgid "Schools list"
-msgstr "Skollista"
+msgstr ""
 
 #: inc/core/post-types.php:359
 msgid "Add New Principal"
-msgstr "Lägg till ny rektor"
+msgstr ""
 
 #: inc/core/post-types.php:360
 msgid "New Principal"
-msgstr "Ny rektor"
+msgstr ""
 
 #: inc/core/post-types.php:361
 msgid "Edit Principal"
-msgstr "Redigera rektor"
+msgstr ""
 
 #: inc/core/post-types.php:362
 msgid "View Principal"
-msgstr "Visa rektor"
+msgstr ""
 
 #: inc/core/post-types.php:364
 msgid "Search Principals"
-msgstr "Sök rektorer"
+msgstr ""
 
 #: inc/core/post-types.php:365
 msgid "No principals found."
-msgstr "Inga rektorer hittades."
+msgstr ""
 
 #: inc/core/post-types.php:366
 msgid "No principals found in Trash."
-msgstr "Inga rektorer hittades i papperskorgen."
+msgstr ""
 
 #: inc/core/post-types.php:367
 msgid "Principal Cover Image"
-msgstr "Rektorns omslagsbild"
+msgstr ""
 
 #: inc/core/post-types.php:371
 msgid "Principal archives"
-msgstr "Rektorsarkiv"
+msgstr ""
 
 #: inc/core/post-types.php:372
 msgid "Insert into principal post type"
-msgstr "Infoga i rektorsposttyp"
+msgstr ""
 
 #: inc/core/post-types.php:373
 msgid "Uploaded to this principal post type"
-msgstr "Uppladdad till denna rektorsposttyp"
+msgstr ""
 
 #: inc/core/post-types.php:374
 msgid "Filter principals list"
-msgstr "Filtrera rektorslista"
+msgstr ""
 
 #: inc/core/post-types.php:375
 msgid "Principals list navigation"
-msgstr "Navigering rektorslista"
+msgstr ""
 
 #: inc/core/post-types.php:376
 msgid "Principals list"
-msgstr "Rektorslista"
+msgstr ""
 
 #: inc/core/post-types.php:422
 msgid "Add New School Head"
-msgstr "Lägg till ny skolledare"
+msgstr ""
 
 #: inc/core/post-types.php:423
 msgid "New School Head"
-msgstr "Ny skolledare"
+msgstr ""
 
 #: inc/core/post-types.php:424
 msgid "Edit School Head"
-msgstr "Redigera skolledare"
+msgstr ""
 
 #: inc/core/post-types.php:425
 msgid "View School Head"
-msgstr "Visa skolledare"
+msgstr ""
 
 #: inc/core/post-types.php:427
 msgid "Search School Heads"
-msgstr "Sök skolledare"
+msgstr ""
 
 #: inc/core/post-types.php:428
 msgid "No school heads found."
-msgstr "Inga skolledare hittades."
+msgstr ""
 
 #: inc/core/post-types.php:429
 msgid "No school heads found in Trash."
-msgstr "Inga skolledare hittades i papperskorgen."
+msgstr ""
 
 #: inc/core/post-types.php:430
 msgid "School Head Cover Image"
-msgstr "Skolledarens omslagsbild"
+msgstr ""
 
 #: inc/core/post-types.php:434
 msgid "School Head archives"
-msgstr "Skolledararkiv"
+msgstr ""
 
 #: inc/core/post-types.php:435
 msgid "Insert into school head post type"
-msgstr "Infoga i skolledarposttyp"
+msgstr ""
 
 #: inc/core/post-types.php:436
 msgid "Uploaded to this school head post type"
-msgstr "Uppladdad till denna skolledarposttyp"
+msgstr ""
 
 #: inc/core/post-types.php:437
 msgid "Filter school heads list"
-msgstr "Filtrera skolledarlista"
+msgstr ""
 
 #: inc/core/post-types.php:438
 msgid "School Heads list navigation"
-msgstr "Navigering skolledarlista"
+msgstr ""
 
 #: inc/core/post-types.php:439
 msgid "School Heads list"
-msgstr "Skolledarlista"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:14
 msgid "Overall question averages"
-msgstr "Övergripande utfall per fråga"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:48
 msgid "Evaluations by Tryggve"
-msgstr "Obs-schemat Statistik"
+msgstr ""
 
-# Short Status Messages
 #: templates/admin/assessment-statistics.php:74
 msgid "Evaluation Drilldown"
-msgstr "Fördelning av observationer"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:114
 #: templates/admin/assessment-statistics.php:163
 msgid "No evaluation data available."
-msgstr "Ingen observationsdata tillgänglig."
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:271
-msgid ""
-"Select a school to drill down into classes, students, and per-question "
-"evaluation progress by semester."
+msgid "Select a school to drill down into classes, students, and per-question evaluation progress by semester."
 msgstr ""
-"Välj en skola för att fördjupa dig i klasser, elever och utveckling per "
-"fråga per termin."
 
 #: templates/admin/assessment-statistics.php:277
 msgid "All schools average progress"
-msgstr "Alla skolors genomsnittliga utveckling"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:279
 #: templates/admin/assessment-statistics.php:312
@@ -1960,7 +1936,7 @@ msgstr "Alla skolors genomsnittliga utveckling"
 #: templates/admin/assessment-statistics.php:790
 #: templates/admin/assessment-statistics.php:836
 msgid "Time bucket"
-msgstr "Tidsintervall"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:287
 #: templates/admin/assessment-statistics.php:320
@@ -1973,7 +1949,7 @@ msgstr "Tidsintervall"
 #: templates/admin/assessment-statistics.php:844
 #: templates/admin/assessments-list.php:37
 msgid "Filter by date:"
-msgstr "Filtrera efter datum:"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:288
 #: templates/admin/assessment-statistics.php:321
@@ -1986,7 +1962,7 @@ msgstr "Filtrera efter datum:"
 #: templates/admin/assessment-statistics.php:845
 #: templates/admin/assessments-list.php:39
 msgid "All Dates"
-msgstr "Alla datum"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:292
 #: templates/admin/assessment-statistics.php:325
@@ -1998,7 +1974,7 @@ msgstr "Alla datum"
 #: templates/admin/assessment-statistics.php:803
 #: templates/admin/assessment-statistics.php:849
 msgid "From"
-msgstr "Från"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:296
 #: templates/admin/assessment-statistics.php:329
@@ -2010,7 +1986,7 @@ msgstr "Från"
 #: templates/admin/assessment-statistics.php:807
 #: templates/admin/assessment-statistics.php:853
 msgid "To"
-msgstr "Till"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:299
 #: templates/admin/assessment-statistics.php:332
@@ -2022,29 +1998,29 @@ msgstr "Till"
 #: templates/admin/assessment-statistics.php:810
 #: templates/admin/assessment-statistics.php:856
 msgid "Clear"
-msgstr "Rensa"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:309
 #: templates/admin/assessment-statistics.php:479
 #: templates/admin/assessment-statistics.php:644
 msgid "Radar (avg per question)"
-msgstr "Radar (genomsnitt per fråga)"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:341
 #: templates/admin/assessment-statistics.php:511
 #: templates/admin/assessment-statistics.php:675
 #: templates/admin/assessment-statistics.php:822
 msgid "Radar values"
-msgstr "Ormdiagram"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:356
 msgid "# Classes"
-msgstr "Antal klasser"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:357
 #: templates/admin/assessment-statistics.php:524
 msgid "# Students"
-msgstr "Antal elever"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:359
 #: templates/admin/assessment-statistics.php:390
@@ -2062,7 +2038,7 @@ msgstr ""
 #: templates/admin/assessment-statistics.php:722
 #: templates/admin/assessments-list.php:131
 msgid "Ansvar"
-msgstr "Ansvar"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:361
 #: templates/admin/assessment-statistics.php:528
@@ -2098,14 +2074,12 @@ msgid "Total"
 msgstr ""
 
 #: templates/admin/assessment-statistics.php:447
-#, fuzzy
 msgid "School average progress"
-msgstr "Alla skolors genomsnittliga utveckling"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:612
-#, fuzzy
 msgid "Class average progress"
-msgstr "Alla skolors genomsnittliga utveckling"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:689
 msgid "Status Anknytning/Ansvar"
@@ -2113,511 +2087,126 @@ msgstr ""
 
 #: templates/admin/assessment-statistics.php:734
 msgid "See individual rows"
-msgstr "Se enskilda rader"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:739
 msgid "No students found for this class."
-msgstr "Inga elever hittades för denna klass."
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:752
 msgid "Student average progress"
-msgstr "Elevens genomsnittliga utveckling"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:788
 msgid "Radar (per evaluation within bucket)"
-msgstr "Radar (per utvärdering inom tidsintervall)"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:829
 msgid "Questions and answer alternatives"
-msgstr "Frågor och svarsalternativ"
+msgstr ""
 
 #: templates/admin/assessment-statistics.php:833
 msgid "Fallback questions"
-msgstr "Reservfrågor"
+msgstr ""
 
-# Student Evaluations Interface
 #: templates/admin/assessments-list.php:14
 msgid "Student Evaluations"
-msgstr "Elevobservationer"
+msgstr ""
 
 #: templates/admin/assessments-list.php:18
 msgid "Filter by student:"
-msgstr "Filtrera efter elev:"
+msgstr ""
 
 #: templates/admin/assessments-list.php:20
 msgid "All Students"
-msgstr "Alla elever"
+msgstr ""
 
 #: templates/admin/assessments-list.php:40
 msgid "Today"
-msgstr "Idag"
+msgstr ""
 
 #: templates/admin/assessments-list.php:41
 msgid "Yesterday"
-msgstr "Igår"
+msgstr ""
 
 #: templates/admin/assessments-list.php:42
 msgid "This Week"
-msgstr "Denna vecka"
+msgstr ""
 
 #: templates/admin/assessments-list.php:43
 msgid "This Month"
-msgstr "Denna månad"
+msgstr ""
 
 #: templates/admin/assessments-list.php:44
 msgid "This Semester"
-msgstr "Denna termin"
+msgstr ""
 
 #: templates/admin/assessments-list.php:45
 msgid "This School Year"
-msgstr "Detta skolår"
+msgstr ""
 
-# Filter Options
 #: templates/admin/assessments-list.php:50
 msgid "Filter by status:"
-msgstr "Filtrera efter status:"
+msgstr ""
 
 #: templates/admin/assessments-list.php:52
 msgid "All"
-msgstr "Alla"
+msgstr ""
 
 #: templates/admin/assessments-list.php:53
 msgid "Fully Established"
-msgstr "Fullt etablerat"
+msgstr ""
 
 #: templates/admin/assessments-list.php:55
 msgid "Not Established"
-msgstr "Ej etablerad"
+msgstr ""
 
 #: templates/admin/assessments-list.php:70
 msgid "Responsible teacher"
-msgstr "Ansvarig pedagog"
+msgstr ""
 
 #: templates/admin/assessments-list.php:71
 #: templates/admin/assessments-list.php:193
 #: templates/admin/assessments-list.php:212
 msgid "Status"
-msgstr "Status"
+msgstr ""
 
 #: templates/admin/assessments-list.php:135
 msgid "View"
-msgstr "Visa"
+msgstr ""
 
 #: templates/admin/assessments-list.php:159
 msgid "Evaluation Details"
-msgstr "Utvärderingsdetaljer"
+msgstr ""
 
 #: templates/admin/assessments-list.php:163
 msgid "Error loading evaluation data."
-msgstr "Fel vid laddning av utvärderingsdata."
+msgstr ""
 
 #: templates/admin/assessments-list.php:167
 msgid "Student:"
-msgstr "Elev:"
+msgstr ""
 
 #: templates/admin/assessments-list.php:171
 msgid "Date:"
-msgstr "Datum:"
+msgstr ""
 
 #: templates/admin/assessments-list.php:175
 msgid "Author:"
-msgstr "Ansvarig pedagog:"
+msgstr ""
 
 #: templates/admin/assessments-list.php:182
 msgid "Connection"
-msgstr "Anknytning"
+msgstr ""
 
 #: templates/admin/assessments-list.php:183
 msgid "Responsibility"
-msgstr "Ansvar"
+msgstr ""
 
 #: templates/admin/assessments-list.php:187
 msgid "Connection Points"
-msgstr "Anknytningsobservation"
+msgstr ""
 
 #: templates/admin/assessments-list.php:206
 msgid "Responsibility Points"
-msgstr "Ansvarspunkter"
-
-# Assessment List Interface
-#~ msgid "Student Assessments"
-#~ msgstr "Elevobservationer"
-
-#~ msgid "Filter by Completion:"
-#~ msgstr "Filtrera efter slutförande:"
-
-#~ msgid "100% Complete"
-#~ msgstr "100% slutfört"
-
-#~ msgid "75%+ Complete"
-#~ msgstr "75%+ slutfört"
-
-#~ msgid "50%+ Complete"
-#~ msgstr "50%+ slutfört"
-
-#~ msgid "25%+ Complete"
-#~ msgstr "25%+ slutfört"
-
-#~ msgid "< 25% Complete"
-#~ msgstr "< 25% slutfört"
-
-#~ msgid "ID"
-#~ msgstr "ID"
-
-#~ msgid "Completion"
-#~ msgstr "Slutförande"
-
-# Assessment Post Type
-#~ msgid "Assessment"
-#~ msgid_plural "Assessments"
-#~ msgstr[0] "Elevobservation"
-#~ msgstr[1] "Elevobservationer"
-
-#~ msgid "All Assessments"
-#~ msgstr "Alla observationer"
-
-#~ msgid "Add New Assessment"
-#~ msgstr "Lägg till ny observationer"
-
-#~ msgid "Edit Assessment"
-#~ msgstr "Redigera observationer"
-
-#~ msgid "New Assessment"
-#~ msgstr "Ny observationer"
-
-#~ msgid "View Assessment"
-#~ msgstr "Visa observation"
-
-#~ msgid "Search Assessments"
-#~ msgstr "Sök elevobservationer"
-
-#~ msgid "No assessments found in Trash"
-#~ msgstr "Inga observationer hittades i papperskorgen"
-
-#~ msgid "No assessments match your search criteria."
-#~ msgstr "Inga observationer matchar dina sökkriterier."
-
-#~ msgid "Parent Assessment:"
-#~ msgstr "Överordnad observation:"
-
-# Media/Image Related
-#~ msgid "Featured Image"
-#~ msgstr "Utvald bild"
-
-#~ msgid "Set featured image"
-#~ msgstr "Ange huvudbild"
-
-#~ msgid "Remove featured image"
-#~ msgstr "Ta bort huvudbild"
-
-#~ msgid "Use as featured image"
-#~ msgstr "Använd som huvudbild"
-
-#~ msgid "Uploaded to this assessment"
-#~ msgstr "Uppladdad till denna observation"
-
-# Assessment Lists
-#~ msgid "Assessments list"
-#~ msgstr "Observationslista"
-
-#~ msgid "Assessments list navigation"
-#~ msgstr "Navigering för observationslista"
-
-#~ msgid "Filter assessments list"
-#~ msgstr "Filtrera observationslista"
-
-# Assessment Status Messages
-#~ msgid "Assessment published"
-#~ msgstr "Observation publicerad"
-
-#~ msgid "Assessment published privately"
-#~ msgstr "Observation publicerad privat"
-
-#~ msgid "Assessment reverted to draft"
-#~ msgstr "Observation återställd till utkast"
-
-#~ msgid "Assessment scheduled"
-#~ msgstr "Observation schemalagd"
-
-#~ msgid "Assessment submitted"
-#~ msgstr "Observation inlämnad"
-
-#~ msgid "Assessment draft updated"
-#~ msgstr "Observationsutkast uppdaterat"
-
-#~ msgid "Assessment draft saved"
-#~ msgstr "Observationsutkast sparat"
-
-#~ msgid "Assessment saved"
-#~ msgstr "Observation sparad"
-
-#~ msgid "Assessment deleted"
-#~ msgstr "Observation borttagen"
-
-#~ msgid "Assessment restored"
-#~ msgstr "Observation återställd"
-
-#~ msgid "Assessment permanently deleted"
-#~ msgstr "Observation permanent borttagen"
-
-#~ msgid "Assessment moved to trash"
-#~ msgstr "Observation flyttad till papperskorgen"
-
-#~ msgid "Assessment removed from trash"
-#~ msgstr "Observation borttagen från papperskorgen"
-
-#~ msgid "Avg"
-#~ msgstr "Snitt"
-
-#~ msgid "# Students evaluated"
-#~ msgstr "Antal bedömda elever"
-
-#~ msgid "Status (students)"
-#~ msgstr "Status (elever)"
-
-#~ msgid "Overall Avg"
-#~ msgstr "Snitt totalt"
-
-#~ msgid "Progress (by semester)"
-#~ msgstr "Utveckling (per termin)"
-
-#~ msgid "School Progress (by semester)"
-#~ msgstr "Skolans utveckling (per termin)"
-
-#~ msgid "Class Progress (by semester)"
-#~ msgstr "Klassens utveckling (per termin)"
-
-#~ msgid "Student Progress (by semester)"
-#~ msgstr "Elevens utveckling (per termin)"
-
-#~ msgid "Per-question averages (by semester)"
-#~ msgstr "Snitt per fråga (per termin)"
-
-#~ msgid "No per-question data available."
-#~ msgstr "Ingen data per fråga tillgänglig."
-
-#~ msgid "Assessment updated."
-#~ msgstr "Observation uppdaterad."
-
-#~ msgid "Assessment created."
-#~ msgstr "Observation skapad."
-
-#~ msgid "Assessment deleted."
-#~ msgstr "Observation borttagen."
-
-#~ msgid "Assessment restored."
-#~ msgstr "Observation återställd."
-
-#~ msgid "Assessment saved."
-#~ msgstr "Observation sparad."
-
-#~ msgid "Assessment submitted."
-#~ msgstr "Observation inlämnad."
-
-#~ msgid "Assessment scheduled."
-#~ msgstr "Observation schemalagd."
-
-#~ msgid "Assessment draft updated."
-#~ msgstr "Observationsutkast uppdaterat."
-
-#~ msgid "All Questions"
-#~ msgstr "Frågebank"
-
-#~ msgid "Assessment Question"
-#~ msgstr "Observationsfråga"
-
-#~ msgid "Add New Assessment Question"
-#~ msgstr "Lägg till ny observationsfråga"
-
-#~ msgid "New Assessment Question"
-#~ msgstr "Ny observationsfråga"
-
-#~ msgid "Edit Assessment Question"
-#~ msgstr "Redigera observationsfråga"
-
-#~ msgid "View Assessment Question"
-#~ msgstr "Visa observationsfråga"
-
-#~ msgid "All Assessment Questions"
-#~ msgstr "Skapa observationsfrågor"
-
-#~ msgid "Search Assessment Questions"
-#~ msgstr "Sök observationsfrågor"
-
-#~ msgid "No assessment questions found in Trash."
-#~ msgstr "Inga observationsfrågor hittades i papperskorgen."
-
-#~ msgid "Filter assessment questions list"
-#~ msgstr "Filtrera observationsfrågorna"
-
-#~ msgid "Assessment questions list navigation"
-#~ msgstr "Navigering för observationsfrågorna"
-
-#~ msgid "Assessment questions list"
-#~ msgstr "Lista över observationsfrågorna"
-
-# Assessment Fields and Values
-#~ msgid "Attachment"
-#~ msgstr "Anknytning"
-
-#~ msgid "Comment"
-#~ msgid_plural "Comments"
-#~ msgstr[0] "Kommentar"
-#~ msgstr[1] "Kommentarer"
-
-# Assessment Scale Values
-#~ msgid "Not at all"
-#~ msgstr "Inte alls"
-
-#~ msgid "Rarely"
-#~ msgstr "Sällan"
-
-#~ msgid "Sometimes"
-#~ msgstr "Ibland"
-
-#~ msgid "Often"
-#~ msgstr "Ofta"
-
-#~ msgid "Always"
-#~ msgstr "Alltid"
-
-# Stage Values
-#~ msgid "Not"
-#~ msgstr "Ej"
-
-#~ msgid "Full"
-#~ msgstr "Fullt etablerat"
-
-#~ msgid "Assessment deleted successfully."
-#~ msgstr "Observationen har tagits bort."
-
-#~ msgid "Error deleting assessment."
-#~ msgstr "Fel vid borttagning av observation."
-
-# Table Headers
-#~ msgid "Title"
-#~ msgstr "Titel"
-
-#~ msgid "Assessed Students"
-#~ msgstr "Bedömda elever"
-
-#~ msgid "Average Completion Rate"
-#~ msgstr "Genomsnittlig slutförandegrad"
-
-#~ msgid "Evaluations This Term"
-#~ msgstr "Utvärderingar denna termin"
-
-#~ msgid "Evaluations This Month"
-#~ msgstr "Utvärderingar denna månad"
-
-#~ msgid "Evaluations This School Year"
-#~ msgstr "Utvärderingar detta skolår"
-
-#~ msgid "Average per Assessment Section"
-#~ msgstr "Genomsnitt per utvärderingsdel"
-
-#~ msgid "Top-Rated Assessment Questions"
-#~ msgstr "Högst utfall per fråga"
-
-#~ msgid "Section"
-#~ msgstr "Avsnitt"
-
-# Dashboard Interface
-#~ msgid "Dashboard"
-#~ msgstr "Kontrollpanel"
-
-#~ msgid "Overview"
-#~ msgstr "Översikt"
-
-#~ msgid "Total Students"
-#~ msgstr "Totala antalet elever"
-
-#~ msgid "Total Teachers"
-#~ msgstr "Totala antalet lärare"
-
-#~ msgid "Active Courses"
-#~ msgstr "Aktiva ämnen"
-
-#~ msgid "View Students"
-#~ msgstr "Visa elever"
-
-#~ msgid "Go to Settings"
-#~ msgstr "Gå till inställningar"
-
-#~ msgid ""
-#~ "Here you can configure the main settings for the Headless Access Manager "
-#~ "plugin."
-#~ msgstr ""
-#~ "Här kan du konfigurera huvudinställningarna för Observationsschemat."
-
-#~ msgid ""
-#~ "Enter your secret key for signing JWT tokens. This must match the key in "
-#~ "your Next.js frontend."
-#~ msgstr ""
-#~ "Ange din hemliga nyckel för att signera JWT-token. Detta måste matcha "
-#~ "nyckeln i din Next.js frontend. Om du byter nyckel här slutar frontend "
-#~ "att fungera korrekt."
-
-#~ msgid ""
-#~ "The secret key is defined in wp-config.php and cannot be changed here."
-#~ msgstr "Hemlig nyckel definieras i wp-config.php och kan inte ändras här."
-
-#~ msgid ""
-#~ "The secret key is not defined. Please define HAM_JWT_SECRET_KEY in your "
-#~ "wp-config.php file."
-#~ msgstr ""
-#~ "Hemlig nyckel är inte definierad. Vänligen definiera HAM_JWT_SECRET_KEY i "
-#~ "wp-config.php-filen."
-
-# CORS Settings
-#~ msgid "CORS Allowed Origins"
-#~ msgstr "CORS tillåtna ursprung"
-
-#~ msgid ""
-#~ "Enter the allowed origins for CORS requests, separated by commas. "
-#~ "Example: http://localhost:3000, https://your-frontend.com"
-#~ msgstr ""
-#~ "Ange de tillåtna ursprungen (allowed origins) för CORS-begäran, "
-#~ "separerade med komma. Exempel: http://localhost:3000, https://din-"
-#~ "frontend.com"
-
-# Role Management
-#~ msgid "Role Management"
-#~ msgstr "Rollhantering"
-
-#~ msgid "Manage custom roles and capabilities."
-#~ msgstr "Hantera anpassade roller och behörigheter."
-
-#~ msgid "Student Role Name"
-#~ msgstr "Elever Rollnamn"
-
-#~ msgid "The display name for the student role."
-#~ msgstr "Visningsnamn för elevroll."
-
-#~ msgid "Teacher Role Name"
-#~ msgstr "Lärare Rollnamn"
-
-#~ msgid "The display name for the teacher role."
-#~ msgstr "Visningsnamn för lärarroll."
-
-#~ msgid "Delete all plugin data on deactivation."
-#~ msgstr "Ta bort all plugin data vid inaktivering."
-
-#~ msgid "Assigned Modules"
-#~ msgstr "Tilldelade moduler"
-
-#~ msgid "New Question"
-#~ msgstr "Ny fråga"
-
-#~ msgid "Edit Question"
-#~ msgstr "Redigera fråga"
-
-#~ msgid "View Question"
-#~ msgstr "Visa fråga"
-
-#~ msgid "Questions list"
-#~ msgstr "Frågelista"
-
-# School List Table
-#~ msgid "No principals assigned"
-#~ msgstr "Inga rektorer tilldelade"
+msgstr ""
