@@ -296,7 +296,7 @@ msgstr "Vår"
 
 #: inc/admin/class-ham-assessment-manager.php:228
 msgid "Fall"
-msgstr "Höst"
+msgstr "Ht"
 msgid "Assessment updated."
 msgstr "Observation uppdaterad."
 
@@ -653,11 +653,11 @@ msgstr "Alternativ 5"
 
 #: inc/admin/class-ham-assessment-manager.php
 msgid "Spring term"
-msgstr "Vårtermin"
+msgstr "Vt"
 
 #: inc/admin/class-ham-assessment-manager.php
 msgid "Autumn term"
-msgstr "Hösttermin"
+msgstr "Ht"
 
 #: templates/admin/assessment-statistics.php:104
 msgid "Status Distribution"
