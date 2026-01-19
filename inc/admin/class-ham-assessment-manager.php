@@ -2476,7 +2476,8 @@ class HAM_Assessment_Manager
             ),
             'monthly_submissions' => array(),
             'term_submissions' => array(),
-            'school_year_submissions' => array()
+            'school_year_submissions' => array(),
+            'hogstadium_submissions' => array(),
         );
 
         if (empty($assessments)) {
@@ -2496,6 +2497,7 @@ class HAM_Assessment_Manager
         $monthly_data = array();
         $term_data = array();
         $school_year_data = array();
+        $hogstadium_data = array();
 
         foreach ($assessments as $assessment) {
             // Track unique students
@@ -2586,6 +2588,12 @@ class HAM_Assessment_Manager
                 $school_year_data[$school_year_start] = 0;
             }
             $school_year_data[$school_year_start]++;
+
+            $hog_key = self::get_hogstadium_key_from_timestamp($timestamp);
+            if (!isset($hogstadium_data[$hog_key])) {
+                $hogstadium_data[$hog_key] = 0;
+            }
+            $hogstadium_data[$hog_key]++;
         }
 
         // Calculate final statistics
@@ -2647,6 +2655,15 @@ class HAM_Assessment_Manager
             $stats['school_year_submissions'][] = array(
                 'school_year_start' => (int) $school_year_start,
                 'label' => $school_year_label,
+                'count' => $count,
+            );
+        }
+
+        ksort($hogstadium_data);
+        foreach ($hogstadium_data as $hog_key => $count) {
+            $stats['hogstadium_submissions'][] = array(
+                'key' => (string) $hog_key,
+                'label' => self::format_hogstadium_label($hog_key),
                 'count' => $count,
             );
         }
@@ -3392,7 +3409,8 @@ public function ajax_get_assessment_details()
                 'comments' => esc_html__('Comments', 'headless-access-manager'),
                 'noComments' => esc_html__('No comments.', 'headless-access-manager'),
                 'answerAlternatives' => esc_html__('Answer alternatives', 'headless-access-manager'),
-                'month' => esc_html__('Month', 'headless-access-manager'),
+                'currentTerm' => esc_html__('Current term', 'headless-access-manager'),
+                'previousTerm' => esc_html__('Previous term', 'headless-access-manager'),
                 'term' => esc_html__('Previous term', 'headless-access-manager'),
                 'schoolYear' => esc_html__('School year', 'headless-access-manager'),
                 'hogstadium' => esc_html__('L/M/H-stadium', 'headless-access-manager'),

@@ -41,6 +41,25 @@
             return;
         }
 
+        // Use the screen ID from PHP for proper postbox state persistence
+        // WordPress expects the exact screen ID for AJAX handlers to work
+        const page = (typeof hamAssessment !== 'undefined' && hamAssessment.screenId)
+            ? String(hamAssessment.screenId)
+            : (holders[0].getAttribute('data-page')
+                ? String(holders[0].getAttribute('data-page'))
+                : 'ham-assessment-stats');
+
+        // Ensure postboxes have stable IDs for WP persistence.
+        // We prefer template-provided IDs; otherwise fall back to deterministic IDs.
+        holders.forEach((holder, holderIdx) => {
+            const postboxes = Array.from(holder.querySelectorAll('.postbox'));
+            postboxes.forEach((pb, pbIdx) => {
+                if (!pb.id) {
+                    pb.id = `${page}-postbox-${holderIdx}-${pbIdx}`;
+                }
+            });
+        });
+
         // Ensure WP-native collapse indicator exists in each postbox header.
         // WP normally renders this markup, but our custom templates omit it.
         try {
@@ -70,14 +89,6 @@
             });
         } catch (e) {
         }
-
-        // Use the screen ID from PHP for proper postbox state persistence
-        // WordPress expects the exact screen ID for AJAX handlers to work
-        const page = (typeof hamAssessment !== 'undefined' && hamAssessment.screenId)
-            ? String(hamAssessment.screenId)
-            : (holders[0].getAttribute('data-page')
-                ? String(holders[0].getAttribute('data-page'))
-                : 'ham-assessment-stats');
 
         // WP expects sortable containers to have stable IDs to persist order.
         // Our templates render `.meta-box-sortables` without IDs, so `save_order()`
@@ -353,8 +364,8 @@
         const CHART_TARGET_COLOR = 'rgba(245, 158, 11, 0.5)';
 
         const t = (window.hamAssessment && window.hamAssessment.texts) ? window.hamAssessment.texts : {};
-        const labelMonth = t.month || 'Month';
-        const labelTerm = t.term || 'Förra terminen';
+        const labelCurrentTerm = t.currentTerm || 'Current term';
+        const labelPreviousTerm = t.previousTerm || t.term || 'Previous term';
         const labelSchoolYear = t.schoolYear || 'Skolår';
         const labelHogstadium = t.hogstadium || 'L/M/H-stadium';
         const labelRadar = t.radar || 'Radar';
@@ -598,12 +609,32 @@
                 return null;
             }
 
-            // Term control represents the previous term.
-            if (bucketKey === 'term' && buckets.length >= 2) {
+            // Backward compat: old `term` key meant "previous term".
+            if (bucketKey === 'term') {
+                bucketKey = 'previous_term';
+            }
+
+            if (bucketKey === 'previous_term' && buckets.length >= 2) {
                 return buckets[buckets.length - 2];
             }
 
             return pickLatestBucket(buckets);
+        }
+
+        function mapControlKeyToBucketType(bucketKey) {
+            // Both of these controls are just different selections within term buckets.
+            if (bucketKey === 'current_term' || bucketKey === 'previous_term') {
+                return 'term';
+            }
+            if (bucketKey === 'term') {
+                return 'term';
+            }
+            return bucketKey;
+        }
+
+        function isControlKeyAvailable(bucketsByKey, bucketKey) {
+            const bucketType = mapControlKeyToBucketType(bucketKey);
+            return Array.isArray(bucketsByKey[bucketType]) && bucketsByKey[bucketType].length > 0;
         }
 
         function filterBuckets(bucketType, buckets) {
@@ -613,6 +644,12 @@
 
         function filterSeries(bucketType, series) {
             const arr = Array.isArray(series) ? series : [];
+            if (bucketType === 'current_term' || bucketType === 'previous_term' || bucketType === 'term') {
+                const filtered = arr.filter((b) => b && bucketIntersectsRange('term', b.key));
+                const resolvedKey = bucketType === 'term' ? 'previous_term' : bucketType;
+                const picked = pickBucketForControl(resolvedKey, filtered);
+                return picked ? [picked] : [];
+            }
             return arr.filter((b) => {
                 if (!b) {
                     return false;
@@ -1180,8 +1217,8 @@
             const mode = stats.group_radar && stats.group_radar.mode ? String(stats.group_radar.mode) : 'counts';
 
             const titleByKey = {
-                month: labelMonth,
-                term: labelTerm,
+                current_term: labelCurrentTerm,
+                previous_term: labelPreviousTerm,
                 school_year: labelSchoolYear,
                 hogstadium: labelHogstadium,
             };
@@ -1218,8 +1255,9 @@
             }
 
             function buildDatasetsForBucket(bucketKey) {
-                const rawBuckets = bucketsByKey && Array.isArray(bucketsByKey[bucketKey]) ? bucketsByKey[bucketKey] : [];
-                const buckets = filterBuckets(bucketKey, rawBuckets);
+                const bucketType = mapControlKeyToBucketType(bucketKey);
+                const rawBuckets = bucketsByKey && Array.isArray(bucketsByKey[bucketType]) ? bucketsByKey[bucketType] : [];
+                const buckets = filterBuckets(bucketType, rawBuckets);
                 const bucket = pickBucketForControl(bucketKey, buckets);
                 if (!bucket || !Array.isArray(bucket.datasets) || bucket.datasets.length === 0) {
                     return { title: titleByKey[bucketKey] || labelRadar, datasets: [], max: 1, bucketGroup: { labels, buckets: [] } };
@@ -1268,7 +1306,7 @@
                 existing.destroy();
             }
 
-            const initial = buildDatasetsForBucket('term');
+            const initial = buildDatasetsForBucket('current_term');
             const chart = new Chart(canvas.getContext('2d'), {
                 type: 'radar',
                 data: {
@@ -1336,8 +1374,8 @@
 
             const controller = initBucketToggle({
                 buttons: btns,
-                defaultKey: 'term',
-                isKeyAvailable: (key) => Array.isArray(bucketsByKey[key]) && bucketsByKey[key].length > 0,
+                defaultKey: 'current_term',
+                isKeyAvailable: (key) => isControlKeyAvailable(bucketsByKey, key),
                 onChange: updateChart,
             });
 
@@ -1381,7 +1419,7 @@
             // Student buckets can be very sparse (often collapsing to a single point).
             // If so, fall back to the richer semester series to avoid single-dot charts.
             if (Array.isArray(stats.series)) {
-                ['month', 'term', 'school_year', 'hogstadium'].forEach((key) => {
+                ['term', 'school_year', 'hogstadium'].forEach((key) => {
                     if (!Array.isArray(seriesByKey[key]) || seriesByKey[key].length <= 1) {
                         seriesByKey[key] = buildFallbackFromSemesterSeries();
                     }
@@ -1389,14 +1427,15 @@
             }
 
             const titleByKey = {
-                month: labelMonth,
-                term: labelTerm,
+                current_term: labelCurrentTerm,
+                previous_term: labelPreviousTerm,
                 school_year: labelSchoolYear,
                 hogstadium: labelHogstadium,
             };
 
             function buildDataForBucket(bucketKey) {
-                const raw = seriesByKey && Array.isArray(seriesByKey[bucketKey]) ? seriesByKey[bucketKey] : [];
+                const bucketType = mapControlKeyToBucketType(bucketKey);
+                const raw = seriesByKey && Array.isArray(seriesByKey[bucketType]) ? seriesByKey[bucketType] : [];
                 const series = filterSeries(bucketKey, raw);
                 const labels = series.map((p) => p.label);
                 const data = series.map((p) => clampNumber(p.overall_avg, 1, 5));
@@ -1408,7 +1447,7 @@
                 existing.destroy();
             }
 
-            const initial = buildDataForBucket('month');
+            const initial = buildDataForBucket('current_term');
             const c = datasetColor(0);
             const chart = new Chart(canvas.getContext('2d'), {
                 type: 'line',
@@ -1468,10 +1507,11 @@
 
             ensureStudentBucketController(
                 allBtns,
-                'month',
+                'current_term',
                 (key) => {
-                    const progressOk = Array.isArray(seriesByKey[key]) && seriesByKey[key].length > 0;
-                    const radarOk = stats.student_radar && stats.student_radar.buckets && Array.isArray(stats.student_radar.buckets[key]) && stats.student_radar.buckets[key].length > 0;
+                    const bucketType = mapControlKeyToBucketType(key);
+                    const progressOk = Array.isArray(seriesByKey[bucketType]) && seriesByKey[bucketType].length > 0;
+                    const radarOk = stats.student_radar && stats.student_radar.buckets && Array.isArray(stats.student_radar.buckets[bucketType]) && stats.student_radar.buckets[bucketType].length > 0;
                     return progressOk || radarOk;
                 }
             );
@@ -1490,15 +1530,16 @@
             const bucketsByKey = stats.student_radar.buckets;
 
             const titleByKey = {
-                month: labelMonth,
-                term: labelTerm,
+                current_term: labelCurrentTerm,
+                previous_term: labelPreviousTerm,
                 school_year: labelSchoolYear,
                 hogstadium: labelHogstadium,
             };
 
             function buildBucketGroup(bucketKey) {
-                const rawBuckets = bucketsByKey && Array.isArray(bucketsByKey[bucketKey]) ? bucketsByKey[bucketKey] : [];
-                const buckets = filterBuckets(bucketKey, rawBuckets);
+                const bucketType = mapControlKeyToBucketType(bucketKey);
+                const rawBuckets = bucketsByKey && Array.isArray(bucketsByKey[bucketType]) ? bucketsByKey[bucketType] : [];
+                const buckets = filterBuckets(bucketType, rawBuckets);
                 return { labels, buckets };
             }
 
@@ -1519,8 +1560,8 @@
 
             const controller = ensureStudentBucketController(
                 btns,
-                'month',
-                (key) => Array.isArray(bucketsByKey[key]) && bucketsByKey[key].length > 0
+                'current_term',
+                (key) => isControlKeyAvailable(bucketsByKey, key)
             );
 
             if (controller) {
@@ -1539,14 +1580,15 @@
 
             const seriesByKey = stats.avg_progress;
             const titleByKey = {
-                month: labelMonth,
-                term: labelTerm,
+                current_term: labelCurrentTerm,
+                previous_term: labelPreviousTerm,
                 school_year: labelSchoolYear,
                 hogstadium: labelHogstadium,
             };
 
             function buildDataForBucket(bucketKey) {
-                const raw = seriesByKey && Array.isArray(seriesByKey[bucketKey]) ? seriesByKey[bucketKey] : [];
+                const bucketType = mapControlKeyToBucketType(bucketKey);
+                const raw = seriesByKey && Array.isArray(seriesByKey[bucketType]) ? seriesByKey[bucketType] : [];
                 const series = filterSeries(bucketKey, raw);
                 const labels = series.map((p) => p.label);
                 const data = series.map((p) => clampNumber(p.overall_avg, 1, 5));
@@ -1558,7 +1600,7 @@
                 existing.destroy();
             }
 
-            const initial = buildDataForBucket('month');
+            const initial = buildDataForBucket('current_term');
             const c = datasetColor(0);
             const chart = new Chart(canvas.getContext('2d'), {
                 type: 'line',
@@ -1610,8 +1652,11 @@
 
             const controller = initBucketToggle({
                 buttons: btns,
-                defaultKey: 'month',
-                isKeyAvailable: (key) => Array.isArray(seriesByKey[key]) && seriesByKey[key].length > 0,
+                defaultKey: 'current_term',
+                isKeyAvailable: (key) => {
+                    const bucketType = mapControlKeyToBucketType(key);
+                    return Array.isArray(seriesByKey[bucketType]) && seriesByKey[bucketType].length > 0;
+                },
                 onChange: updateChart,
             });
 

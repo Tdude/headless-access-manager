@@ -326,9 +326,9 @@ class HAM_Admin_Menu
         $ssc_trans = isset($ssc['trans']) ? (int) $ssc['trans'] : 0;
         $ssc_full = isset($ssc['full']) ? (int) $ssc['full'] : 0;
 
-        $time_bucket = isset($_GET['time_bucket']) ? sanitize_text_field(wp_unslash($_GET['time_bucket'])) : 'term';
-        if ($time_bucket !== 'month' && $time_bucket !== 'school_year' && $time_bucket !== 'term') {
-            $time_bucket = 'term';
+        $time_bucket = isset($_GET['time_bucket']) ? sanitize_text_field(wp_unslash($_GET['time_bucket'])) : 'current_term';
+        if ($time_bucket !== 'current_term' && $time_bucket !== 'previous_term' && $time_bucket !== 'school_year' && $time_bucket !== 'hogstadium') {
+            $time_bucket = 'current_term';
         }
 
         ?>
@@ -476,12 +476,14 @@ class HAM_Admin_Menu
                     <div class="postbox-header">
                         <h2 class="hndle">
                             <?php
-                            if ($time_bucket === 'month') {
-                                echo esc_html__('Monthly Evaluations', 'headless-access-manager');
-                            } elseif ($time_bucket === 'school_year') {
+                            if ($time_bucket === 'school_year') {
                                 echo esc_html__('School Year Evaluations', 'headless-access-manager');
+                            } elseif ($time_bucket === 'hogstadium') {
+                                echo esc_html__('L/M/H-stadium Evaluations', 'headless-access-manager');
+                            } elseif ($time_bucket === 'previous_term') {
+                                echo esc_html__('Previous Term Evaluations', 'headless-access-manager');
                             } else {
-                                echo esc_html__('Term Evaluations', 'headless-access-manager');
+                                echo esc_html__('Current Term Evaluations', 'headless-access-manager');
                             }
                             ?>
                         </h2>
@@ -509,36 +511,40 @@ class HAM_Admin_Menu
                                 return '<a href="' . esc_url($url) . '" style="' . esc_attr($style) . '">' . esc_html($label) . '</a>';
                             };
 
-                            echo $make_link('month', __('Month', 'headless-access-manager'));
-                            echo $make_link('term', __('Term', 'headless-access-manager'));
+                            echo $make_link('current_term', __('Current term', 'headless-access-manager'));
+                            echo $make_link('previous_term', __('Previous term', 'headless-access-manager'));
                             echo $make_link('school_year', __('School year', 'headless-access-manager'));
+                            echo $make_link('hogstadium', __('L/M/H-stadium', 'headless-access-manager'));
                             ?>
                         </div>
 
                         <div class="ham-chart-container" style="padding: 20px; text-align: center;">
                             <?php
                             $chartData = array();
-                            if ($time_bucket === 'month') {
-                                $chartData = array_map(function($item) {
-                                    return array(
-                                        'label' => date_i18n('M Y', strtotime($item['month'] . '-01')),
-                                        'count' => $item['count']
-                                    );
-                                }, isset($stats['monthly_submissions']) ? $stats['monthly_submissions'] : array());
-                            } elseif ($time_bucket === 'school_year') {
+                            if ($time_bucket === 'school_year') {
                                 $chartData = array_map(function($item) {
                                     return array(
                                         'label' => isset($item['label']) ? $item['label'] : '',
                                         'count' => $item['count']
                                     );
                                 }, isset($stats['school_year_submissions']) ? $stats['school_year_submissions'] : array());
-                            } else {
+                            } elseif ($time_bucket === 'hogstadium') {
                                 $chartData = array_map(function($item) {
                                     return array(
                                         'label' => isset($item['label']) ? $item['label'] : '',
                                         'count' => $item['count']
                                     );
-                                }, isset($stats['term_submissions']) ? $stats['term_submissions'] : array());
+                                }, isset($stats['hogstadium_submissions']) ? $stats['hogstadium_submissions'] : array());
+                            } else {
+                                $term_series = isset($stats['term_submissions']) && is_array($stats['term_submissions']) ? array_values($stats['term_submissions']) : array();
+                                $idx = ($time_bucket === 'previous_term') ? (count($term_series) - 2) : (count($term_series) - 1);
+                                $one = ($idx >= 0 && isset($term_series[$idx])) ? array($term_series[$idx]) : array();
+                                $chartData = array_map(function($item) {
+                                    return array(
+                                        'label' => isset($item['label']) ? $item['label'] : '',
+                                        'count' => $item['count']
+                                    );
+                                }, $one);
                             }
 
                             if (empty($chartData)) {
