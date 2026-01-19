@@ -767,6 +767,20 @@ msgstr "Svarsalternativ"
 msgid "Previous term"
 msgstr "Förra terminen"
 
+#: templates/admin/assessment-statistics.php:280
+#: templates/admin/assessment-statistics.php:313
+#: templates/admin/assessment-statistics.php:450
+#: templates/admin/assessment-statistics.php:483
+#: templates/admin/assessment-statistics.php:615
+#: templates/admin/assessment-statistics.php:647
+#: templates/admin/assessment-statistics.php:760
+#: templates/admin/assessment-statistics.php:791
+#: templates/admin/assessment-statistics.php:837
+#: inc/admin/admin-menu.php:515
+#: inc/admin/class-ham-assessment-manager.php:3397
+msgid "Current term"
+msgstr "Nuvarande terminen"
+
 #: inc/admin/class-ham-assessment-manager.php:3398
 #: templates/admin/assessment-statistics.php:283
 #: templates/admin/assessment-statistics.php:316
