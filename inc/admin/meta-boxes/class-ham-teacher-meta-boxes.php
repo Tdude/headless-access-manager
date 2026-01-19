@@ -50,7 +50,7 @@ class HAM_Teacher_Meta_Boxes {
 
             add_meta_box(
                 'ham_teacher_school_assignment',
-                __('Assign School', 'headless-access-manager'),
+                __('Assign Schools', 'headless-access-manager'),
                 [__CLASS__, 'render_school_assignment_meta_box'],
                 HAM_CPT_TEACHER,
                 'side',
@@ -85,12 +85,26 @@ class HAM_Teacher_Meta_Boxes {
     public static function render_class_assignment_meta_box($post) {
         wp_nonce_field('ham_teacher_classes_meta_box_nonce', 'ham_teacher_classes_meta_box_nonce');
 
-        // Get classes assigned to this teacher post
-        $assigned_class_ids = get_post_meta($post->ID, '_ham_class_ids', true);
-        $assigned_class_ids = is_array($assigned_class_ids) ? $assigned_class_ids : [];
+        $linked_user_id = get_post_meta($post->ID, '_ham_user_id', true);
+        $linked_user_id = !empty($linked_user_id) ? absint($linked_user_id) : 0;
 
-        // Get the teacher's school ID
-        $teacher_school_id = get_post_meta($post->ID, '_ham_school_id', true);
+        // Get classes assigned to the linked WP user (source of truth)
+        $assigned_class_ids = [];
+        if ($linked_user_id > 0) {
+            $assigned_class_ids = get_user_meta($linked_user_id, HAM_USER_META_CLASS_IDS, true);
+            $assigned_class_ids = is_array($assigned_class_ids) ? array_values(array_filter(array_map('absint', $assigned_class_ids))) : [];
+        }
+
+        // Get the teacher's school IDs
+        $teacher_school_ids = [];
+        if ($linked_user_id > 0) {
+            $teacher_school_ids = get_user_meta($linked_user_id, HAM_USER_META_SCHOOL_IDS, true);
+            if (!is_array($teacher_school_ids) || empty($teacher_school_ids)) {
+                $legacy_school_id = get_user_meta($linked_user_id, HAM_USER_META_SCHOOL_ID, true);
+                $teacher_school_ids = ! empty($legacy_school_id) ? [absint($legacy_school_id)] : [];
+            }
+            $teacher_school_ids = array_values(array_filter(array_map('absint', (array) $teacher_school_ids)));
+        }
 
         $args = [
             'post_type' => HAM_CPT_CLASS,
@@ -100,35 +114,36 @@ class HAM_Teacher_Meta_Boxes {
             'order' => 'ASC',
         ];
 
-        if (!empty($teacher_school_id)) {
+        $all_classes = [];
+        $has_schools = !empty($teacher_school_ids);
+
+        if ($linked_user_id <= 0) {
+            echo '<p style="color: red;">' . esc_html__('This teacher is not linked to a WordPress user yet. Link the user first; assignments are managed on the WordPress user profile.', 'headless-access-manager') . '</p>';
+        }
+
+        if ($has_schools) {
             $args['meta_query'] = [
                 [
                     'key' => '_ham_school_id',
-                    'value' => $teacher_school_id,
-                    'compare' => '=',
+                    'value' => array_map('absint', $teacher_school_ids),
+                    'compare' => 'IN',
                 ],
             ];
+
+            // Get available classes to select from based on args
+            $all_classes = get_posts($args);
+
+            if (empty($all_classes)) {
+                echo '<p>' . esc_html__('No classes found for the selected schools.', 'headless-access-manager') . '</p>';
+            }
         } else {
-            // Optional: Add a message if teacher has no school, or handle as desired
-            // For now, it will list all classes if no school is assigned to the teacher.
-            echo '<p style="color: red;">' . esc_html__('This teacher is not assigned to any school. All classes are listed. Please assign a school to this teacher to see school-specific classes.', 'headless-access-manager') . '</p>';
-        }
-
-        // Get available classes to select from based on args
-        $all_classes = get_posts($args);
-
-        if (empty($all_classes) && !empty($teacher_school_id)) {
-            echo '<p>' . esc_html__('No classes found for the assigned school.', 'headless-access-manager') . '</p>';
-            // Optionally, hide the select dropdown or provide other feedback
-        } elseif (empty($all_classes) && empty($teacher_school_id)) {
-             // This case is partly handled by the message above, but if $args still returns no classes at all.
-            echo '<p>' . esc_html__('No classes found in the system.', 'headless-access-manager') . '</p>';
+            echo '<p style="color: red;">' . esc_html__('This teacher is not assigned to any school yet. Please assign one or more schools first.', 'headless-access-manager') . '</p>';
         }
 
         ?>
         <p>
             <label for="ham_teacher_class_ids"><?php esc_html_e('Assign Classes to this Teacher:', 'headless-access-manager'); ?></label>
-            <select name="ham_teacher_class_ids[]" id="ham_teacher_class_ids" class="widefat" multiple="multiple" style="min-height: 120px;">
+            <select name="ham_teacher_class_ids[]" id="ham_teacher_class_ids" class="widefat" multiple="multiple" style="min-height: 120px;" disabled="disabled">
                 <?php foreach ($all_classes as $class_obj) : 
                     // Get the school name for this class
                     $class_school_id = get_post_meta($class_obj->ID, '_ham_school_id', true);
@@ -146,7 +161,7 @@ class HAM_Teacher_Meta_Boxes {
                 <?php endforeach; ?>
             </select>
         </p>
-        <p class="description"><?php esc_html_e('Hold Ctrl (Windows) or Cmd (Mac) to select multiple Classes.', 'headless-access-manager'); ?></p>
+        <p class="description"><?php esc_html_e('Classes are managed on the linked WordPress user profile.', 'headless-access-manager'); ?></p>
         <?php
     }
 
@@ -158,7 +173,18 @@ class HAM_Teacher_Meta_Boxes {
     public static function render_school_assignment_meta_box($post) {
         wp_nonce_field('ham_teacher_school_meta_box_nonce', 'ham_teacher_school_meta_box_nonce');
 
-        $assigned_school_id = get_post_meta($post->ID, '_ham_school_id', true);
+        $linked_user_id = get_post_meta($post->ID, '_ham_user_id', true);
+        $linked_user_id = !empty($linked_user_id) ? absint($linked_user_id) : 0;
+
+        $assigned_school_ids = [];
+        if ($linked_user_id > 0) {
+            $assigned_school_ids = get_user_meta($linked_user_id, HAM_USER_META_SCHOOL_IDS, true);
+            if (!is_array($assigned_school_ids) || empty($assigned_school_ids)) {
+                $legacy_school_id = get_user_meta($linked_user_id, HAM_USER_META_SCHOOL_ID, true);
+                $assigned_school_ids = ! empty($legacy_school_id) ? [absint($legacy_school_id)] : [];
+            }
+            $assigned_school_ids = array_values(array_filter(array_map('absint', (array) $assigned_school_ids)));
+        }
 
         $all_schools = get_posts([
             'post_type' => HAM_CPT_SCHOOL,
@@ -169,16 +195,16 @@ class HAM_Teacher_Meta_Boxes {
         ]);
         ?>
         <p>
-            <label for="ham_teacher_school_id"><?php esc_html_e('Assign School to this Teacher:', 'headless-access-manager'); ?></label>
-            <select name="ham_teacher_school_id" id="ham_teacher_school_id" class="widefat">
-                <option value=""><?php esc_html_e('-- Select a School --', 'headless-access-manager'); ?></option>
+            <label for="ham_teacher_school_ids"><?php esc_html_e('Assign Schools to this Teacher:', 'headless-access-manager'); ?></label>
+            <select name="ham_teacher_school_ids[]" id="ham_teacher_school_ids" class="widefat" multiple="multiple" style="min-height: 120px;" disabled="disabled">
                 <?php foreach ($all_schools as $school_obj) : ?>
-                    <option value="<?php echo esc_attr($school_obj->ID); ?>" <?php selected($assigned_school_id, $school_obj->ID); ?>>
+                    <option value="<?php echo esc_attr($school_obj->ID); ?>" <?php selected(in_array($school_obj->ID, $assigned_school_ids)); ?>>
                         <?php echo esc_html($school_obj->post_title); ?>
                     </option>
                 <?php endforeach; ?>
             </select>
         </p>
+        <p class="description"><?php esc_html_e('Schools are managed on the linked WordPress user profile.', 'headless-access-manager'); ?></p>
         <?php
     }
 
@@ -276,28 +302,6 @@ class HAM_Teacher_Meta_Boxes {
         }
         if (HAM_CPT_TEACHER !== get_post_type($post_id)) {
             return;
-        }
-
-        // Save assigned class IDs to teacher post meta
-        if (isset($_POST['ham_teacher_classes_meta_box_nonce']) && wp_verify_nonce($_POST['ham_teacher_classes_meta_box_nonce'], 'ham_teacher_classes_meta_box_nonce')) {
-            if (isset($_POST['ham_teacher_class_ids'])) {
-                $class_ids = array_map('absint', (array)$_POST['ham_teacher_class_ids']);
-                update_post_meta($post_id, '_ham_class_ids', $class_ids);
-            } else {
-                delete_post_meta($post_id, '_ham_class_ids');
-            }
-        }
-
-        // Save assigned school ID
-        if (isset($_POST['ham_teacher_school_meta_box_nonce']) && wp_verify_nonce($_POST['ham_teacher_school_meta_box_nonce'], 'ham_teacher_school_meta_box_nonce')) {
-            if (isset($_POST['ham_teacher_school_id'])) {
-                $school_id = sanitize_text_field($_POST['ham_teacher_school_id']);
-                if (!empty($school_id)) {
-                    update_post_meta($post_id, '_ham_school_id', absint($school_id));
-                } else {
-                    delete_post_meta($post_id, '_ham_school_id');
-                }
-            }
         }
 
         // Save linked user ID

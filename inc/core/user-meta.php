@@ -41,12 +41,24 @@ class HAM_User_Meta
             return;
         }
 
-        // Process school ID
-        if (isset($_POST['ham_school_id'])) {
+        // Process school IDs (multi) for teachers; keep ham_school_id for others/backwards compatibility
+        if (isset($_POST['ham_school_ids']) && is_array($_POST['ham_school_ids'])) {
+            $school_ids = array_values(array_filter(array_map('absint', (array) $_POST['ham_school_ids'])));
+
+            if (! empty($school_ids)) {
+                update_user_meta($user_id, HAM_USER_META_SCHOOL_IDS, $school_ids);
+                update_user_meta($user_id, HAM_USER_META_SCHOOL_ID, absint($school_ids[0]));
+            } else {
+                delete_user_meta($user_id, HAM_USER_META_SCHOOL_IDS);
+                delete_user_meta($user_id, HAM_USER_META_SCHOOL_ID);
+            }
+        } elseif (isset($_POST['ham_school_id'])) {
             $school_id = absint($_POST['ham_school_id']);
             if ($school_id > 0) {
+                update_user_meta($user_id, HAM_USER_META_SCHOOL_IDS, [absint($school_id)]);
                 update_user_meta($user_id, HAM_USER_META_SCHOOL_ID, $school_id);
             } else {
+                delete_user_meta($user_id, HAM_USER_META_SCHOOL_IDS);
                 delete_user_meta($user_id, HAM_USER_META_SCHOOL_ID);
             }
         }

@@ -65,6 +65,9 @@ class HAM_Users_Controller extends HAM_Base_Controller
                             'required'          => false,
                             'sanitize_callback' => 'absint',
                         ),
+                        'school_ids' => array(
+                            'required' => false,
+                        ),
                         'class_id'  => array(
                             'required'          => false,
                             'sanitize_callback' => 'absint',
@@ -128,6 +131,9 @@ class HAM_Users_Controller extends HAM_Base_Controller
                             'required'          => false,
                             'sanitize_callback' => 'absint',
                         ),
+                        'school_ids' => array(
+                            'required' => false,
+                        ),
                         'class_ids' => array(
                             'required' => false,
                         ),
@@ -170,6 +176,9 @@ class HAM_Users_Controller extends HAM_Base_Controller
                         'school_id' => array(
                             'required'          => false,
                             'sanitize_callback' => 'absint',
+                        ),
+                        'school_ids' => array(
+                            'required' => false,
                         ),
                         'class_ids' => array(
                             'required' => false,
@@ -222,6 +231,7 @@ class HAM_Users_Controller extends HAM_Base_Controller
     {
         $role      = $request->get_param('role');
         $school_id = $request->get_param('school_id');
+        $school_ids = $request->get_param('school_ids');
         $class_id  = $request->get_param('class_id');
 
         $args = array();
@@ -237,8 +247,32 @@ class HAM_Users_Controller extends HAM_Base_Controller
         // Get users
         $users = get_users($args);
 
+        $resolved_school_ids = [];
+        if (is_array($school_ids)) {
+            $resolved_school_ids = array_values(array_filter(array_map('absint', $school_ids)));
+        }
+
+        // Filter by school_ids if provided
+        if (! empty($resolved_school_ids)) {
+            $filtered_users = array();
+
+            foreach ($users as $user) {
+                $user_school_ids = get_user_meta($user->ID, HAM_USER_META_SCHOOL_IDS, true);
+                if (! is_array($user_school_ids) || empty($user_school_ids)) {
+                    $legacy_school_id = get_user_meta($user->ID, HAM_USER_META_SCHOOL_ID, true);
+                    $user_school_ids = ! empty($legacy_school_id) ? [absint($legacy_school_id)] : [];
+                }
+
+                if (! empty(array_intersect($resolved_school_ids, array_map('absint', $user_school_ids)))) {
+                    $filtered_users[] = $user;
+                }
+            }
+
+            $users = $filtered_users;
+        }
+
         // Filter by school if provided
-        if (! empty($school_id)) {
+        if (! empty($school_id) && empty($resolved_school_ids)) {
             $filtered_users = array();
 
             foreach ($users as $user) {
@@ -428,7 +462,17 @@ class HAM_Users_Controller extends HAM_Base_Controller
         $role      = $request->get_param('role');
         $name      = $request->get_param('name');
         $school_id = $request->get_param('school_id');
+        $school_ids = $request->get_param('school_ids');
         $class_ids = $request->get_param('class_ids');
+
+        $resolved_school_ids = [];
+        if (is_array($school_ids)) {
+            $resolved_school_ids = array_values(array_filter(array_map('absint', $school_ids)));
+        } elseif (! empty($school_id)) {
+            $resolved_school_ids = [absint($school_id)];
+        }
+
+        $resolved_school_id = !empty($resolved_school_ids) ? absint($resolved_school_ids[0]) : 0;
 
         // Validate role
         if (! in_array($role, HAM_Roles::get_all_roles())) {
@@ -439,16 +483,18 @@ class HAM_Users_Controller extends HAM_Base_Controller
             );
         }
 
-        // Validate school ID
-        if (! empty($school_id)) {
-            $school = get_post($school_id);
+        // Validate school IDs
+        if (! empty($resolved_school_ids)) {
+            foreach ($resolved_school_ids as $sid) {
+                $school = get_post($sid);
 
-            if (! $school || $school->post_type !== HAM_CPT_SCHOOL) {
-                return new WP_Error(
-                    'ham_rest_invalid_school',
-                    __('Invalid school ID.', 'headless-access-manager'),
-                    array( 'status' => 400 )
-                );
+                if (! $school || $school->post_type !== HAM_CPT_SCHOOL) {
+                    return new WP_Error(
+                        'ham_rest_invalid_school',
+                        __('Invalid school ID.', 'headless-access-manager'),
+                        array( 'status' => 400 )
+                    );
+                }
             }
         }
 
@@ -488,8 +534,12 @@ class HAM_Users_Controller extends HAM_Base_Controller
         }
 
         // Set school and class metadata
-        if (! empty($school_id)) {
-            update_user_meta($user_id, HAM_USER_META_SCHOOL_ID, $school_id);
+        if (! empty($resolved_school_ids)) {
+            update_user_meta($user_id, HAM_USER_META_SCHOOL_IDS, $resolved_school_ids);
+        }
+
+        if (! empty($resolved_school_id)) {
+            update_user_meta($user_id, HAM_USER_META_SCHOOL_ID, $resolved_school_id);
         }
 
         if (! empty($class_ids) && is_array($class_ids)) {
@@ -620,8 +670,35 @@ class HAM_Users_Controller extends HAM_Base_Controller
         }
 
         // Update school and class metadata
-        if (isset($school_id)) {
+        if (isset($school_ids)) {
+            if (empty($school_ids) || ! is_array($school_ids)) {
+                delete_user_meta($user_id, HAM_USER_META_SCHOOL_IDS);
+                delete_user_meta($user_id, HAM_USER_META_SCHOOL_ID);
+            } else {
+                $resolved_school_ids = array_values(array_filter(array_map('absint', $school_ids)));
+
+                foreach ($resolved_school_ids as $sid) {
+                    $school = get_post($sid);
+
+                    if (! $school || $school->post_type !== HAM_CPT_SCHOOL) {
+                        return new WP_Error(
+                            'ham_rest_invalid_school',
+                            __('Invalid school ID.', 'headless-access-manager'),
+                            array( 'status' => 400 )
+                        );
+                    }
+                }
+
+                update_user_meta($user_id, HAM_USER_META_SCHOOL_IDS, $resolved_school_ids);
+                if (!empty($resolved_school_ids)) {
+                    update_user_meta($user_id, HAM_USER_META_SCHOOL_ID, absint($resolved_school_ids[0]));
+                } else {
+                    delete_user_meta($user_id, HAM_USER_META_SCHOOL_ID);
+                }
+            }
+        } elseif (isset($school_id)) {
             if (empty($school_id)) {
+                delete_user_meta($user_id, HAM_USER_META_SCHOOL_IDS);
                 delete_user_meta($user_id, HAM_USER_META_SCHOOL_ID);
             } else {
                 $school = get_post($school_id);
@@ -634,6 +711,7 @@ class HAM_Users_Controller extends HAM_Base_Controller
                     );
                 }
 
+                update_user_meta($user_id, HAM_USER_META_SCHOOL_IDS, [absint($school_id)]);
                 update_user_meta($user_id, HAM_USER_META_SCHOOL_ID, $school_id);
             }
         }
@@ -732,6 +810,7 @@ class HAM_Users_Controller extends HAM_Base_Controller
 
         // Add HAM-specific user data
         $data['school_id'] = get_user_meta($user->ID, HAM_USER_META_SCHOOL_ID, true);
+        $data['school_ids'] = get_user_meta($user->ID, HAM_USER_META_SCHOOL_IDS, true);
         $data['class_ids'] = get_user_meta($user->ID, HAM_USER_META_CLASS_IDS, true);
 
         if (in_array(HAM_ROLE_SCHOOL_HEAD, (array) $user->roles, true)) {

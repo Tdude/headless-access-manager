@@ -74,6 +74,8 @@ if (isset($stats) && is_array($stats) && isset($stats['question_averages']) && i
             <h2><?php echo esc_html__('Evaluation Drilldown', 'headless-access-manager'); ?></h2>
 
             <div id="ham-stats-postboxes-drilldown" class="metabox-holder ham-stats-postboxes" data-page="ham-assessment-stats">
+                <?php wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false); ?>
+                <?php wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false); ?>
                 <div class="postbox-container">
                     <div class="meta-box-sortables ui-sortable">
 

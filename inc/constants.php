@@ -34,6 +34,7 @@ define('HAM_ROLE_SCHOOL_HEAD', 'ham_school_head');
 
 // User meta keys
 define('HAM_USER_META_SCHOOL_ID', '_ham_school_id');
+define('HAM_USER_META_SCHOOL_IDS', '_ham_school_ids');
 define('HAM_USER_META_CLASS_IDS', '_ham_class_ids');
 define('HAM_USER_META_MANAGED_SCHOOL_IDS', '_ham_managed_school_ids');
 

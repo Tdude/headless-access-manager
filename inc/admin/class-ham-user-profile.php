@@ -24,6 +24,8 @@ class HAM_User_Profile
      */
     public function __construct()
     {
+        add_action('admin_init', array( $this, 'remove_admin_color_scheme_picker' ));
+
         // Add user profile fields
         add_action('show_user_profile', array( $this, 'add_user_profile_fields' ));
         add_action('edit_user_profile', array( $this, 'add_user_profile_fields' ));
@@ -39,6 +41,21 @@ class HAM_User_Profile
         // Make HAM columns sortable
         add_filter('manage_users_sortable_columns', array( $this, 'make_ham_columns_sortable' ));
         add_action('pre_get_users', array( $this, 'sort_users_by_ham_columns' ));
+    }
+
+    public function remove_admin_color_scheme_picker()
+    {
+        global $pagenow;
+
+        if (! is_admin()) {
+            return;
+        }
+
+        if (! in_array($pagenow, array('user-edit.php', 'profile.php'), true)) {
+            return;
+        }
+
+        remove_action('admin_color_scheme_picker', 'admin_color_scheme_picker');
     }
 
     /**
@@ -135,8 +152,17 @@ class HAM_User_Profile
 
         // Get current values
         $school_id = get_user_meta($user->ID, HAM_USER_META_SCHOOL_ID, true);
+        $school_ids = get_user_meta($user->ID, HAM_USER_META_SCHOOL_IDS, true);
         $class_ids = get_user_meta($user->ID, HAM_USER_META_CLASS_IDS, true);
         $managed_school_ids = get_user_meta($user->ID, HAM_USER_META_MANAGED_SCHOOL_IDS, true);
+
+        if (!is_array($school_ids)) {
+            $school_ids = [];
+        }
+
+        if (empty($school_ids) && !empty($school_id)) {
+            $school_ids = [absint($school_id)];
+        }
 
         // Get schools and classes
         $schools = ham_get_schools();
@@ -158,18 +184,42 @@ class HAM_User_Profile
         ?>
 <h2><?php echo esc_html__('Headless Access Manager', 'headless-access-manager'); ?></h2>
 <table class="form-table">
+    <?php if ($is_teacher) : ?>
+    <tr>
+        <th></th>
+        <td>
+            <p>
+                <?php echo esc_html__('Teachers: manage School(s) and Class(es) assignments here. These assignments control which students the teacher can access. The Teacher post (CPT) only links to the WordPress user and displays assignments for reference.', 'headless-access-manager'); ?>
+            </p>
+        </td>
+    </tr>
+    <?php endif; ?>
     <?php if ($show_school_field) : ?>
     <tr>
-        <th><label for="ham_school_id"><?php echo esc_html__('School', 'headless-access-manager'); ?></label></th>
+        <th><label for="ham_school_ids"><?php echo esc_html__('School', 'headless-access-manager'); ?></label></th>
         <td>
-            <select name="ham_school_id" id="ham_school_id">
-                <option value=""><?php echo esc_html__('— Select School —', 'headless-access-manager'); ?></option>
-                <?php foreach ($schools as $school) : ?>
-                <option value="<?php echo esc_attr($school->ID); ?>" <?php selected($school_id, $school->ID); ?>>
-                    <?php echo esc_html($school->post_title); ?>
-                </option>
-                <?php endforeach; ?>
-            </select>
+            <?php if ($is_teacher) : ?>
+                <select name="ham_school_ids[]" id="ham_school_ids" multiple style="min-width: 300px; height: 150px;">
+                    <?php foreach ($schools as $school) : ?>
+                    <?php $selected = is_array($school_ids) && in_array($school->ID, $school_ids); ?>
+                    <option value="<?php echo esc_attr($school->ID); ?>" <?php selected($selected); ?>>
+                        <?php echo esc_html($school->post_title); ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+                <p class="description">
+                    <?php echo esc_html__('Hold Ctrl/Cmd key to select multiple schools', 'headless-access-manager'); ?>
+                </p>
+            <?php else : ?>
+                <select name="ham_school_id" id="ham_school_id">
+                    <option value=""><?php echo esc_html__('— Select School —', 'headless-access-manager'); ?></option>
+                    <?php foreach ($schools as $school) : ?>
+                    <option value="<?php echo esc_attr($school->ID); ?>" <?php selected($school_id, $school->ID); ?>>
+                        <?php echo esc_html($school->post_title); ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            <?php endif; ?>
         </td>
     </tr>
     <?php endif; ?>
@@ -279,29 +329,78 @@ class HAM_User_Profile
             return false;
         }
 
-        // Update school ID
-        if (isset($_POST['ham_school_id'])) {
+        // Update school IDs (multi) for teachers; keep school_id for others
+        $schools_for_sync = null;
+        if (isset($_POST['ham_school_ids']) && is_array($_POST['ham_school_ids'])) {
+            $school_ids = array_values(array_filter(array_map('absint', (array) $_POST['ham_school_ids'])));
+
+            if (!empty($school_ids)) {
+                update_user_meta($user_id, HAM_USER_META_SCHOOL_IDS, $school_ids);
+                update_user_meta($user_id, HAM_USER_META_SCHOOL_ID, absint($school_ids[0]));
+                $schools_for_sync = $school_ids;
+            } else {
+                delete_user_meta($user_id, HAM_USER_META_SCHOOL_IDS);
+                delete_user_meta($user_id, HAM_USER_META_SCHOOL_ID);
+                $schools_for_sync = [];
+            }
+        } elseif (isset($_POST['ham_school_id'])) {
             $school_id = absint($_POST['ham_school_id']);
 
             if ($school_id > 0) {
+                update_user_meta($user_id, HAM_USER_META_SCHOOL_IDS, [absint($school_id)]);
                 update_user_meta($user_id, HAM_USER_META_SCHOOL_ID, $school_id);
+                $schools_for_sync = [absint($school_id)];
             } else {
+                delete_user_meta($user_id, HAM_USER_META_SCHOOL_IDS);
                 delete_user_meta($user_id, HAM_USER_META_SCHOOL_ID);
+                $schools_for_sync = [];
             }
         }
 
         // Update class IDs
+        $classes_for_sync = null;
         if (isset($_POST['ham_class_ids']) && is_array($_POST['ham_class_ids'])) {
             $class_ids = array_map('absint', $_POST['ham_class_ids']);
             $class_ids = array_filter($class_ids);
 
             if (! empty($class_ids)) {
                 update_user_meta($user_id, HAM_USER_META_CLASS_IDS, $class_ids);
+                $classes_for_sync = array_values($class_ids);
             } else {
                 delete_user_meta($user_id, HAM_USER_META_CLASS_IDS);
+                $classes_for_sync = [];
             }
         } else {
             delete_user_meta($user_id, HAM_USER_META_CLASS_IDS);
+            $classes_for_sync = [];
+        }
+
+        // If this is a teacher user, sync to linked Teacher CPT post meta (one-way)
+        if (in_array(HAM_ROLE_TEACHER, (array) $user->roles) && (is_array($schools_for_sync) || is_array($classes_for_sync))) {
+            $teacher_post_id = null;
+            if (class_exists('HAM_Teacher_Controller') && method_exists('HAM_Teacher_Controller', 'get_teacher_by_user_id')) {
+                $teacher_post_id = HAM_Teacher_Controller::get_teacher_by_user_id($user_id);
+            }
+
+            if (! empty($teacher_post_id)) {
+                if (is_array($schools_for_sync)) {
+                    if (! empty($schools_for_sync)) {
+                        update_post_meta($teacher_post_id, '_ham_school_ids', $schools_for_sync);
+                        update_post_meta($teacher_post_id, '_ham_school_id', absint($schools_for_sync[0]));
+                    } else {
+                        delete_post_meta($teacher_post_id, '_ham_school_ids');
+                        delete_post_meta($teacher_post_id, '_ham_school_id');
+                    }
+                }
+
+                if (is_array($classes_for_sync)) {
+                    if (! empty($classes_for_sync)) {
+                        update_post_meta($teacher_post_id, '_ham_class_ids', $classes_for_sync);
+                    } else {
+                        delete_post_meta($teacher_post_id, '_ham_class_ids');
+                    }
+                }
+            }
         }
 
         // Update managed school IDs
@@ -373,11 +472,23 @@ class HAM_User_Profile
                         case HAM_ROLE_STUDENT:
                         case HAM_ROLE_TEACHER:
                         case HAM_ROLE_PRINCIPAL:
-                            $school_id = get_user_meta($user_id, HAM_USER_META_SCHOOL_ID, true);
+                            $school_ids = get_user_meta($user_id, HAM_USER_META_SCHOOL_IDS, true);
+                            if (is_array($school_ids) && !empty($school_ids)) {
+                                $schools = array();
+                                foreach ($school_ids as $sid) {
+                                    $school = get_post($sid);
+                                    if ($school) {
+                                        $schools[] = $school->post_title;
+                                    }
+                                }
+                                if (!empty($schools)) {
+                                    return implode(', ', $schools);
+                                }
+                            }
 
+                            $school_id = get_user_meta($user_id, HAM_USER_META_SCHOOL_ID, true);
                             if ($school_id) {
                                 $school = get_post($school_id);
-
                                 if ($school) {
                                     return $school->post_title;
                                 }

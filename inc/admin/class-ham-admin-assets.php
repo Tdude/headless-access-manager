@@ -55,21 +55,7 @@ class HAM_Admin_Assets {
                 ],
             ];
 
-            if (HAM_CPT_TEACHER === $post_type) {
-                wp_enqueue_script(
-                    'ham-dynamic-select-populator',
-                    HAM_PLUGIN_URL . 'assets/js/ham-dynamic-select-populator.js',
-                    ['jquery'],
-                    HAM_VERSION,
-                    true
-                );
-                $teacher_config = array_merge($common_populator_config, [
-                    'triggerSelector' => '#ham_teacher_school_id',
-                    'targetSelector' => '#ham_teacher_class_ids',
-                    'debug' => defined('WP_DEBUG') && WP_DEBUG, // Enable debug only if WP_DEBUG is true
-                ]);
-                wp_add_inline_script('ham-dynamic-select-populator', 'jQuery(document).ready(function($) { HAM.dynamicSelectPopulator(' . wp_json_encode($teacher_config) . '); });', 'after');
-            } elseif (HAM_CPT_STUDENT === $post_type) {
+            if (HAM_CPT_STUDENT === $post_type) {
                 wp_enqueue_script(
                     'ham-dynamic-select-populator',
                     HAM_PLUGIN_URL . 'assets/js/ham-dynamic-select-populator.js',

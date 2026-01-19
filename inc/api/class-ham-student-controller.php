@@ -315,13 +315,24 @@ class HAM_Student_Controller extends HAM_Base_Controller
             }
         }
         
-        // Get the teacher's assigned classes
-        $assigned_class_ids = get_post_meta($teacher_id, '_ham_class_ids', true);
-        $assigned_class_ids = is_array($assigned_class_ids) ? array_filter(array_map('intval', $assigned_class_ids)) : [];
+        // WP Users are the source of truth for teacher assignments
+        $teacher_user_id = get_post_meta($teacher_id, '_ham_user_id', true);
+        $teacher_user_id = !empty($teacher_user_id) ? absint($teacher_user_id) : 0;
 
-        // Get the teacher's assigned school
-        $assigned_school_id = get_post_meta($teacher_id, '_ham_school_id', true);
-        $assigned_school_id = !empty($assigned_school_id) ? intval($assigned_school_id) : null;
+        $assigned_class_ids = [];
+        $assigned_school_ids = [];
+
+        if ($teacher_user_id > 0) {
+            $assigned_class_ids = get_user_meta($teacher_user_id, HAM_USER_META_CLASS_IDS, true);
+            $assigned_class_ids = is_array($assigned_class_ids) ? array_values(array_filter(array_map('absint', $assigned_class_ids))) : [];
+
+            $assigned_school_ids = get_user_meta($teacher_user_id, HAM_USER_META_SCHOOL_IDS, true);
+            if (! is_array($assigned_school_ids) || empty($assigned_school_ids)) {
+                $legacy_school_id = get_user_meta($teacher_user_id, HAM_USER_META_SCHOOL_ID, true);
+                $assigned_school_ids = ! empty($legacy_school_id) ? [absint($legacy_school_id)] : [];
+            }
+            $assigned_school_ids = array_values(array_filter(array_map('absint', (array) $assigned_school_ids)));
+        }
         
         $accessible_student_ids = [];
         
@@ -345,22 +356,6 @@ class HAM_Student_Controller extends HAM_Base_Controller
                 'post_status'    => 'publish',
                 'posts_per_page' => -1,
                 'post__in'       => $accessible_student_ids,
-                'orderby'        => 'title',
-                'order'          => 'ASC',
-            ]);
-        } elseif ($assigned_school_id) {
-            // Priority 2: Get students from assigned school if no classes
-            $student_query = new WP_Query([
-                'post_type'      => HAM_CPT_STUDENT,
-                'post_status'    => 'publish',
-                'posts_per_page' => -1,
-                'meta_query'     => [
-                    [
-                        'key'     => '_ham_school_id',
-                        'value'   => $assigned_school_id,
-                        'compare' => '=',
-                    ],
-                ],
                 'orderby'        => 'title',
                 'order'          => 'ASC',
             ]);
