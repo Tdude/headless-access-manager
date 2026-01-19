@@ -779,7 +779,7 @@ msgstr "Förra terminen"
 #: inc/admin/admin-menu.php:515
 #: inc/admin/class-ham-assessment-manager.php:3397
 msgid "Current term"
-msgstr "Nuvarande terminen"
+msgstr "Nuvarande termin"
 
 #: inc/admin/class-ham-assessment-manager.php:3398
 #: templates/admin/assessment-statistics.php:283
