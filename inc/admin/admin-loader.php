@@ -49,6 +49,89 @@ class HAM_Admin_Loader
         }
     }
 
+    public static function maybe_backfill_teacher_user_assignments()
+    {
+        if (! is_admin()) {
+            return;
+        }
+
+        if (! current_user_can('manage_options')) {
+            return;
+        }
+
+        $force = isset($_GET['ham_backfill_teacher_assignments']) && $_GET['ham_backfill_teacher_assignments'] === '1';
+        $option_key = 'ham_backfill_teacher_user_assignments_v1_done';
+
+        if (! $force && get_option($option_key)) {
+            return;
+        }
+
+        $teacher_ids = get_posts([
+            'post_type' => HAM_CPT_TEACHER,
+            'posts_per_page' => -1,
+            'post_status' => 'any',
+            'fields' => 'ids',
+            'meta_query' => [
+                [
+                    'key' => '_ham_user_id',
+                    'compare' => 'EXISTS',
+                ],
+            ],
+        ]);
+
+        if (! is_array($teacher_ids) || empty($teacher_ids)) {
+            update_option($option_key, 1, false);
+            return;
+        }
+
+        foreach ($teacher_ids as $teacher_id) {
+            $linked_user_id = get_post_meta($teacher_id, '_ham_user_id', true);
+            $linked_user_id = ! empty($linked_user_id) ? absint($linked_user_id) : 0;
+
+            if ($linked_user_id <= 0) {
+                continue;
+            }
+
+            $user = get_user_by('id', $linked_user_id);
+            if (! $user || ! in_array(HAM_ROLE_TEACHER, (array) $user->roles, true)) {
+                continue;
+            }
+
+            // Schools
+            $existing_school_ids = get_user_meta($linked_user_id, HAM_USER_META_SCHOOL_IDS, true);
+            $has_school_ids = is_array($existing_school_ids) && ! empty(array_filter($existing_school_ids));
+
+            if (! $has_school_ids) {
+                $school_ids = get_post_meta($teacher_id, '_ham_school_ids', true);
+                if (! is_array($school_ids) || empty($school_ids)) {
+                    $legacy_school_id = get_post_meta($teacher_id, '_ham_school_id', true);
+                    $school_ids = ! empty($legacy_school_id) ? [absint($legacy_school_id)] : [];
+                }
+                $school_ids = array_values(array_filter(array_map('absint', (array) $school_ids)));
+
+                if (! empty($school_ids)) {
+                    update_user_meta($linked_user_id, HAM_USER_META_SCHOOL_IDS, $school_ids);
+                    update_user_meta($linked_user_id, HAM_USER_META_SCHOOL_ID, absint($school_ids[0]));
+                }
+            }
+
+            // Classes
+            $existing_class_ids = get_user_meta($linked_user_id, HAM_USER_META_CLASS_IDS, true);
+            $has_class_ids = is_array($existing_class_ids) && ! empty(array_filter($existing_class_ids));
+
+            if (! $has_class_ids) {
+                $class_ids = get_post_meta($teacher_id, '_ham_class_ids', true);
+                $class_ids = is_array($class_ids) ? array_values(array_filter(array_map('absint', $class_ids))) : [];
+
+                if (! empty($class_ids)) {
+                    update_user_meta($linked_user_id, HAM_USER_META_CLASS_IDS, $class_ids);
+                }
+            }
+        }
+
+        update_option($option_key, 1, false);
+    }
+
     /**
      * Enqueue Select2 for class CPT edit screens.
      */
@@ -119,6 +202,9 @@ class HAM_Admin_Loader
         add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue_cpt_theming_styles'));
 
         add_action('admin_bar_menu', array(__CLASS__, 'fix_admin_bar_logo_link'), 1);
+
+        // One-time backfill: sync teacher assignments from Teacher CPT meta -> WP user meta
+        add_action('admin_init', array(__CLASS__, 'maybe_backfill_teacher_user_assignments'));
 
         // Class CPT Meta Boxes (already refactored)
         add_action('add_meta_boxes_' . HAM_CPT_CLASS, ['HAM_Class_Meta_Boxes', 'register_meta_boxes']);
